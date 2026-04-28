@@ -1,0 +1,33 @@
+{
+  "name": "claude-skills",
+  "owner": {
+    "name": "Matheus Malagris",
+    "url": "https://github.com/mqmalagris"
+  },
+  "metadata": {
+    "description": "Curated Claude Code skills — software engineering coaching and beyond.",
+    "version": "0.1.0"
+  },
+  "plugins": [
+    {
+      "name": "swe-compass",
+      "source": "./swe-compass",
+      "description": "Multi-mode software engineering coach: architect, advisor, reviewer, refactor, and concept explainer. Stack-agnostic by default.",
+      "version": "0.1.0",
+      "author": {
+        "name": "Matheus Malagris"
+      },
+      "category": "development",
+      "keywords": [
+        "software-engineering",
+        "architecture",
+        "design-patterns",
+        "solid",
+        "code-review",
+        "refactoring",
+        "tdd",
+        "devops"
+      ]
+    }
+  ]
+}

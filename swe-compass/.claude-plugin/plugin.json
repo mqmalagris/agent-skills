@@ -1,0 +1,23 @@
+{
+  "name": "swe-compass",
+  "version": "0.1.0",
+  "description": "Multi-mode software engineering coach for Claude Code: architect, advisor, reviewer, refactor, and concept explainer. Stack-agnostic by default — discusses stack with the user, defers to the user's choice, then optimizes patterns and structure for that stack.",
+  "author": {
+    "name": "Matheus Malagris",
+    "url": "https://github.com/mqmalagris"
+  },
+  "homepage": "https://github.com/mqmalagris/claude-skills/tree/main/swe-compass",
+  "repository": "https://github.com/mqmalagris/claude-skills",
+  "license": "MIT",
+  "keywords": [
+    "software-engineering",
+    "architecture",
+    "design-patterns",
+    "solid",
+    "code-review",
+    "refactoring",
+    "tdd",
+    "devops",
+    "system-design"
+  ]
+}

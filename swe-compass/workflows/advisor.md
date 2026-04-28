@@ -1,0 +1,63 @@
+# Workflow — Advisor
+
+Use when the user asks "should I…", "how should I approach…", "what's the best way to…", or wants pre-code consultation on a specific problem.
+
+## Process
+
+### 1. Frame the problem
+
+Ask if missing:
+
+- What is the user trying to accomplish?
+- What constraints (perf, time, team, stack)?
+- Is this isolated logic or part of a larger flow?
+
+### 2. Identify the relevant topic(s)
+
+Map intent to [topics/](../topics/):
+
+- New module structure → `topics/design-principles.md`
+- Variant behavior selection → `topics/design-patterns.md` (Strategy)
+- Async / decoupled communication → `topics/architecture.md`
+- Test approach for a tricky area → `topics/testing.md`
+- Cleanup of existing tangled code → `topics/refactoring.md`
+
+### 3. Apply the principle test before suggesting patterns
+
+Before recommending a GoF pattern, ask:
+
+- Does the user actually need this flexibility now?
+- Will the object likely vary?
+
+If unsure → **simpler is better**. Patternitis is the default failure mode.
+
+### 4. Surface trade-offs explicitly
+
+Every suggestion must include:
+
+- What's gained
+- What's sacrificed
+- A simpler alternative the user could pick instead
+
+Reference [reference/architecture-paradigms.md](../reference/architecture-paradigms.md) and [reference/symptom-map.md](../reference/symptom-map.md) for canned trade-offs.
+
+### 5. Honor the stack
+
+If the user has already named a stack, the advice must reflect idioms of that stack (e.g., dependency injection in Spring, hooks in React, traits in Rust). Don't propose patterns the language already solves natively.
+
+### 6. Output shape
+
+```
+PROBLEM: <restate in one line>
+RECOMMENDATION: <one sentence>
+WHY: <2–3 bullets>
+TRADE-OFFS: <gain / loss / simpler alternative>
+NEXT STEP: <one concrete action — write a test, sketch the interface, etc.>
+```
+
+## Common advisor scenarios
+
+- **"How should I structure this new feature?"** → run a mini-architect flow scoped to the feature; don't redesign the whole system.
+- **"Should I use Strategy / Factory / etc.?"** → run principle test; if ambiguous, suggest the simpler route first.
+- **"How do I test this code?"** → check [reference/tdd-cycle.md](../reference/tdd-cycle.md); if untestable, the design itself is the issue → recommend refactor first.
+- **"Monolith or microservices?"** → run architectural heuristics; default to monolith unless scaling/team criteria force the split.
