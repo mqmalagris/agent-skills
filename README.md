@@ -27,7 +27,7 @@ That registers the marketplace and installs the chosen skill into your local Cla
 Each skill self-describes its triggers in its own README. For `swe-compass`, the typical triggers are:
 
 ```text
-/swe-compass me ajude a arquitetar X
+/swe-compass help me architect X
 /swe-compass review this code: <paste>
 /swe-compass refactor this <function>
 /swe-compass explain SOLID
