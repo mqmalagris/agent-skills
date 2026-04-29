@@ -29,7 +29,7 @@ Language-specific code best practices and idiom reference. Complements `swe-comp
 | Hono (4.x) | [frameworks/hono.md](frameworks/hono.md) | shipped |
 | Cloudflare Workers | [frameworks/cloudflare-workers.md](frameworks/cloudflare-workers.md) | shipped |
 | Astro (4 / 5 / 6) | [frameworks/astro.md](frameworks/astro.md) | shipped |
-| Svelte (4 / 5) | `frameworks/svelte.md` | planned |
+| Svelte 5 | [frameworks/svelte.md](frameworks/svelte.md) | shipped |
 | Drizzle ORM | `frameworks/drizzle.md` | planned |
 | AWS Lambda + SAM | `frameworks/aws-lambda.md` | planned |
 | Tailwind CSS (v4) | `languages/tailwind.md` | planned |

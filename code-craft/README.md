@@ -24,6 +24,7 @@ Two modes:
 | Hono (4.x) | ~55 | [`frameworks/hono.md`](frameworks/hono.md) |
 | Cloudflare Workers | ~75 | [`frameworks/cloudflare-workers.md`](frameworks/cloudflare-workers.md) |
 | Astro (4 / 5 / 6) | ~80 | [`frameworks/astro.md`](frameworks/astro.md) |
+| Svelte 5 | ~65 | [`frameworks/svelte.md`](frameworks/svelte.md) |
 
 Every rule has: short name, one-sentence rule, one-line reason, 3–10 line wrong-vs-right example. Source citations only on debated rules (enums vs unions, `@extend`, `forwardRef` migration, BEM alternatives, etc.).
 
