@@ -25,6 +25,7 @@ Two modes:
 | Cloudflare Workers | ~75 | [`frameworks/cloudflare-workers.md`](frameworks/cloudflare-workers.md) |
 | Astro (4 / 5 / 6) | ~80 | [`frameworks/astro.md`](frameworks/astro.md) |
 | Svelte 5 | ~65 | [`frameworks/svelte.md`](frameworks/svelte.md) |
+| Drizzle ORM (Postgres / MySQL / SQLite / D1) | ~60 | [`frameworks/drizzle.md`](frameworks/drizzle.md) |
 
 Every rule has: short name, one-sentence rule, one-line reason, 3–10 line wrong-vs-right example. Source citations only on debated rules (enums vs unions, `@extend`, `forwardRef` migration, BEM alternatives, etc.).
 

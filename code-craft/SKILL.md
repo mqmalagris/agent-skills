@@ -30,7 +30,7 @@ Language-specific code best practices and idiom reference. Complements `swe-comp
 | Cloudflare Workers | [frameworks/cloudflare-workers.md](frameworks/cloudflare-workers.md) | shipped |
 | Astro (4 / 5 / 6) | [frameworks/astro.md](frameworks/astro.md) | shipped |
 | Svelte 5 | [frameworks/svelte.md](frameworks/svelte.md) | shipped |
-| Drizzle ORM | `frameworks/drizzle.md` | planned |
+| Drizzle ORM | [frameworks/drizzle.md](frameworks/drizzle.md) | shipped |
 | AWS Lambda + SAM | `frameworks/aws-lambda.md` | planned |
 | Tailwind CSS (v4) | `languages/tailwind.md` | planned |
 | Supabase patterns | `frameworks/supabase.md` | planned |
