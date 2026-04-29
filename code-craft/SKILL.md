@@ -28,7 +28,7 @@ Language-specific code best practices and idiom reference. Complements `swe-comp
 | React Native + Expo (SDK 53/54+) | [frameworks/react-native-expo.md](frameworks/react-native-expo.md) | shipped |
 | Hono (4.x) | [frameworks/hono.md](frameworks/hono.md) | shipped |
 | Cloudflare Workers | [frameworks/cloudflare-workers.md](frameworks/cloudflare-workers.md) | shipped |
-| Astro | `frameworks/astro.md` | planned |
+| Astro (4 / 5 / 6) | [frameworks/astro.md](frameworks/astro.md) | shipped |
 | Svelte (4 / 5) | `frameworks/svelte.md` | planned |
 | Drizzle ORM | `frameworks/drizzle.md` | planned |
 | AWS Lambda + SAM | `frameworks/aws-lambda.md` | planned |
