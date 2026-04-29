@@ -3,6 +3,9 @@
 **/_drafts/
 **/.notes/
 
+# Claude Code local indexes
+.leankg/
+
 # OS / editor
 .DS_Store
 Thumbs.db

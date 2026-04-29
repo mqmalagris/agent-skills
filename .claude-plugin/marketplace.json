@@ -28,6 +28,30 @@
         "tdd",
         "devops"
       ]
+    },
+    {
+      "name": "code-craft",
+      "source": "./code-craft",
+      "description": "Language-specific code best practices and idioms — complementary to swe-compass. Reader and reviewer modes. Ships TypeScript, Rust, CSS/SASS, React, Next.js, React Native + Expo, and Hono references.",
+      "version": "0.1.0",
+      "author": {
+        "name": "Matheus Malagris"
+      },
+      "category": "development",
+      "keywords": [
+        "code-review",
+        "best-practices",
+        "idioms",
+        "typescript",
+        "rust",
+        "react",
+        "nextjs",
+        "react-native",
+        "expo",
+        "hono",
+        "css",
+        "sass"
+      ]
     }
   ]
 }

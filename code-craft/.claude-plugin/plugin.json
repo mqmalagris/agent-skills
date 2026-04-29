@@ -1,0 +1,26 @@
+{
+  "name": "code-craft",
+  "version": "0.1.0",
+  "description": "Language-specific code best practices and idioms for Claude Code — complementary to swe-compass (stack-agnostic architecture coach). Two modes: reader (rule + reason + example for a topic) and reviewer (apply rules to user code, flag violations with fixes). Currently ships TypeScript, Rust, and CSS/SASS language references and React, Next.js, React Native + Expo, and Hono framework references.",
+  "author": {
+    "name": "Matheus Malagris",
+    "url": "https://github.com/mqmalagris"
+  },
+  "homepage": "https://github.com/mqmalagris/claude-skills/tree/main/code-craft",
+  "repository": "https://github.com/mqmalagris/claude-skills",
+  "license": "MIT",
+  "keywords": [
+    "code-review",
+    "best-practices",
+    "idioms",
+    "typescript",
+    "rust",
+    "react",
+    "nextjs",
+    "react-native",
+    "expo",
+    "hono",
+    "css",
+    "sass"
+  ]
+}
