@@ -27,6 +27,7 @@ Two modes:
 | Svelte 5 | ~65 | [`frameworks/svelte.md`](frameworks/svelte.md) |
 | Drizzle ORM (Postgres / MySQL / SQLite / D1) | ~60 | [`frameworks/drizzle.md`](frameworks/drizzle.md) |
 | Tailwind CSS (v4) | ~60 | [`languages/tailwind.md`](languages/tailwind.md) |
+| Supabase (Auth, Postgres + RLS, Realtime, Storage, Edge Functions) | ~60 | [`frameworks/supabase.md`](frameworks/supabase.md) |
 
 Every rule has: short name, one-sentence rule, one-line reason, 3–10 line wrong-vs-right example. Source citations only on debated rules (enums vs unions, `@extend`, `forwardRef` migration, BEM alternatives, etc.).
 

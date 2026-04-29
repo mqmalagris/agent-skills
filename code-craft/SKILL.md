@@ -32,8 +32,8 @@ Language-specific code best practices and idiom reference. Complements `swe-comp
 | Svelte 5 | [frameworks/svelte.md](frameworks/svelte.md) | shipped |
 | Drizzle ORM | [frameworks/drizzle.md](frameworks/drizzle.md) | shipped |
 | Tailwind CSS (v4) | [languages/tailwind.md](languages/tailwind.md) | shipped |
+| Supabase | [frameworks/supabase.md](frameworks/supabase.md) | shipped |
 | AWS Lambda + SAM | `frameworks/aws-lambda.md` | planned |
-| Supabase patterns | `frameworks/supabase.md` | planned |
 | Dart | `languages/dart.md` | planned |
 | Flutter | `frameworks/flutter.md` | planned (paired with Dart) |
 | Go | `languages/go.md` | planned |
