@@ -34,7 +34,7 @@ Language-specific code best practices and idiom reference. Complements `swe-comp
 | Tailwind CSS (v4) | [languages/tailwind.md](languages/tailwind.md) | shipped |
 | Supabase | [frameworks/supabase.md](frameworks/supabase.md) | shipped |
 | AWS Lambda + SAM | [frameworks/aws-lambda-sam.md](frameworks/aws-lambda-sam.md) | shipped |
-| Terraform | `frameworks/terraform.md` | planned |
+| Terraform / OpenTofu | [frameworks/terraform.md](frameworks/terraform.md) | shipped |
 | Dart | `languages/dart.md` | planned |
 | Flutter | `frameworks/flutter.md` | planned (paired with Dart) |
 | Go | `languages/go.md` | planned |

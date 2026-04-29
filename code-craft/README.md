@@ -29,6 +29,7 @@ Two modes:
 | Tailwind CSS (v4) | ~60 | [`languages/tailwind.md`](languages/tailwind.md) |
 | Supabase (Auth, Postgres + RLS, Realtime, Storage, Edge Functions) | ~60 | [`frameworks/supabase.md`](frameworks/supabase.md) |
 | AWS Lambda + SAM | ~90 | [`frameworks/aws-lambda-sam.md`](frameworks/aws-lambda-sam.md) |
+| Terraform / OpenTofu | ~70 | [`frameworks/terraform.md`](frameworks/terraform.md) |
 
 Every rule has: short name, one-sentence rule, one-line reason, 3–10 line wrong-vs-right example. Source citations only on debated rules (enums vs unions, `@extend`, `forwardRef` migration, BEM alternatives, etc.).
 
