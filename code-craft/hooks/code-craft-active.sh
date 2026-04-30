@@ -31,6 +31,7 @@ case "$ext" in
   astro)                 refs+=("frameworks/astro.md") ;;
   tf|tfvars|hcl)         refs+=("frameworks/terraform.md") ;;
   dart)                  refs+=("languages/dart.md") ;;
+  go)                    refs+=("languages/go.md") ;;
 esac
 
 # Flutter — .dart files in a Flutter project (pubspec mentions flutter, or path hint)

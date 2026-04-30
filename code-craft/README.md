@@ -32,6 +32,7 @@ Two modes:
 | Terraform / OpenTofu | ~70 | [`frameworks/terraform.md`](frameworks/terraform.md) |
 | Dart 3 | ~55 | [`languages/dart.md`](languages/dart.md) |
 | Flutter (3.27+) | ~70 | [`frameworks/flutter.md`](frameworks/flutter.md) |
+| Go (1.21+) | ~90 | [`languages/go.md`](languages/go.md) |
 
 Every rule has: short name, one-sentence rule, one-line reason, 3–10 line wrong-vs-right example. Source citations only on debated rules (enums vs unions, `@extend`, `forwardRef` migration, BEM alternatives, etc.).
 

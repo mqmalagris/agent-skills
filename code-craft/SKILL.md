@@ -37,7 +37,7 @@ Language-specific code best practices and idiom reference. Complements `swe-comp
 | Terraform / OpenTofu | [frameworks/terraform.md](frameworks/terraform.md) | shipped |
 | Dart 3 | [languages/dart.md](languages/dart.md) | shipped |
 | Flutter (3.27+) | [frameworks/flutter.md](frameworks/flutter.md) | shipped |
-| Go | `languages/go.md` | planned |
+| Go (1.21+) | [languages/go.md](languages/go.md) | shipped |
 | Python | `languages/python.md` | planned |
 | Angular, Vue 2, Ionic, Express, Strapi, LoopBack, BigCommerce, Miva | `frameworks/*.md` | legacy / on demand |
 
