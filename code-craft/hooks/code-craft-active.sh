@@ -30,7 +30,13 @@ case "$ext" in
   svelte)                refs+=("frameworks/svelte.md") ;;
   astro)                 refs+=("frameworks/astro.md") ;;
   tf|tfvars|hcl)         refs+=("frameworks/terraform.md") ;;
+  dart)                  refs+=("languages/dart.md") ;;
 esac
+
+# Flutter — .dart files in a Flutter project (pubspec mentions flutter, or path hint)
+if [ "$ext" = "dart" ] && echo "$path" | grep -Eq '(/lib/|/test/|widget|flutter|pubspec\.ya?ml)'; then
+  refs+=("frameworks/flutter.md")
+fi
 
 # React for .tsx/.jsx
 case "$ext" in

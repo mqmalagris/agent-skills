@@ -35,8 +35,8 @@ Language-specific code best practices and idiom reference. Complements `swe-comp
 | Supabase | [frameworks/supabase.md](frameworks/supabase.md) | shipped |
 | AWS Lambda + SAM | [frameworks/aws-lambda-sam.md](frameworks/aws-lambda-sam.md) | shipped |
 | Terraform / OpenTofu | [frameworks/terraform.md](frameworks/terraform.md) | shipped |
-| Dart | `languages/dart.md` | planned |
-| Flutter | `frameworks/flutter.md` | planned (paired with Dart) |
+| Dart 3 | [languages/dart.md](languages/dart.md) | shipped |
+| Flutter (3.27+) | [frameworks/flutter.md](frameworks/flutter.md) | shipped |
 | Go | `languages/go.md` | planned |
 | Python | `languages/python.md` | planned |
 | Angular, Vue 2, Ionic, Express, Strapi, LoopBack, BigCommerce, Miva | `frameworks/*.md` | legacy / on demand |
