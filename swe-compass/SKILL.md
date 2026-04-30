@@ -17,6 +17,7 @@ When activated, identify the user's intent and load the matching workflow:
 | "Should I…", "how should I…", pre-code consultation | [workflows/advisor.md](workflows/advisor.md) |
 | Review code / PR / diff against principles | [workflows/reviewer.md](workflows/reviewer.md) |
 | Refactor / clean up / fix code smell | [workflows/refactor.md](workflows/refactor.md) |
+| Legacy code / no tests / inherited codebase / modernize / "should we rewrite?" | [workflows/legacy.md](workflows/legacy.md) |
 | Explain a concept / pattern / principle | [workflows/explain.md](workflows/explain.md) |
 
 If intent is ambiguous, ask one clarifying question before picking a workflow.
@@ -67,6 +68,8 @@ Cross-cutting tables and frameworks in [reference/](reference/):
 - `tdd-cycle.md` — Red-Green-Refactor, FIRST rules, test smells
 - `refactoring-catalog.md` — smell → operation → result table
 - `project-order.md` — order of application for new project vs legacy
+- `legacy-tactics.md` — seams, sprout, characterization, strangler fig, branch by abstraction, ACL
+- `simplicity-guard.md` — anti-overengineering filter applied before every output
 
 ## Operational checklists
 
