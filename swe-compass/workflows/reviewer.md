@@ -39,7 +39,22 @@ Reference [reference/tdd-cycle.md](../reference/tdd-cycle.md). Flag:
 - Conditionals inside tests
 - Mocks coupled to internal implementation rather than contracts
 
-#### Pass 4 — Architecture / boundaries
+#### Pass 4 — Overengineering
+
+Reference [reference/simplicity-guard.md](../reference/simplicity-guard.md). Flag:
+
+- Abstractions / interfaces / generics with one implementation
+- Layers that only forward calls (repo → service → controller with no logic)
+- Config knobs / env vars with one value in use
+- Dependencies replacing < 20 lines of code
+- Patterns applied without a named force ("might need later", "best practice")
+- Defensive try/catch / validation for impossible states
+- Feature flags / fallbacks for use cases not requested
+- Premature service splits, queues, caches without measured need
+
+Fix prescription: collapse / inline / delete. Three similar lines beat a premature abstraction.
+
+#### Pass 5 — Architecture / boundaries
 
 Reference [topics/architecture.md](../topics/architecture.md). Flag:
 

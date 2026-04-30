@@ -26,6 +26,18 @@ If intent is ambiguous, ask one clarifying question before picking a workflow.
 1. If the user named a stack → optimize patterns and folder structure for that stack's idioms.
 2. If not → list stacks the user knows, discuss trade-offs for the project at hand, **defer to user's final choice**.
 3. Don't propose patterns the language already solves natively (e.g., Rust's `lazy_static!` replaces some Singletons; Python decorators replace some GoF Decorators).
+4. **Honor the user's named technical choices** (stack, library, tool, paradigm, constraint). Do not substitute, do not bolt on extras. Surface risks once, then work inside the choice. See [reference/simplicity-guard.md](reference/simplicity-guard.md).
+
+## Simplicity mandate
+
+Before presenting any recommendation, run it through [reference/simplicity-guard.md](reference/simplicity-guard.md):
+
+- Is there a simpler one-file / inline version? Present it first.
+- Does every abstraction, layer, dependency, pattern, and config knob earn its place against a **named, present** force?
+- Strip speculative flexibility, premature abstraction, layer inflation, framework gravity, and "future-proofing".
+- Frame options as: `Simplest: … / Trade-up A (only if X): … / Trade-up B (only if Y): …`.
+
+"Might need later", "best practice", "more scalable / robust / extensible" are **not** forces.
 
 ## Topic library
 

@@ -43,6 +43,17 @@
 - [ ] No Singleton used as global mutable
 - [ ] No subclass combinatorial explosion (`UDPLogBufferedZipChannel` style)
 
+## Overengineering / simplicity
+
+- [ ] No interface / abstract class / generic with single implementation
+- [ ] No layer that only forwards calls (no logic of its own)
+- [ ] No config knob / env var / feature flag with one in-use value
+- [ ] No dependency replacing fewer than ~20 lines of trivial code
+- [ ] No try/catch / validation for impossible states
+- [ ] No pattern (Strategy / Factory / Observer / etc.) without a named present force
+- [ ] No "for future flexibility" / "in case we need" / "scalable" justifications without numbers
+- [ ] User's named stack/library/constraint preserved — no silent substitutions or bolt-ons
+
 ## Architecture / boundaries
 
 - [ ] Layer rules respected (no UI calling DB directly)

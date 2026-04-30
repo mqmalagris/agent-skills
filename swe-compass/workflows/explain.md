@@ -56,6 +56,10 @@ When relevant, point to:
 - The smell it detects ([reference/anti-patterns.md](../reference/anti-patterns.md)).
 - The refactoring it triggers ([reference/refactoring-catalog.md](../reference/refactoring-catalog.md)).
 
-### 6. Stay neutral on dogma
+### 6. Flag the simpler-is-better counter-case
+
+For every pattern, abstraction, or architecture explained, include a "when not to use" that points back at simpler alternatives. Reference [reference/simplicity-guard.md](../reference/simplicity-guard.md). A reader who walks away thinking "I should apply this" without knowing when to skip it is a failure mode.
+
+### 7. Stay neutral on dogma
 
 Some teachings ("composition over inheritance", "always TDD") are guidance, not absolutes. Present them as defaults with their counter-cases rather than commandments.

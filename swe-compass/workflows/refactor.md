@@ -63,7 +63,16 @@ If the changed method is consumed externally:
 
 Don't break callers without warning.
 
-### 6. Behavior preservation rule
+### 6. Simplicity direction
+
+Refactoring removes complexity, never adds speculative complexity. Reference [reference/simplicity-guard.md](../reference/simplicity-guard.md).
+
+- Prefer **inline / collapse / delete** over **extract / abstract / layer** unless duplication or a named force demands abstraction.
+- Don't introduce a Strategy / Factory / interface for a single implementation "to make it extensible".
+- Don't add config knobs, DI seams, or plugin points without a present consumer.
+- If the user named a stack or constraint, refactor inside it — no library swaps mid-refactor.
+
+### 7. Behavior preservation rule
 
 Refactoring must **not** change observable behavior. If you find a bug along the way:
 

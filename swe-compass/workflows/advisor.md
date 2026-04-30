@@ -39,11 +39,13 @@ Every suggestion must include:
 - What's sacrificed
 - A simpler alternative the user could pick instead
 
+Run [reference/simplicity-guard.md](../reference/simplicity-guard.md) before recommending. If proposal trips any smell (speculative flexibility, premature abstraction, layer inflation, framework gravity, future-proofing), downgrade to the simplest viable option and present *that* as the headline recommendation.
+
 Reference [reference/architecture-paradigms.md](../reference/architecture-paradigms.md) and [reference/symptom-map.md](../reference/symptom-map.md) for canned trade-offs.
 
-### 5. Honor the stack
+### 5. Honor the stack and the user's choices
 
-If the user has already named a stack, the advice must reflect idioms of that stack (e.g., dependency injection in Spring, hooks in React, traits in Rust). Don't propose patterns the language already solves natively.
+If the user has already named a stack, library, tool, or constraint, treat it as **fixed input**. Reflect the idioms of that stack (DI in Spring, hooks in React, traits in Rust). Don't propose patterns the language already solves natively. Don't substitute the user's pick for your preferred one without a named technical reason. Don't bolt on extra tech the user did not ask for. If you see a real risk, surface once and proceed inside their choice.
 
 ### 6. Output shape
 

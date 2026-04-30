@@ -54,7 +54,18 @@ Deliver, in this order:
 6. **ADR draft** — fill [checklists/adr.md](../checklists/adr.md).
 7. **First slice** — smallest end-to-end vertical that proves the architecture.
 
-### 7. Anti-patterns to flag
+### 7. Simplicity gate
+
+Before output, run [reference/simplicity-guard.md](../reference/simplicity-guard.md) over the design:
+
+- Could a single service / single file / single function meet the stated requirements? If yes, present that first.
+- Each module, layer, queue, cache, service boundary must answer to a **named present force** (scale, team split, regulatory, measured perf). Strip the rest.
+- No speculative microservice splits, no "we'll add Kafka later", no plugin points without a second consumer today.
+- Anchor every choice inside the user's named stack/constraints — do not bolt on extras.
+
+Frame trade-ups: `Simplest: monolith / Trade-up A (only if N teams ship independently): split service X / Trade-up B (only if write throughput > Y): introduce queue`.
+
+### 8. Anti-patterns to flag
 
 While designing, watch out for these (full list in [reference/anti-patterns.md](../reference/anti-patterns.md)):
 
