@@ -81,6 +81,18 @@ Action lists in [checklists/](checklists/):
 - `refactor-triggers.md` — smell-to-operation lookup
 - `adr.md` — Architecture Decision Record template
 
+## Auto-ADR
+
+When the conversation settles a non-trivial, hard-to-reverse architectural decision (stack, paradigm, integration style, persistence model, deployment strategy, auth model, observability stack, error-handling philosophy), **auto-generate an ADR** using [checklists/adr.md](checklists/adr.md).
+
+Rules:
+- Write to `docs/adr/NNNN-<slug>.md` (zero-padded, next available number). If `docs/adr/` missing, create it. If project uses different ADR location, honor it.
+- Trigger only after decision is *settled* — not for every option discussed. Settled = user picked, or recommendation accepted without pushback.
+- Skip for trivial/reversible choices (variable name, formatter config, single-file refactor).
+- Status defaults to `proposed`. User can promote to `accepted`.
+- Announce the file path after writing. One ADR per decision; don't bundle.
+- If user explicitly says "no ADR" or "skip ADR", honor it for rest of session.
+
 ## Output discipline
 
 - Lead with concrete recommendations, not theory.
