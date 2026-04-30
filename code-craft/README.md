@@ -51,6 +51,27 @@ Every rule has: short name, one-sentence rule, one-line reason, 3–10 line wron
 /reload-plugins
 ```
 
+After install, **enable active mode** (one-time):
+
+```bash
+touch ~/.claude/code-craft.active
+```
+
+## Active mode
+
+Once enabled, a bundled `PostToolUse` hook fires after every `Edit` / `Write` / `MultiEdit`. It detects the file's language/framework and injects a system reminder pointing Claude to the matching rule files. Claude then applies the rules to the change you just made and flags any violations the same turn — silent if clean.
+
+Toggle anytime:
+
+| Action | Command | Or natural language |
+|---|---|---|
+| **Disable** | `rm ~/.claude/code-craft.active` | "code-craft off" / "pause code-craft" |
+| **Enable** | `touch ~/.claude/code-craft.active` | "code-craft on" / "resume code-craft" |
+
+**Requirements:**
+- `bash` on `PATH`. Bundled with macOS / Linux. On Windows, install [Git for Windows](https://git-scm.com/download/win) — Claude Code's built-in shell is bash, so the hook works out of the box.
+- The hook is bundled at `${CLAUDE_PLUGIN_ROOT}/hooks/code-craft-active.sh` and registered via `${CLAUDE_PLUGIN_ROOT}/hooks/hooks.json` — no user `settings.json` edits needed.
+
 ## Trigger examples
 
 ```text

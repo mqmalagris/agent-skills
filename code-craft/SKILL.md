@@ -98,6 +98,32 @@ Close with a one-sentence summary. Do not re-print the user's code.
 - Reader mode: no confirmation needed; just answer.
 - Reviewer mode: confirm scope before scanning ("Reviewing for idioms only? Or include security and perf?"). Default to all three.
 
+## Active mode (PostToolUse hook)
+
+This plugin ships a `PostToolUse` hook (`hooks/code-craft-active.sh`) that fires after every `Edit`, `Write`, or `MultiEdit`. The hook detects the file's language/framework and injects a system reminder pointing Claude to the matching rule files. When active, you should:
+
+- Apply the named rules silently to the just-made change.
+- Flag violations the same turn (concise, actionable: `location → rule → fix`).
+- Stay silent if the change is clean — silence is acceptance.
+
+### Toggling active mode
+
+Active mode is gated by a flag file at `~/.claude/code-craft.active`. The hook checks it on every run and exits silently if missing.
+
+When the user says **"code-craft off"**, **"pause code-craft"**, **"disable code-craft"** → delete the flag:
+
+```bash
+rm "$HOME/.claude/code-craft.active"
+```
+
+When the user says **"code-craft on"**, **"resume code-craft"**, **"enable code-craft"** → re-create the flag:
+
+```bash
+touch "$HOME/.claude/code-craft.active"
+```
+
+After toggling, confirm in one short sentence and stop. The flag is per-machine — first install of the plugin should create it once with `touch ~/.claude/code-craft.active` (see plugin README).
+
 ## Reference
 
 - [languages/ts.md](languages/ts.md) — TypeScript: ~50 rules across tactical, ecosystem idioms, anti-patterns.
