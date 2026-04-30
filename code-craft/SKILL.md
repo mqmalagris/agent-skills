@@ -38,7 +38,7 @@ Language-specific code best practices and idiom reference. Complements `swe-comp
 | Dart 3 | [languages/dart.md](languages/dart.md) | shipped |
 | Flutter (3.27+) | [frameworks/flutter.md](frameworks/flutter.md) | shipped |
 | Go (1.21+) | [languages/go.md](languages/go.md) | shipped |
-| Python | `languages/python.md` | planned |
+| Python (3.12+) | [languages/python.md](languages/python.md) | shipped |
 | Angular, Vue 2, Ionic, Express, Strapi, LoopBack, BigCommerce, Miva | `frameworks/*.md` | legacy / on demand |
 
 If the user asks for a language not yet supported, say so and offer to add a stub via the structure documented below.

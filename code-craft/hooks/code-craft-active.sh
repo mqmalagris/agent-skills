@@ -32,6 +32,7 @@ case "$ext" in
   tf|tfvars|hcl)         refs+=("frameworks/terraform.md") ;;
   dart)                  refs+=("languages/dart.md") ;;
   go)                    refs+=("languages/go.md") ;;
+  py|pyi)                refs+=("languages/python.md") ;;
 esac
 
 # Flutter — .dart files in a Flutter project (pubspec mentions flutter, or path hint)
