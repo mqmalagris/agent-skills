@@ -38,12 +38,22 @@ Files touched. New = create, Mod = modify, Del = delete.
 | `src/api/auth.routes.ts` | wire endpoints | Mod |
 
 ## The Sequence
-Ordered tasks. Each one independently shippable when possible.
+Phased plan. Each phase is a coherent milestone, ideally one PR. Tasks inside are checkboxes.
 
-1. **<task name>** — <one line>. Touches: `<files>`. Done when: `<observable result>`.
-2. **<task name>** — ...
+### Phase 1: <phase name>
+- **Status**: planned | in-progress | done
+- **Goal**: <what this phase delivers>
 
-Mark dependencies inline: `(depends on #1)`.
+- [ ] **<task name>** — <one line>. Touches: `<files>`. Done when: `<observable result>`.
+- [ ] **<task name>** — ... `(depends on previous)`
+
+### Phase 2: <phase name>
+- **Status**: planned
+- **Goal**: ...
+
+- [ ] **<task name>** — ...
+
+Phases run sequentially unless marked parallel. Small features = 1 phase. Large = 3-5. Don't pad.
 
 ## The Payoff
 Acceptance criteria. Bullet list. Each item testable.
@@ -73,7 +83,8 @@ Unresolved items blocking start. If empty, delete section.
 ## Rules
 
 - **One feature per plan.** Bundling = bad plan.
-- **Sequence is ordered.** Each task should be reviewable as own PR if possible.
+- **Phases are milestones, not micro-steps.** Each phase ships something working. If a phase has 1 task, collapse phases.
+- **Tasks are checkboxes.** Update `- [ ]` → `- [x]` as work progresses. Bump phase Status field too.
 - **Crew table is exhaustive for known files.** Add `?` next to speculative ones.
 - **Acceptance criteria are testable.** "Works well" is not. "Login completes in <2s p95" is.
 - **No code in plan.** Pseudocode rare; only when sequencing isn't clear without it.
