@@ -1,6 +1,6 @@
 ---
 name: commit-report
-description: Generate dual-format commit report (prose paragraph + bullet list) from recent git activity, tunable to audience (dev / pm / client). Use when user asks for a standup note, status update, work summary, "what did I ship today", commit recap, end-of-day report, PM/client update, or runs /commit-report. Triggers on phrases like "write a report", "summarize commits", "report for the PM", "update for the client", "what did I do today". Always emits BOTH a prose Report and a Bullets list in the same response, level-tuned. Default scope = current user's latest commit batch at HEAD; supports --since <hash>, --last, --count, --range, --path overrides.
+description: Generate dual-format commit report (prose paragraph + bullet list) from recent git activity, tunable to audience (dev / pm / client). Use when user asks for a standup note, status update, work summary, "what did I ship today", commit recap, end-of-day report, PM/client update, or runs /commit-report. Triggers on phrases like "write a report", "summarize commits", "report for the PM", "update for the client", "what did I do today". Always emits BOTH a prose Report and a Bullets list in the same response, level-tuned. Default scope = `--since-mine` (current user's contiguous commit batch at HEAD); other scope flags: --since <hash>, --last, --count, --range. Filters: --path, --include-merges. Parses Conventional Commits prefixes (feat/fix/chore/refactor) for cleaner bucketing. Honors Co-Authored-By trailers so pair-programming commits aren't dropped.
 ---
 
 # commit-report
@@ -17,11 +17,12 @@ Generate two-part commit report: prose paragraph + bullet list. Always both, in 
 /commit-report pm --since a3f2c1d       # commits since this hash up to HEAD
 /commit-report pm --range main..HEAD    # explicit range
 /commit-report dev --path apps/web      # restrict to subdir
+/commit-report dev --include-merges     # include merge commits (dev only)
 ```
 
 ## Workflow
 
-1. **Resolve user identity**: `git config user.email`. Bail with clear error if unset.
+1. **Resolve user identity**: `git config user.email`. Bail with clear error if unset. For author matching, scan both the `--author` field AND `Co-Authored-By:` trailers in commit bodies — pair-programming commits where the user is co-author must be included, not silently dropped.
 2. **Resolve scope** (precedence: explicit flag > default `--since-mine`):
    - `--since-mine` *(default, no arg)*: contiguous commits at HEAD authored by user. Walk back through `git log --pretty='%H%x09%ae'`; stop at first commit whose author email ≠ user. If HEAD's author ≠ user → fallback to `--last today` and note the fallback in output.
    - `--since <hash>`: explicit boundary. Run `git log <hash>..HEAD --author="$email"`. Hash = exclusive lower bound (commits AFTER `<hash>` up to HEAD). Accepts short or full SHA.
@@ -30,9 +31,10 @@ Generate two-part commit report: prose paragraph + bullet list. Always both, in 
    - `--range <ref..ref>`: `git log --author="$email" <range>`.
    - `--path <dir>`: append `-- <dir>` to any `git log` invocation. Repo cwd is default.
 3. **Resolve audience** (positional first arg, default `dev`): `dev` | `pm` | `client`.
-4. **Collect commit data**: subject, body, files changed (`git show --stat --pretty=format:'%H%n%s%n%b' <sha>`). Skip merge commits (`Merge branch …`, `Merge pull request …`) unless `dev` + `--include-merges`.
-5. **Synthesize** per audience (see [Audience map](#audience-map)). Group related commits; do not echo subjects 1:1.
-6. **Render** in this exact order:
+4. **Collect commit data**: subject, body, short SHA, files changed (`git show --stat --pretty=format:'%h%n%H%n%s%n%b' <sha>` — `%h` for rendering, `%H` for internal joins). Skip merge commits (`Merge branch …`, `Merge pull request …`) unless `dev` + `--include-merges`.
+5. **Parse Conventional Commits prefixes** (`feat:`, `fix:`, `chore:`, `refactor:`, `docs:`, `test:`, `perf:`, `build:`, `ci:`) when present. Use them as primary bucketing signal: features ship, fixes resolve, refactor/chore/test = "groundwork" for client audience. If no prefix, fall back to content heuristics. Scope in parens (`feat(auth): …`) becomes a `pm`/`client` framing hint.
+6. **Synthesize** per audience (see [Audience map](#audience-map)). Group related commits; do not echo subjects 1:1.
+7. **Render** in this exact order:
 
    ```
    ## Report
@@ -43,8 +45,8 @@ Generate two-part commit report: prose paragraph + bullet list. Always both, in 
    - point 2
    ```
 
-7. **Bullet count**: 5–8 default. Each bullet = one shipped change, verb-first, level-vocab.
-8. **Report length**: dev ≈ 2 short paragraphs; pm ≈ 1 paragraph (~120 words); client ≈ 1 paragraph (~80 words).
+8. **Bullet count**: 5–8 default. Each bullet = one shipped change, verb-first, level-vocab.
+9. **Report length**: dev ≈ 2 short paragraphs; pm ≈ 1 paragraph (~120 words); client ≈ 1 paragraph (~80 words).
 
 ## Audience map
 
