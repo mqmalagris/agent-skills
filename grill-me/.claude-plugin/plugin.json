@@ -1,0 +1,20 @@
+{
+  "name": "grill-me",
+  "version": "0.2.0",
+  "description": "Interview the user relentlessly about a plan or design until every branch of the decision tree is resolved. Captures domain vocabulary (ubiquitous language) and emits a Design Notes + Glossary block as handoff to /to-prd. Adapted from Matt Pocock's grill-me (https://github.com/mattpocock/skills).",
+  "author": {
+    "name": "Matheus Malagris",
+    "url": "https://github.com/mqmalagris"
+  },
+  "homepage": "https://github.com/mqmalagris/claude-skills/tree/main/grill-me",
+  "repository": "https://github.com/mqmalagris/claude-skills",
+  "license": "MIT",
+  "keywords": [
+    "design-review",
+    "pre-prd",
+    "interview",
+    "stress-test",
+    "ubiquitous-language",
+    "engineering-workflow"
+  ]
+}

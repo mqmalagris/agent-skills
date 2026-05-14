@@ -1,0 +1,22 @@
+{
+  "name": "seo",
+  "version": "0.1.0",
+  "description": "Deterministic LLM-first SEO audits for websites, blog posts, and GitHub repositories. 16 specialized sub-skills, 10 specialist agents, 33 evidence-collector scripts. Covers technical SEO, schema, Core Web Vitals, E-E-A-T, hreflang, GEO/AEO, and repository-level SEO. Adapted from Bhanunamikaze/Agentic-SEO-Skill (https://github.com/Bhanunamikaze/Agentic-SEO-Skill), originally derived from AgriciDaniel/claude-seo (https://github.com/AgriciDaniel/claude-seo).",
+  "author": {
+    "name": "Matheus Malagris",
+    "url": "https://github.com/mqmalagris"
+  },
+  "homepage": "https://github.com/mqmalagris/claude-skills/tree/main/seo",
+  "repository": "https://github.com/mqmalagris/claude-skills",
+  "license": "MIT",
+  "keywords": [
+    "seo",
+    "audit",
+    "schema",
+    "core-web-vitals",
+    "e-e-a-t",
+    "geo",
+    "aeo",
+    "technical-seo"
+  ]
+}

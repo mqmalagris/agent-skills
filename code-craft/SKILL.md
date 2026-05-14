@@ -1,11 +1,11 @@
 ---
 name: code-craft
-description: Language-specific code best practices and idioms — complementary to swe-compass (stack-agnostic architecture coach). Two modes: reader (give the rule + reason + example for a topic the user asks about) and reviewer (apply rules to user code and flag violations with fixes). Currently supports TypeScript; future languages and frameworks slot into languages/ and frameworks/ subdirectories. Use when the user asks for language-specific best practices ("TS best practices", "is this idiomatic TS", "/code-craft ts"), wants a code review focused on language idioms (not architecture — see swe-compass for that), or asks how to do X the right way in a specific language.
+description: Language- and framework-specific code best practices and idioms — complementary to compass (stack-agnostic architecture coach). Two modes: reader (rule + reason + example for a topic) and reviewer (apply rules to user code, flag violations with fixes). Ships rules for TypeScript, Rust, CSS/SASS, Tailwind, Dart, Go, Python and frameworks React, Next.js, RN+Expo, Hono, Cloudflare Workers, Astro, Svelte, Drizzle, Supabase, AWS Lambda+SAM, Terraform, Flutter. Use when the user asks for language-specific best practices ("TS best practices", "is this idiomatic Rust", "/code-craft ts"), wants a code review focused on language idioms (not architecture — see compass), or asks how to do X the right way in a specific language/framework.
 ---
 
 # code-craft
 
-Language-specific code best practices and idiom reference. Complements `swe-compass` (stack-agnostic architecture / design coach) — `code-craft` is tactical and per-language.
+Language- and framework-specific code best practices and idiom reference. Complements `compass` (stack-agnostic architecture / design coach) — `code-craft` is tactical and per-language.
 
 ## Quick start
 
@@ -43,17 +43,18 @@ Language-specific code best practices and idiom reference. Complements `swe-comp
 
 If the user asks for a language not yet supported, say so and offer to add a stub via the structure documented below.
 
-## When to defer to swe-compass
+## When to defer to compass
 
-Defer to `swe-compass` if the user asks about:
+Defer to `compass` if the user asks about:
 
 - Architecture / system design
 - SOLID, GoF patterns, MVC, microservices
 - Refactoring strategy across modules
 - TDD / CI/CD / DevOps
 - Stack selection or technology trade-offs
+- Security model, threat surface, perf budget
 
-`code-craft` is for **inside-the-file** decisions. `swe-compass` is for **across-file / across-system** decisions. When a user request straddles both, route the language-idiom parts here and the architecture parts to swe-compass.
+`code-craft` is for **inside-the-file** decisions. `compass` is for **across-file / across-system** decisions. When a user request straddles both, route the language-idiom parts here and the architecture parts to compass.
 
 ## Reader-mode output format
 
@@ -96,34 +97,23 @@ Close with a one-sentence summary. Do not re-print the user's code.
 ## Confirmation discipline
 
 - Reader mode: no confirmation needed; just answer.
-- Reviewer mode: confirm scope before scanning ("Reviewing for idioms only? Or include security and perf?"). Default to all three.
+- Reviewer mode: confirm scope before scanning ("idioms only, or include anti-patterns?"). Default to both. Security and performance reviews belong in `compass` — route there if asked.
 
-## Active mode (PostToolUse hook)
+## When to skip code-craft
 
-This plugin ships a `PostToolUse` hook (`hooks/code-craft-active.sh`) that fires after every `Edit`, `Write`, or `MultiEdit`. The hook detects the file's language/framework and injects a system reminder pointing Claude to the matching rule files. When active, you should:
+- One-line tweaks (rename, fix typo, add import).
+- Throwaway scripts / spikes.
+- Generated code (migrations, codegen output, build artifacts).
+- Language not in the Supported table — say so, don't fabricate rules from training data.
+- User asks about architecture, security, or perf — route to compass instead.
 
-- Apply the named rules silently to the just-made change.
-- Flag violations the same turn (concise, actionable: `location → rule → fix`).
-- Stay silent if the change is clean — silence is acceptance.
+## Pipeline placement
 
-### Toggling active mode
+`grill-me → to-prd → compass → heist → maestro → code (+ code-craft) → compass (review)`
 
-Active mode is gated by a flag file at `~/.claude/code-craft.active`. The hook checks it on every run and exits silently if missing.
+code-craft sits **during the code phase**, applied tactically per-file as code lands. Use cases:
 
-When the user says **"code-craft off"**, **"pause code-craft"**, **"disable code-craft"** → delete the flag:
+- **Drafting** — when writing new code in a supported stack, apply rules silently to the just-written diff and self-correct before showing it.
+- **PR review** — alongside compass's reviewer workflow, run code-craft on the diff for stack-specific idiom violations.
 
-```bash
-rm "$HOME/.claude/code-craft.active"
-```
-
-When the user says **"code-craft on"**, **"resume code-craft"**, **"enable code-craft"** → re-create the flag:
-
-```bash
-touch "$HOME/.claude/code-craft.active"
-```
-
-After toggling, confirm in one short sentence and stop. The flag is per-machine — first install of the plugin should create it once with `touch ~/.claude/code-craft.active` (see plugin README).
-
-## Reference
-
-- [languages/ts.md](languages/ts.md) — TypeScript: ~50 rules across tactical, ecosystem idioms, anti-patterns.
+code-craft does NOT replace `compass`'s reviewer workflow. They run side-by-side at PR time: compass for cross-file architecture, code-craft for inside-file idioms.

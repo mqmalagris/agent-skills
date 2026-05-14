@@ -5,53 +5,117 @@
     "url": "https://github.com/mqmalagris"
   },
   "metadata": {
-    "description": "Curated Claude Code skills — software engineering coaching and beyond.",
-    "version": "0.1.0"
+    "description": "Curated Claude Code skills — a dev pipeline (grill-me → to-prd → compass → heist → maestro), tactical language idioms, and a handful of career/content/SEO tools.",
+    "version": "0.2.0"
   },
   "plugins": [
     {
-      "name": "swe-compass",
-      "source": "./swe-compass",
-      "description": "Multi-mode software engineering coach: architect, advisor, reviewer, refactor, and concept explainer. Stack-agnostic by default.",
-      "version": "0.1.0",
-      "author": {
-        "name": "Matheus Malagris"
-      },
+      "name": "grill-me",
+      "source": "./grill-me",
+      "description": "Stress-test a plan or design via relentless interview. Resolves each branch of the decision tree, captures domain vocabulary, emits Design Notes + Glossary block for /to-prd. Adapted from mattpocock/skills.",
+      "version": "0.2.0",
+      "author": { "name": "Matheus Malagris" },
+      "category": "engineering-workflow",
+      "keywords": ["design-review", "pre-prd", "interview", "ubiquitous-language"]
+    },
+    {
+      "name": "to-prd",
+      "source": "./to-prd",
+      "description": "Synthesize conversation context into a PRD. Writes docs/prds/NNNN-<slug>.md + publishes to GitHub Issues. Includes Glossary section. Adapted from mattpocock/skills.",
+      "version": "0.2.0",
+      "author": { "name": "Matheus Malagris" },
+      "category": "engineering-workflow",
+      "keywords": ["prd", "feature-spec", "github-issues"]
+    },
+    {
+      "name": "compass",
+      "source": "./compass",
+      "description": "Multi-mode software engineering coach: architect, advisor, reviewer, refactor, legacy, and explainer workflows. Auto-writes ADRs to docs/adr/.",
+      "version": "0.2.0",
+      "author": { "name": "Matheus Malagris" },
       "category": "development",
-      "keywords": [
-        "software-engineering",
-        "architecture",
-        "design-patterns",
-        "solid",
-        "code-review",
-        "refactoring",
-        "tdd",
-        "devops"
-      ]
+      "keywords": ["software-engineering", "architecture", "design-patterns", "solid", "ddd", "adr"]
+    },
+    {
+      "name": "heist",
+      "source": "./heist",
+      "description": "Turn a settled feature scope into an implementation plan at docs/plans/NNNN-<slug>.md. Crew, sequence (with parallel phases), getaway, payoff. Consumes PRDs + ADRs.",
+      "version": "0.2.0",
+      "author": { "name": "Matheus Malagris" },
+      "category": "engineering-workflow",
+      "keywords": ["planning", "implementation-plan", "prd", "adr"]
+    },
+    {
+      "name": "maestro",
+      "source": "./maestro",
+      "description": "Verify parallel feasibility across plans, orchestrate agents in git worktrees, run integration tests, clean up. Deterministic branch names (parallel/<slug>).",
+      "version": "0.2.0",
+      "author": { "name": "Matheus Malagris" },
+      "category": "engineering-workflow",
+      "keywords": ["orchestration", "parallel-execution", "git-worktree", "multi-agent"]
     },
     {
       "name": "code-craft",
       "source": "./code-craft",
-      "description": "Language-specific code best practices and idioms — complementary to swe-compass. Reader and reviewer modes. Ships TypeScript, Rust, CSS/SASS, React, Next.js, React Native + Expo, and Hono references.",
-      "version": "0.1.0",
-      "author": {
-        "name": "Matheus Malagris"
-      },
+      "description": "Language- and framework-specific best practices and idioms. Reader and reviewer modes. Ships 7 languages + 12 frameworks (TS, Rust, CSS, Tailwind, Dart, Go, Python, React, Next, RN+Expo, Hono, Workers, Astro, Svelte, Drizzle, Supabase, Lambda, Terraform, Flutter).",
+      "version": "0.2.0",
+      "author": { "name": "Matheus Malagris" },
       "category": "development",
-      "keywords": [
-        "code-review",
-        "best-practices",
-        "idioms",
-        "typescript",
-        "rust",
-        "react",
-        "nextjs",
-        "react-native",
-        "expo",
-        "hono",
-        "css",
-        "sass"
-      ]
+      "keywords": ["code-review", "idioms", "typescript", "rust", "react", "nextjs", "go", "python", "flutter"]
+    },
+    {
+      "name": "commit-report",
+      "source": "./commit-report",
+      "description": "Dual-format commit report (prose + bullets) from recent git activity, tunable to audience (dev / pm / client).",
+      "version": "0.1.0",
+      "author": { "name": "Matheus Malagris" },
+      "category": "reporting",
+      "keywords": ["git", "standup", "status-update", "reporting"]
+    },
+    {
+      "name": "cv-craft",
+      "source": "./cv-craft",
+      "description": "Maintain a canonical master CV in Markdown and produce tailored, ATS-friendly resumes and recruiter-screen prep packs from job descriptions.",
+      "version": "0.1.0",
+      "author": { "name": "Matheus Malagris" },
+      "category": "career",
+      "keywords": ["cv", "resume", "ats", "job-search"]
+    },
+    {
+      "name": "portfolio-sync",
+      "source": "./portfolio-sync",
+      "description": "Sync the current project into a central project-portfolio Markdown archive. Source data for cv-craft.",
+      "version": "0.1.0",
+      "author": { "name": "Matheus Malagris" },
+      "category": "career",
+      "keywords": ["portfolio", "project-archive", "cv-source"]
+    },
+    {
+      "name": "write-with-ai",
+      "source": "./write-with-ai",
+      "description": "Online-content writing assistant: articles, newsletters, social posts, hooks, sales copy. Frameworks from Nicolas Cole / Dickie Bush + Maria Sukhareva's voice-preserving workflow.",
+      "version": "0.1.0",
+      "author": { "name": "Matheus Malagris" },
+      "category": "writing",
+      "keywords": ["writing", "content", "copywriting", "newsletter", "social-media"]
+    },
+    {
+      "name": "write-a-skill",
+      "source": "./write-a-skill",
+      "description": "Meta-skill: create new Claude Code skills with proper structure, progressive disclosure, and bundled resources.",
+      "version": "0.1.0",
+      "author": { "name": "Matheus Malagris" },
+      "category": "meta",
+      "keywords": ["meta", "skill-authoring", "claude-code"]
+    },
+    {
+      "name": "seo",
+      "source": "./seo",
+      "description": "Deterministic LLM-first SEO audits for websites, blog posts, and GitHub repos. 16 sub-skills, 10 specialist agents, 33 evidence scripts. Adapted from Bhanunamikaze/Agentic-SEO-Skill (originally AgriciDaniel/claude-seo).",
+      "version": "0.1.0",
+      "author": { "name": "Matheus Malagris" },
+      "category": "marketing",
+      "keywords": ["seo", "audit", "schema", "core-web-vitals", "e-e-a-t", "geo", "aeo"]
     }
   ]
 }
