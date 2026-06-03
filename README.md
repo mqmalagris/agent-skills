@@ -4,7 +4,7 @@ A curated collection of [Claude Code](https://claude.com/claude-code) skills, pa
 
 ## What's in here
 
-Twelve skills, grouped by purpose:
+Thirteen skills, grouped by purpose:
 
 ### Dev pipeline (5)
 
@@ -50,6 +50,12 @@ The core loop I use to take a feature idea from "vague hunch" to "merged code" w
 |-------|--------------|
 | [`seo`](seo/) | Deterministic LLM-first SEO audits for websites, blog posts, and GitHub repositories. 16 specialized sub-skills, 10 specialist agents, 33 evidence-collector scripts. Covers technical SEO, schema, Core Web Vitals, E-E-A-T, hreflang, GEO/AEO. Adapted from [Bhanunamikaze/Agentic-SEO-Skill](https://github.com/Bhanunamikaze/Agentic-SEO-Skill), originally [AgriciDaniel/claude-seo](https://github.com/AgriciDaniel/claude-seo). |
 
+### Security (1)
+
+| Skill | What it does |
+|-------|--------------|
+| [`wstg-security-testing`](wstg-security-testing/) | Web application security testing via the OWASP [Web Security Testing Guide](https://owasp.org/www-project-web-security-testing-guide/) (WSTG) — 12 categories, ~109 canonical test cases. Four modes: guide an authorized pentest, self-review your own app, build/score a coverage checklist, or review a code diff against relevant WSTG tests. Bundles a full per-category reference, detection payloads, a reporting template, and scripts to look up WSTG IDs and generate/score checklists. Methodology from [OWASP/wstg](https://github.com/OWASP/wstg). Authorized/defensive use only. |
+
 ## How I use them — the dev pipeline
 
 The five engineering-workflow skills are designed to compose into a single pipeline:
@@ -81,7 +87,7 @@ Real example, fresh repo:
 /commit-report             # standup note from the commits
 ```
 
-The other skills (`commit-report`, `cv-craft`, `portfolio-sync`, `write-with-ai`, `write-a-skill`, `seo`) are independent — invoke as needed.
+The other skills (`commit-report`, `cv-craft`, `portfolio-sync`, `write-with-ai`, `write-a-skill`, `seo`, `wstg-security-testing`) are independent — invoke as needed.
 
 ## Install
 
@@ -101,6 +107,7 @@ Add this repo as a marketplace and install the skills you want:
 /plugin install write-with-ai@claude-skills
 /plugin install write-a-skill@claude-skills
 /plugin install seo@claude-skills
+/plugin install wstg-security-testing@claude-skills
 /reload-plugins
 ```
 
@@ -132,6 +139,11 @@ draft a LinkedIn post about <topic>
 # SEO
 perform SEO audit on https://example.com
 review the schema on this page
+
+# Security
+self-review this Next.js app against OWASP WSTG
+build a WSTG checklist for my API
+what does WSTG-INPV-05 cover?
 ```
 
 You can also explicitly route: `use compass to review this PR` or `apply code-craft to this file`.
@@ -154,3 +166,4 @@ MIT — see [LICENSE](LICENSE).
 
 - [Matt Pocock](https://github.com/mattpocock) — `grill-me` and `to-prd` skills, adapted from his [skills repo](https://github.com/mattpocock/skills) (*Skills for Real Engineers, straight from my .claude directory*).
 - [Bhanunamikaze](https://github.com/Bhanunamikaze) and [AgriciDaniel](https://github.com/AgriciDaniel) — the `seo` skill is adapted from [Agentic-SEO-Skill](https://github.com/Bhanunamikaze/Agentic-SEO-Skill), itself based on [claude-seo](https://github.com/AgriciDaniel/claude-seo).
+- [OWASP](https://owasp.org) — the `wstg-security-testing` skill encodes the methodology and test catalog from the [Web Security Testing Guide](https://github.com/OWASP/wstg) (CC BY-SA).

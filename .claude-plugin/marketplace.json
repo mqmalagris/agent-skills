@@ -116,6 +116,15 @@
       "author": { "name": "Matheus Malagris" },
       "category": "marketing",
       "keywords": ["seo", "audit", "schema", "core-web-vitals", "e-e-a-t", "geo", "aeo"]
+    },
+    {
+      "name": "wstg-security-testing",
+      "source": "./wstg-security-testing",
+      "description": "Web application security testing via the OWASP Web Security Testing Guide (WSTG) — 12 categories, ~109 test cases. Four modes: guide a pentest, self-review your app, build/score a coverage checklist, review a diff against WSTG. Methodology from OWASP/wstg. Authorized/defensive use only.",
+      "version": "0.1.0",
+      "author": { "name": "Matheus Malagris" },
+      "category": "security",
+      "keywords": ["owasp", "wstg", "security-testing", "pentest", "appsec", "web-security", "code-review"]
     }
   ]
 }
