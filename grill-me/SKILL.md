@@ -3,14 +3,14 @@ name: grill-me
 description: Interview the user relentlessly about a plan or design until reaching shared understanding, resolving each branch of the decision tree and emitting a Design Notes + Glossary block for handoff to /to-prd. Use when user wants to stress-test a plan, get grilled on their design, do a pre-PRD design review, challenge an idea before writing it up, or mentions "grill me" or runs /grill-me.
 ---
 
-Interview me relentlessly about every aspect of this plan until we reach a shared understanding. Walk down each branch of the design tree, resolving dependencies between decisions one-by-one. For each question, provide your recommended answer (with brief reasoning); skip the recommendation only when the codebase or my prior answers haven't given you enough signal.
+Interview me relentlessly about every aspect of this plan until we reach a shared understanding. Walk down each branch of the decision tree, resolving dependencies between decisions one-by-one. For each question, provide your recommended answer (with brief reasoning); skip the recommendation only when the codebase or my prior answers haven't given you enough signal.
 
 ## Rules of engagement
 
 - **One question at a time.** No multi-part dumps.
 - **Codebase first.** If a question can be answered by reading the repo, read it instead of asking.
 - **ADR awareness.** Scan `docs/adr/` before grilling. Don't relitigate settled architectural decisions; treat ADRs as locked inputs and grill *around* them.
-- **Converge.** Stop when every major branch of the design tree has either a resolved decision or an explicit `OPEN` marker. Cap: ~20 questions per session unless I ask to keep going.
+- **Converge.** Stop when every major branch of the decision tree has either a resolved decision or an explicit `OPEN` marker. Cap: ~20 questions per session unless I ask to keep going.
 - **OPEN markers.** If a branch can't be resolved (I defer, codebase silent, needs external input), record it as `OPEN: <question>` and move on. Don't loop.
 
 ## Questioning lens
@@ -72,7 +72,7 @@ This block is the handoff to `/to-prd`, which synthesizes it into a PRD. Don't w
 
 `grill-me → to-prd → compass → heist → maestro → code`
 
-- **grill-me** (this skill) — stress-tests design tree, extracts Glossary + OPEN questions.
+- **grill-me** (this skill) — stress-tests decision tree, extracts Glossary + OPEN questions.
 - **to-prd** — synthesizes Design Notes into a PRD on disk + tracker.
 - **compass** — locks architectural decisions in ADRs.
 - **heist** — produces implementation plan.

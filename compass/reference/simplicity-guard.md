@@ -79,6 +79,8 @@ Complexity earns its place only against a **named, present** force:
 
 "We might need it later" is not a force. "Best practice" is not a force. "It's cleaner" is not a force.
 
+A force must be **stated**, with its source named (user / PRD / repo / explicit assumption). If scale, availability, or load is unknown, do **not** silently assume "no force" and default to simple — establish the figure or record an explicit assumption first. Silently guessing low scale is as wrong as silently over-building for high scale.
+
 ## Red phrases to avoid in your own output
 
 If you catch yourself writing these, stop and re-evaluate:

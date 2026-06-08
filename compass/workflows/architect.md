@@ -4,14 +4,17 @@ Use when the user asks to design a system, choose an architecture, or plan a new
 
 ## Process
 
-### 1. Discover the system class
+### 1. Establish the system class (required — never skip)
 
-Ask the user (or infer from context):
+These drive how complex the architecture must be. Resolve each **before** designing:
 
-- Is this **mission-critical** (Type A — life/finance), **commercial** (Type B), or **casual** (Type C)?
+- **Criticality** — mission-critical (Type A — life/finance), commercial (Type B), or casual (Type C)?
+- **Scale** — expected users, traffic, data volume.
+- **Availability / latency targets** — SLA % (e.g. 99.99%), p95 latency.
 - New project or feature inside an existing system?
-- Expected scale (users, traffic, data volume)?
 - Team size + experience with distributed systems?
+
+**Source order:** pull from the PRD / `docs/adr/` / repo if present → else ask the user. If a value stays unknown, pick a default and **record it as an explicit stated assumption** in the output and ADR — never assume silently. Any recommendation that hinges on scale or availability must name where that figure came from (user / PRD / assumption).
 
 ### 2. Run the architectural heuristics in order
 
