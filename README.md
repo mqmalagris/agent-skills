@@ -4,14 +4,15 @@ A curated collection of [Claude Code](https://claude.com/claude-code) skills, pa
 
 ## What's in here
 
-Thirteen skills, grouped by purpose:
+Fourteen skills, grouped by purpose:
 
-### Dev pipeline (5)
+### Dev pipeline (6)
 
 The core loop I use to take a feature idea from "vague hunch" to "merged code" without writing fiction at any step:
 
 | Skill | What it does |
 |-------|--------------|
+| [`dev-flow`](dev-flow/) | Conductor for the pipeline below. Detects a task's tier (bug / feature / architecture / client), prints the exact subset of stages it will run and skip — with reasons — confirms, then drives the sub-skills in order. Matches ceremony to stakes so a bug gets three steps and a new subsystem gets the full chain. |
 | [`grill-me`](grill-me/) | Stress-test a plan or design via relentless interview. Resolves each branch of the decision tree, captures domain vocabulary, emits a Design Notes + Glossary block. Adapted from [mattpocock/skills](https://github.com/mattpocock/skills). |
 | [`to-prd`](to-prd/) | Synthesize the conversation into a PRD. Writes `docs/prds/NNNN-<slug>.md` on disk and publishes to GitHub Issues via `gh issue create`. Includes a Glossary section for downstream skills. Adapted from [mattpocock/skills](https://github.com/mattpocock/skills). |
 | [`compass`](compass/) | Multi-mode software engineering coach: architect, advisor, reviewer, refactor, legacy, and explainer workflows. Stack-agnostic by default. Auto-writes ADRs to `docs/adr/` when a non-trivial architectural decision settles. |
@@ -58,9 +59,10 @@ The core loop I use to take a feature idea from "vague hunch" to "merged code" w
 
 ## How I use them — the dev pipeline
 
-The five engineering-workflow skills are designed to compose into a single pipeline:
+The engineering-workflow skills are designed to compose into a single pipeline, with `dev-flow` as the optional conductor that picks which stages a given task actually needs:
 
 ```
+dev-flow  ⟶  routes to a subset of:
 grill-me  →  to-prd  →  compass  →  heist  →  maestro  →  code (+ code-craft)
 ```
 
@@ -95,6 +97,7 @@ Add this repo as a marketplace and install the skills you want:
 
 ```text
 /plugin marketplace add mqmalagris/claude-skills
+/plugin install dev-flow@claude-skills
 /plugin install grill-me@claude-skills
 /plugin install to-prd@claude-skills
 /plugin install compass@claude-skills
@@ -119,6 +122,7 @@ Each skill self-describes its trigger keywords in its frontmatter `description`.
 
 ```text
 # Dev pipeline
+/dev-flow add magic-link auth to the API
 grill me on this auth design
 write a PRD for the magic-link flow
 /compass help me pick between layered and hexagonal here
