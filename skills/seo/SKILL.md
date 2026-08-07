@@ -350,3 +350,7 @@ Structure reports as:
 ```bash
 pip install requests beautifulsoup4
 ```
+
+## Humanize the written prose (if available)
+
+Before writing generated prose to a file, if the `humanizer` skill is installed, run it on the drafted text so the created document reads naturally and free of AI tells; skip silently if it is not available. Apply it to the human-facing document body only, never to code, frontmatter, file paths, IDs, or literal templates.
