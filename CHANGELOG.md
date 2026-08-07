@@ -3,8 +3,15 @@
 All notable changes to this collection are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); the collection follows [SemVer](https://semver.org). See [VERSIONING.md](VERSIONING.md) for the per-skill vs collection model.
 
 ## [Unreleased]
-- `semver` 0.1.0 — new skill
-- `publish-skill` 0.1.1 — updated
+
+## [0.5.0] - 2026-08-07
+
+### Added
+- `semver` — decide and apply the SemVer bump for a change: analyzes the diff against the public surface, runs the ecosystem's breaking-change detector (Rust/npm/Go/Elixir/Python), then bumps the manifest + changelog. Stack-agnostic; feeds `publish-skill` / `release.py`.
+
+### Changed
+- Adopted a PR-based workflow: `publish-skill` now opens a CI-gated PR by default (`--auto-merge` / `--merge` / `--push-main` to control) instead of pushing to `main`.
+- README: added the skills.sh badge.
 
 ## [0.4.1] - 2026-08-07
 
