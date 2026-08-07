@@ -10,22 +10,6 @@
   },
   "plugins": [
     {
-      "name": "grill-me",
-      "source": "./skills/grill-me",
-      "description": "Stress-test a plan or design via relentless interview. Resolves each branch of the decision tree, captures domain vocabulary, emits Design Notes + Glossary block for /to-prd. Adapted from mattpocock/skills.",
-      "version": "0.2.0",
-      "author": {
-        "name": "Matheus Malagris"
-      },
-      "category": "engineering-workflow",
-      "keywords": [
-        "design-review",
-        "pre-prd",
-        "interview",
-        "ubiquitous-language"
-      ]
-    },
-    {
       "name": "maestro",
       "source": "./skills/maestro",
       "description": "Verify parallel feasibility across plans, orchestrate agents in git worktrees, run integration tests, clean up. Deterministic branch names (parallel/<slug>).",
@@ -364,6 +348,22 @@
         "standup",
         "status-update",
         "reporting"
+      ]
+    },
+    {
+      "name": "grill-me",
+      "source": "./skills/grill-me",
+      "description": "Stress-test a plan or design via relentless interview. Resolves each branch of the decision tree, captures domain vocabulary, emits Design Notes + Glossary block for /to-prd. Adapted from mattpocock/skills.",
+      "version": "0.2.0",
+      "author": {
+        "name": "Matheus Malagris"
+      },
+      "category": "engineering-workflow",
+      "keywords": [
+        "design-review",
+        "pre-prd",
+        "interview",
+        "ubiquitous-language"
       ]
     }
   ]
