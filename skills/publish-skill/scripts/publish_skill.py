@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
 """Publish one local skill to mqmalagris/agent-skills.
 
-Mechanical pipeline only (the agent supplies category/keywords/description):
+Mechanical pipeline only (the agent supplies category/keywords/description for
+new skills; on update they default to the existing marketplace entry):
   refresh a repo clone -> copy skills/<name> -> mint .claude-plugin/plugin.json
   -> upsert marketplace.json entry -> validate JSON -> commit + push to main.
 
-Idempotent: re-running for the same skill updates it instead of duplicating.
+Idempotent: re-running for the same skill updates it instead of duplicating,
+and preserves its existing category/keywords/description/version unless you
+override them with flags.
 """
 import argparse, json, re, shutil, subprocess, sys
 from pathlib import Path
@@ -30,7 +33,7 @@ def frontmatter_description(skill_md: Path) -> str:
     m = re.match(r"^---\s*\n(.*?)\n---", text, re.S)
     if not m:
         return ""
-    fm, lines, desc, capturing = m.group(1), None, [], False
+    fm, desc, capturing = m.group(1), [], False
     for line in fm.splitlines():
         dm = re.match(r"^description:\s*(.*)$", line)
         if dm:
@@ -44,9 +47,7 @@ def frontmatter_description(skill_md: Path) -> str:
             if re.match(r"^\S", line):  # next top-level key ends the block
                 break
             desc.append(line.strip())
-    joined = " ".join(desc).strip()
-    joined = re.sub(r"\s+", " ", joined)
-    # first sentence, capped
+    joined = re.sub(r"\s+", " ", " ".join(desc)).strip()
     first = re.split(r"(?<=[.!?])\s", joined)[0] if joined else ""
     return (first if 20 <= len(first) <= 240 else joined)[:240].strip()
 
@@ -64,10 +65,11 @@ def ensure_repo(repo_dir: Path):
 def main():
     ap = argparse.ArgumentParser(description="Publish a local skill to " + OWNER_NAME)
     ap.add_argument("skill", help="skill name = dir under the local skills dir")
-    ap.add_argument("--category", required=True, help="marketplace category, e.g. engineering-workflow")
-    ap.add_argument("--keywords", default="", help="comma-separated keywords")
-    ap.add_argument("--description", default="", help="concise description (else derived from SKILL.md)")
-    ap.add_argument("--version", default="0.1.0")
+    ap.add_argument("--category", default=None,
+                    help="marketplace category (required for a NEW skill; kept from the existing entry on update)")
+    ap.add_argument("--keywords", default=None, help="comma-separated keywords (kept from existing entry on update if omitted)")
+    ap.add_argument("--description", default="", help="concise description (kept from existing entry, else derived from SKILL.md)")
+    ap.add_argument("--version", default=None, help="semver (default 0.1.0 for new; kept from existing entry on update)")
     ap.add_argument("--author-name", default=AUTHOR["name"])
     ap.add_argument("--local-skills-dir", type=Path, default=DEFAULT_LOCAL)
     ap.add_argument("--repo-dir", type=Path, default=DEFAULT_REPO_DIR)
@@ -82,49 +84,57 @@ def main():
     if not re.fullmatch(r"[a-z0-9]+(-[a-z0-9]+)*", name):
         sys.exit(f"! skill name '{name}' must be kebab-case")
 
-    desc = args.description.strip() or frontmatter_description(src / "SKILL.md")
+    ensure_repo(args.repo_dir)
+    mp_path = args.repo_dir / ".claude-plugin" / "marketplace.json"
+    mp = json.loads(mp_path.read_text(encoding="utf-8"))
+    existing = next((p for p in mp["plugins"] if p["name"] == name), None)
+
+    # resolve metadata: explicit flag > existing marketplace entry > SKILL.md / default
+    category = args.category or (existing or {}).get("category")
+    if not category:
+        sys.exit("! --category is required for a new skill")
+    if args.keywords is not None:
+        kw = [k.strip() for k in args.keywords.split(",") if k.strip()]
+    else:
+        kw = list((existing or {}).get("keywords", []))
+    desc = (args.description.strip() or (existing or {}).get("description")
+            or frontmatter_description(src / "SKILL.md"))
     if not desc:
         sys.exit("! no description given and none parseable from SKILL.md; pass --description")
-    kw = [k.strip() for k in args.keywords.split(",") if k.strip()]
+    version = args.version or (existing or {}).get("version") or "0.1.0"
 
-    ensure_repo(args.repo_dir)
     dst = args.repo_dir / "skills" / name
-    existed = dst.exists()
-    if existed:
+    if dst.exists():
         shutil.rmtree(dst)
     shutil.copytree(src, dst)
 
     # mint plugin.json (keywords include the category, matching repo convention)
     plugin = {
-        "name": name, "version": args.version, "description": desc,
+        "name": name, "version": version, "description": desc,
         "author": {"name": args.author_name, "url": AUTHOR["url"]},
         "homepage": f"{REPO}/tree/main/skills/{name}",
         "repository": REPO, "license": "MIT",
-        "keywords": kw + [args.category],
+        "keywords": kw + [category],
     }
     pj_dir = dst / ".claude-plugin"
     pj_dir.mkdir(parents=True, exist_ok=True)
     (pj_dir / "plugin.json").write_text(json.dumps(plugin, indent=2) + "\n", encoding="utf-8")
 
     # upsert marketplace entry
-    mp_path = args.repo_dir / ".claude-plugin" / "marketplace.json"
-    mp = json.loads(mp_path.read_text(encoding="utf-8"))
     entry = {
         "name": name, "source": f"./skills/{name}", "description": desc,
-        "version": args.version, "author": {"name": args.author_name},
-        "category": args.category, "keywords": kw,
+        "version": version, "author": {"name": args.author_name},
+        "category": category, "keywords": kw,
     }
-    plugins = [p for p in mp["plugins"] if p["name"] != name]
-    plugins.append(entry)
-    mp["plugins"] = plugins
+    mp["plugins"] = [p for p in mp["plugins"] if p["name"] != name] + [entry]
     mp_path.write_text(json.dumps(mp, indent=2) + "\n", encoding="utf-8")
 
     # validate every manifest parses
     for p in [mp_path] + list((args.repo_dir / "skills").glob("*/.claude-plugin/plugin.json")):
         json.loads(p.read_text(encoding="utf-8"))
 
-    action = "updated" if existed else "added"
-    print(f"{action} skills/{name} ({len(plugins)} plugins in marketplace)")
+    action = "updated" if existing else "added"
+    print(f"{action} skills/{name} ({len(mp['plugins'])} plugins in marketplace)")
     print(f'README row -> | [`{name}`](skills/{name}/) | {desc} |')
 
     if args.dry_run:
