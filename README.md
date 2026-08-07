@@ -83,7 +83,7 @@ The loop I use to take a feature from vague hunch to merged code without writing
 | Skill | What it does |
 |-------|--------------|
 | [`write-a-skill`](skills/write-a-skill/) | Create new skills with proper structure, progressive disclosure, and bundled resources. |
-| [`publish-skill`](skills/publish-skill/) | Publish one of my own skills to this repo: copies it under `skills/<name>/`, mints its `plugin.json`, upserts `marketplace.json`, and pushes to main. Idempotent. |
+| [`publish-skill`](skills/publish-skill/) | Publish one of my own skills to this repo: copies it under `skills/<name>/`, mints its `plugin.json`, upserts `marketplace.json`, bumps its SemVer, and opens a CI-gated PR. Idempotent. |
 
 ### Marketing (1)
 
