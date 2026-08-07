@@ -1,6 +1,7 @@
 ---
 name: portfolio-sync
-description: Sync the current project into a central project-portfolio Markdown archive — a comprehensive log of every project the user has worked on (stack, role, scope). Path-agnostic: the user picks where the archive lives, the skill remembers it. Gathers project signals (git log, manifests, README, structure), matches existing entries by folder name, proposes add/amend for user confirmation before writing. Use when user asks to update their portfolio, log a project, sync the archive, document the current project, or runs /portfolio-sync. Distinct from cv-craft (which produces actual CVs from this archive as source).
+description: >-
+  Sync the current project into a central project-portfolio Markdown archive — a comprehensive log of every project the user has worked on (stack, role, scope). Path-agnostic: the user picks where the archive lives, the skill remembers it. Gathers project signals (git log, manifests, README, structure), matches existing entries by folder name, proposes add/amend for user confirmation before writing. Use when user asks to update their portfolio, log a project, sync the archive, document the current project, or runs /portfolio-sync. Distinct from cv-craft (which produces actual CVs from this archive as source).
 ---
 
 # portfolio-sync

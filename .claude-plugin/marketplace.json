@@ -248,21 +248,6 @@
       ]
     },
     {
-      "name": "portfolio-sync",
-      "source": "./skills/portfolio-sync",
-      "description": "Sync the current project into a central project-portfolio Markdown archive. Source data for cv-craft.",
-      "version": "0.1.0",
-      "author": {
-        "name": "Matheus Malagris"
-      },
-      "category": "career",
-      "keywords": [
-        "portfolio",
-        "project-archive",
-        "cv-source"
-      ]
-    },
-    {
       "name": "grill-me",
       "source": "./skills/grill-me",
       "description": "Stress-test a plan or design via relentless interview. Resolves each branch of the decision tree, captures domain vocabulary, emits Design Notes + Glossary block for /to-prd. Adapted from mattpocock/skills.",
@@ -364,6 +349,21 @@
         "standup",
         "status-update",
         "reporting"
+      ]
+    },
+    {
+      "name": "portfolio-sync",
+      "source": "./skills/portfolio-sync",
+      "description": "Sync the current project into a central project-portfolio Markdown archive. Source data for cv-craft.",
+      "version": "0.1.1",
+      "author": {
+        "name": "Matheus Malagris"
+      },
+      "category": "career",
+      "keywords": [
+        "portfolio",
+        "project-archive",
+        "cv-source"
       ]
     }
   ]
