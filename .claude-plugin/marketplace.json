@@ -112,21 +112,6 @@
       ]
     },
     {
-      "name": "portfolio-sync",
-      "source": "./skills/portfolio-sync",
-      "description": "Sync the current project into a central project-portfolio Markdown archive. Source data for cv-craft.",
-      "version": "0.1.0",
-      "author": {
-        "name": "Matheus Malagris"
-      },
-      "category": "career",
-      "keywords": [
-        "portfolio",
-        "project-archive",
-        "cv-source"
-      ]
-    },
-    {
       "name": "write-a-skill",
       "source": "./skills/write-a-skill",
       "description": "Meta-skill: create new Claude Code skills with proper structure, progressive disclosure, and bundled resources.",
@@ -364,6 +349,21 @@
         "solid",
         "ddd",
         "adr"
+      ]
+    },
+    {
+      "name": "portfolio-sync",
+      "source": "./skills/portfolio-sync",
+      "description": "Sync the current project into a central project-portfolio Markdown archive. Source data for cv-craft.",
+      "version": "0.1.0",
+      "author": {
+        "name": "Matheus Malagris"
+      },
+      "category": "career",
+      "keywords": [
+        "portfolio",
+        "project-archive",
+        "cv-source"
       ]
     }
   ]

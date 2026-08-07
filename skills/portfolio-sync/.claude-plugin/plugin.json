@@ -1,7 +1,7 @@
 {
   "name": "portfolio-sync",
   "version": "0.1.0",
-  "description": "Sync the current project into a central project-portfolio Markdown archive \u2014 a comprehensive log of every project worked on (stack, role, scope). Path-agnostic: user picks where the archive lives. Distinct from cv-craft, which uses this archive as a source.",
+  "description": "Sync the current project into a central project-portfolio Markdown archive. Source data for cv-craft.",
   "author": {
     "name": "Matheus Malagris",
     "url": "https://github.com/mqmalagris"
@@ -12,7 +12,7 @@
   "keywords": [
     "portfolio",
     "project-archive",
-    "career",
-    "cv-source"
+    "cv-source",
+    "career"
   ]
 }
