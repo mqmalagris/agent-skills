@@ -25,6 +25,10 @@ bunx skills add mqmalagris/agent-skills --all -g    # everything, installed glob
 
 Each skill is a directory under [`skills/`](skills/) with a `SKILL.md` (plus optional `references/`, `scripts/`, or templates). [`.claude-plugin/marketplace.json`](.claude-plugin/marketplace.json) indexes them for Claude Code; `bunx skills` discovers the same directories directly.
 
+## Versioning & releases
+
+Each skill is versioned independently (SemVer in its `plugin.json`); the collection is snapshotted with git tags `vX.Y.Z` and [GitHub Releases](https://github.com/mqmalagris/agent-skills/releases). See [`CHANGELOG.md`](CHANGELOG.md) and [`VERSIONING.md`](VERSIONING.md). Manifests are validated in CI on every push and PR.
+
 ## What's in here (21 skills)
 
 ### Dev pipeline (8)
