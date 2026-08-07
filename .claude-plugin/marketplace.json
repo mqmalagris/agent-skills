@@ -348,6 +348,23 @@
         "continuous-discovery",
         "product-trio"
       ]
+    },
+    {
+      "name": "publish-skill",
+      "source": "./skills/publish-skill",
+      "description": "Publish one of your own skills from ~/.claude/skills to this repo: copy it under skills/<name>/, mint its plugin.json, upsert marketplace.json, and push to main. Idempotent.",
+      "version": "0.1.0",
+      "author": {
+        "name": "Matheus Malagris"
+      },
+      "category": "meta",
+      "keywords": [
+        "publish",
+        "skill-authoring",
+        "marketplace",
+        "bunx-skills",
+        "git"
+      ]
     }
   ]
 }
