@@ -80,22 +80,6 @@
       ]
     },
     {
-      "name": "commit-report",
-      "source": "./skills/commit-report",
-      "description": "Dual-format commit report (prose + bullets) from recent git activity, tunable to audience (dev / pm / client).",
-      "version": "0.1.0",
-      "author": {
-        "name": "Matheus Malagris"
-      },
-      "category": "reporting",
-      "keywords": [
-        "git",
-        "standup",
-        "status-update",
-        "reporting"
-      ]
-    },
-    {
       "name": "cv-craft",
       "source": "./skills/cv-craft",
       "description": "Maintain a canonical master CV in Markdown and produce tailored, ATS-friendly resumes and recruiter-screen prep packs from job descriptions.",
@@ -364,6 +348,22 @@
         "self-review",
         "promotion",
         "cv-source"
+      ]
+    },
+    {
+      "name": "commit-report",
+      "source": "./skills/commit-report",
+      "description": "Dual-format commit report (prose + bullets) from recent git activity, tunable to audience (dev / pm / client).",
+      "version": "0.1.0",
+      "author": {
+        "name": "Matheus Malagris"
+      },
+      "category": "reporting",
+      "keywords": [
+        "git",
+        "standup",
+        "status-update",
+        "reporting"
       ]
     }
   ]

@@ -1,7 +1,7 @@
 {
   "name": "commit-report",
   "version": "0.1.0",
-  "description": "Generate dual-format commit report (prose paragraph + bullet list) from recent git activity, tunable to audience (dev / pm / client). Defaults to HEAD's latest commit batch; supports --since, --last, --count, --range, --path overrides.",
+  "description": "Dual-format commit report (prose + bullets) from recent git activity, tunable to audience (dev / pm / client).",
   "author": {
     "name": "Matheus Malagris",
     "url": "https://github.com/mqmalagris"
@@ -13,7 +13,7 @@
     "git",
     "standup",
     "status-update",
-    "commit-summary",
+    "reporting",
     "reporting"
   ]
 }
