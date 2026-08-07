@@ -1,5 +1,7 @@
 # agent-skills
 
+[![skills.sh](https://www.skills.sh/b/mqmalagris/agent-skills)](https://www.skills.sh/mqmalagris/agent-skills)
+
 A curated, **dual-format** collection of [Agent Skills](https://www.anthropic.com/news/skills). Install it as a [Claude Code](https://claude.com/claude-code) plugin marketplace, **or** with [`bunx skills`](https://www.skills.sh/) into any of 75+ agents (Cursor, Copilot, Windsurf, Codex, …) — same `SKILL.md` files, either way.
 
 Most skills are mine; a few are forks/adaptations of public skills, attributed per skill below. Third-party skills I use but don't vendor here live in [`THIRD_PARTY.md`](THIRD_PARTY.md).
