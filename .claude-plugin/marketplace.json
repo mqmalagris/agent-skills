@@ -6,7 +6,7 @@
   },
   "metadata": {
     "description": "Curated, dual-format skill collection: installable as a Claude Code plugin marketplace or via `bunx skills`. A full dev pipeline (grill-me -> to-prd -> compass -> heist -> maestro -> parallel-worktrees), a pre-commit quality gate (implementation-review + testing-philosophy + security-audit + wstg), language idioms, plus career/product/reporting/SEO tools.",
-    "version": "0.4.0"
+    "version": "0.4.1"
   },
   "plugins": [
     {

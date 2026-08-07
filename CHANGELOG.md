@@ -3,11 +3,14 @@
 All notable changes to this collection are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); the collection follows [SemVer](https://semver.org). See [VERSIONING.md](VERSIONING.md) for the per-skill vs collection model.
 
 ## [Unreleased]
-- `portfolio-sync` — fix YAML frontmatter (block-scalar description) so strict parsers / skills.sh index it
-- `commit-report` — fix YAML frontmatter (block-scalar description) so strict parsers / skills.sh index it
-- `code-craft` — fix YAML frontmatter (block-scalar description) so strict parsers / skills.sh index it
-- `cagan-check` — fix YAML frontmatter (block-scalar description) so strict parsers / skills.sh index it
-- `brag-doc` — fix YAML frontmatter (block-scalar description) so strict parsers / skills.sh index it
+
+## [0.4.1] - 2026-08-07
+
+### Fixed
+- `brag-doc`, `cagan-check`, `code-craft`, `commit-report`, `portfolio-sync` had an unquoted `: ` in their SKILL.md frontmatter `description`, which broke strict YAML parsers and hid them from [skills.sh](https://www.skills.sh/mqmalagris/agent-skills). Descriptions converted to `>-` block scalars; each patch-bumped.
+
+### Changed
+- `validate_repo.py` now strict-parses SKILL.md frontmatter (PyYAML in CI, colon-space heuristic locally) so invalid frontmatter fails the build.
 
 ## [0.4.0] - 2026-08-07
 
