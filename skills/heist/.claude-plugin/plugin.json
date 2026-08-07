@@ -1,7 +1,7 @@
 {
   "name": "heist",
   "version": "0.2.0",
-  "description": "Turn a settled feature scope into a concrete implementation plan and write it to docs/plans/NNNN-<slug>.md. Plans the job like a heist \u2014 crew (files touched), sequence (ordered tasks + parallel phases), getaway (rollback/risks), payoff (acceptance criteria). Consumes PRDs + ADRs.",
+  "description": "Turn a settled feature scope into an implementation plan at docs/plans/NNNN-<slug>.md. Crew, sequence (with parallel phases), getaway, payoff. Consumes PRDs + ADRs.",
   "author": {
     "name": "Matheus Malagris",
     "url": "https://github.com/mqmalagris"
@@ -12,7 +12,6 @@
   "keywords": [
     "planning",
     "implementation-plan",
-    "feature-spec",
     "prd",
     "adr",
     "engineering-workflow"
