@@ -49,3 +49,7 @@ This skill takes the current conversation context and codebase understanding and
 - **code** — user or agent implements one phase at a time.
 
 Skip earlier stages when the artifact already exists. If grill-me hasn't run and the conversation lacks scope clarity, halt and route there instead of synthesizing fiction.
+
+## Humanize the written prose (if available)
+
+Before writing generated prose to a file, if the `humanizer` skill is installed, run it on the drafted text so the created document reads naturally and free of AI tells; skip silently if it is not available. Apply it to the human-facing document body only, never to code, frontmatter, file paths, IDs, or literal templates.

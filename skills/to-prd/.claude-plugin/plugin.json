@@ -1,7 +1,7 @@
 {
   "name": "to-prd",
   "version": "0.2.0",
-  "description": "Synthesize the current conversation context into a PRD. Writes to docs/prds/NNNN-<slug>.md on disk and publishes to GitHub Issues via gh issue create. Includes a Glossary section (ubiquitous language) for downstream skills. Adapted from Matt Pocock's to-prd (https://github.com/mattpocock/skills).",
+  "description": "Synthesize conversation context into a PRD. Writes docs/prds/NNNN-<slug>.md + publishes to GitHub Issues. Includes Glossary section. Adapted from mattpocock/skills.",
   "author": {
     "name": "Matheus Malagris",
     "url": "https://github.com/mqmalagris"
@@ -12,7 +12,6 @@
   "keywords": [
     "prd",
     "feature-spec",
-    "product-requirements",
     "github-issues",
     "engineering-workflow"
   ]
