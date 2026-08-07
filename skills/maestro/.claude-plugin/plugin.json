@@ -1,0 +1,20 @@
+{
+  "name": "maestro",
+  "version": "0.2.0",
+  "description": "Verify plans, PRDs, and ADRs for parallel-execution feasibility. Builds a conflict graph from files-touched data, judges whether parallelizing is worthwhile, then orchestrates agents in git worktrees to implement, test, and clean up. Native `git worktree` per plan with deterministic branch names (parallel/<slug>).",
+  "author": {
+    "name": "Matheus Malagris",
+    "url": "https://github.com/mqmalagris"
+  },
+  "homepage": "https://github.com/mqmalagris/claude-skills/tree/main/skills/maestro",
+  "repository": "https://github.com/mqmalagris/claude-skills",
+  "license": "MIT",
+  "keywords": [
+    "orchestration",
+    "parallel-execution",
+    "git-worktree",
+    "multi-agent",
+    "dag",
+    "engineering-workflow"
+  ]
+}

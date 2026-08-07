@@ -1,0 +1,19 @@
+{
+  "name": "parallel-worktrees",
+  "version": "0.1.0",
+  "description": "Playbook for parallel work across git worktrees: go/no-go, file partitioning, isolation mechanism, integration and cleanup. The plan-optional counterpart to maestro.",
+  "author": {
+    "name": "Matheus Malagris",
+    "url": "https://github.com/mqmalagris"
+  },
+  "homepage": "https://github.com/mqmalagris/claude-skills/tree/main/skills/parallel-worktrees",
+  "repository": "https://github.com/mqmalagris/claude-skills",
+  "license": "MIT",
+  "keywords": [
+    "git-worktree",
+    "parallel-execution",
+    "multi-agent",
+    "orchestration",
+    "engineering-workflow"
+  ]
+}

@@ -5,135 +5,349 @@
     "url": "https://github.com/mqmalagris"
   },
   "metadata": {
-    "description": "Curated Claude Code skills — a dev pipeline (grill-me → to-prd → compass → heist → maestro), tactical language idioms, and a handful of career/content/SEO tools.",
-    "version": "0.2.0"
+    "description": "Curated, dual-format skill collection: installable as a Claude Code plugin marketplace or via `bunx skills`. A full dev pipeline (grill-me -> to-prd -> compass -> heist -> maestro -> parallel-worktrees), a pre-commit quality gate (implementation-review + testing-philosophy + security-audit + wstg), language idioms, plus career/product/reporting/SEO tools.",
+    "version": "0.3.0"
   },
   "plugins": [
     {
       "name": "grill-me",
-      "source": "./grill-me",
+      "source": "./skills/grill-me",
       "description": "Stress-test a plan or design via relentless interview. Resolves each branch of the decision tree, captures domain vocabulary, emits Design Notes + Glossary block for /to-prd. Adapted from mattpocock/skills.",
       "version": "0.2.0",
-      "author": { "name": "Matheus Malagris" },
+      "author": {
+        "name": "Matheus Malagris"
+      },
       "category": "engineering-workflow",
-      "keywords": ["design-review", "pre-prd", "interview", "ubiquitous-language"]
+      "keywords": [
+        "design-review",
+        "pre-prd",
+        "interview",
+        "ubiquitous-language"
+      ]
     },
     {
       "name": "to-prd",
-      "source": "./to-prd",
+      "source": "./skills/to-prd",
       "description": "Synthesize conversation context into a PRD. Writes docs/prds/NNNN-<slug>.md + publishes to GitHub Issues. Includes Glossary section. Adapted from mattpocock/skills.",
       "version": "0.2.0",
-      "author": { "name": "Matheus Malagris" },
+      "author": {
+        "name": "Matheus Malagris"
+      },
       "category": "engineering-workflow",
-      "keywords": ["prd", "feature-spec", "github-issues"]
+      "keywords": [
+        "prd",
+        "feature-spec",
+        "github-issues"
+      ]
     },
     {
       "name": "compass",
-      "source": "./compass",
+      "source": "./skills/compass",
       "description": "Multi-mode software engineering coach: architect, advisor, reviewer, refactor, legacy, and explainer workflows. Auto-writes ADRs to docs/adr/.",
       "version": "0.2.0",
-      "author": { "name": "Matheus Malagris" },
+      "author": {
+        "name": "Matheus Malagris"
+      },
       "category": "development",
-      "keywords": ["software-engineering", "architecture", "design-patterns", "solid", "ddd", "adr"]
+      "keywords": [
+        "software-engineering",
+        "architecture",
+        "design-patterns",
+        "solid",
+        "ddd",
+        "adr"
+      ]
     },
     {
       "name": "heist",
-      "source": "./heist",
+      "source": "./skills/heist",
       "description": "Turn a settled feature scope into an implementation plan at docs/plans/NNNN-<slug>.md. Crew, sequence (with parallel phases), getaway, payoff. Consumes PRDs + ADRs.",
       "version": "0.2.0",
-      "author": { "name": "Matheus Malagris" },
+      "author": {
+        "name": "Matheus Malagris"
+      },
       "category": "engineering-workflow",
-      "keywords": ["planning", "implementation-plan", "prd", "adr"]
+      "keywords": [
+        "planning",
+        "implementation-plan",
+        "prd",
+        "adr"
+      ]
     },
     {
       "name": "maestro",
-      "source": "./maestro",
+      "source": "./skills/maestro",
       "description": "Verify parallel feasibility across plans, orchestrate agents in git worktrees, run integration tests, clean up. Deterministic branch names (parallel/<slug>).",
       "version": "0.2.0",
-      "author": { "name": "Matheus Malagris" },
+      "author": {
+        "name": "Matheus Malagris"
+      },
       "category": "engineering-workflow",
-      "keywords": ["orchestration", "parallel-execution", "git-worktree", "multi-agent"]
+      "keywords": [
+        "orchestration",
+        "parallel-execution",
+        "git-worktree",
+        "multi-agent"
+      ]
     },
     {
       "name": "dev-flow",
-      "source": "./dev-flow",
+      "source": "./skills/dev-flow",
       "description": "Conductor for the dev pipeline: detects a task's tier (bug / feature / architecture / client), prints the exact chain of sub-skills it will run and skip with reasons, confirms, then drives them in order. Matches ceremony to stakes.",
       "version": "0.1.0",
-      "author": { "name": "Matheus Malagris" },
+      "author": {
+        "name": "Matheus Malagris"
+      },
       "category": "engineering-workflow",
-      "keywords": ["orchestration", "router", "conductor", "pipeline", "meta"]
+      "keywords": [
+        "orchestration",
+        "router",
+        "conductor",
+        "pipeline",
+        "meta"
+      ]
     },
     {
       "name": "code-craft",
-      "source": "./code-craft",
+      "source": "./skills/code-craft",
       "description": "Language- and framework-specific best practices and idioms. Reader and reviewer modes. Ships 7 languages + 12 frameworks (TS, Rust, CSS, Tailwind, Dart, Go, Python, React, Next, RN+Expo, Hono, Workers, Astro, Svelte, Drizzle, Supabase, Lambda, Terraform, Flutter).",
       "version": "0.2.0",
-      "author": { "name": "Matheus Malagris" },
+      "author": {
+        "name": "Matheus Malagris"
+      },
       "category": "development",
-      "keywords": ["code-review", "idioms", "typescript", "rust", "react", "nextjs", "go", "python", "flutter"]
+      "keywords": [
+        "code-review",
+        "idioms",
+        "typescript",
+        "rust",
+        "react",
+        "nextjs",
+        "go",
+        "python",
+        "flutter"
+      ]
     },
     {
       "name": "commit-report",
-      "source": "./commit-report",
+      "source": "./skills/commit-report",
       "description": "Dual-format commit report (prose + bullets) from recent git activity, tunable to audience (dev / pm / client).",
       "version": "0.1.0",
-      "author": { "name": "Matheus Malagris" },
+      "author": {
+        "name": "Matheus Malagris"
+      },
       "category": "reporting",
-      "keywords": ["git", "standup", "status-update", "reporting"]
+      "keywords": [
+        "git",
+        "standup",
+        "status-update",
+        "reporting"
+      ]
     },
     {
       "name": "cv-craft",
-      "source": "./cv-craft",
+      "source": "./skills/cv-craft",
       "description": "Maintain a canonical master CV in Markdown and produce tailored, ATS-friendly resumes and recruiter-screen prep packs from job descriptions.",
       "version": "0.1.0",
-      "author": { "name": "Matheus Malagris" },
+      "author": {
+        "name": "Matheus Malagris"
+      },
       "category": "career",
-      "keywords": ["cv", "resume", "ats", "job-search"]
+      "keywords": [
+        "cv",
+        "resume",
+        "ats",
+        "job-search"
+      ]
     },
     {
       "name": "portfolio-sync",
-      "source": "./portfolio-sync",
+      "source": "./skills/portfolio-sync",
       "description": "Sync the current project into a central project-portfolio Markdown archive. Source data for cv-craft.",
       "version": "0.1.0",
-      "author": { "name": "Matheus Malagris" },
+      "author": {
+        "name": "Matheus Malagris"
+      },
       "category": "career",
-      "keywords": ["portfolio", "project-archive", "cv-source"]
-    },
-    {
-      "name": "write-with-ai",
-      "source": "./write-with-ai",
-      "description": "Online-content writing assistant: articles, newsletters, social posts, hooks, sales copy. Frameworks from Nicolas Cole / Dickie Bush + Maria Sukhareva's voice-preserving workflow.",
-      "version": "0.1.0",
-      "author": { "name": "Matheus Malagris" },
-      "category": "writing",
-      "keywords": ["writing", "content", "copywriting", "newsletter", "social-media"]
+      "keywords": [
+        "portfolio",
+        "project-archive",
+        "cv-source"
+      ]
     },
     {
       "name": "write-a-skill",
-      "source": "./write-a-skill",
+      "source": "./skills/write-a-skill",
       "description": "Meta-skill: create new Claude Code skills with proper structure, progressive disclosure, and bundled resources.",
       "version": "0.1.0",
-      "author": { "name": "Matheus Malagris" },
+      "author": {
+        "name": "Matheus Malagris"
+      },
       "category": "meta",
-      "keywords": ["meta", "skill-authoring", "claude-code"]
+      "keywords": [
+        "meta",
+        "skill-authoring",
+        "claude-code"
+      ]
     },
     {
       "name": "seo",
-      "source": "./seo",
+      "source": "./skills/seo",
       "description": "Deterministic LLM-first SEO audits for websites, blog posts, and GitHub repos. 16 sub-skills, 10 specialist agents, 33 evidence scripts. Adapted from Bhanunamikaze/Agentic-SEO-Skill (originally AgriciDaniel/claude-seo).",
       "version": "0.1.0",
-      "author": { "name": "Matheus Malagris" },
+      "author": {
+        "name": "Matheus Malagris"
+      },
       "category": "marketing",
-      "keywords": ["seo", "audit", "schema", "core-web-vitals", "e-e-a-t", "geo", "aeo"]
+      "keywords": [
+        "seo",
+        "audit",
+        "schema",
+        "core-web-vitals",
+        "e-e-a-t",
+        "geo",
+        "aeo"
+      ]
     },
     {
       "name": "wstg-security-testing",
-      "source": "./wstg-security-testing",
-      "description": "Web application security testing via the OWASP Web Security Testing Guide (WSTG) — 12 categories, ~109 test cases. Four modes: guide a pentest, self-review your app, build/score a coverage checklist, review a diff against WSTG. Methodology from OWASP/wstg. Authorized/defensive use only.",
+      "source": "./skills/wstg-security-testing",
+      "description": "Web application security testing via the OWASP Web Security Testing Guide (WSTG) \u2014 12 categories, ~109 test cases. Four modes: guide a pentest, self-review your app, build/score a coverage checklist, review a diff against WSTG. Methodology from OWASP/wstg. Authorized/defensive use only.",
       "version": "0.1.0",
-      "author": { "name": "Matheus Malagris" },
+      "author": {
+        "name": "Matheus Malagris"
+      },
       "category": "security",
-      "keywords": ["owasp", "wstg", "security-testing", "pentest", "appsec", "web-security", "code-review"]
+      "keywords": [
+        "owasp",
+        "wstg",
+        "security-testing",
+        "pentest",
+        "appsec",
+        "web-security",
+        "code-review"
+      ]
+    },
+    {
+      "name": "pr-craft",
+      "source": "./skills/pr-craft",
+      "description": "Create a pull request with a structured description (Problem / Root cause / Fix / Test / Out of scope) derived from the diff and conversation. Drives the branch -> commit -> push -> gh pr create flow.",
+      "version": "0.1.0",
+      "author": {
+        "name": "Matheus Malagris"
+      },
+      "category": "engineering-workflow",
+      "keywords": [
+        "pull-request",
+        "git",
+        "gh",
+        "code-review",
+        "engineering-workflow"
+      ]
+    },
+    {
+      "name": "implementation-review",
+      "source": "./skills/implementation-review",
+      "description": "Pre-commit quality gate: seven parallel-subagent checks (plan gaps, use-case coverage, test scenarios, test philosophy, SOLID, Clean Code, security). Runs after /verify, before commit.",
+      "version": "0.1.0",
+      "author": {
+        "name": "Matheus Malagris"
+      },
+      "category": "engineering-workflow",
+      "keywords": [
+        "code-review",
+        "pre-commit",
+        "quality-gate",
+        "testing",
+        "solid",
+        "security",
+        "multi-agent"
+      ]
+    },
+    {
+      "name": "security-audit",
+      "source": "./skills/security-audit",
+      "description": "High-confidence security review of a diff, layered on wstg-security-testing. Confidence gate, false-positive precedents, WSTG-ID mapping, and a dependency audit. Reports only concretely exploitable findings.",
+      "version": "0.1.0",
+      "author": {
+        "name": "Matheus Malagris"
+      },
+      "category": "security",
+      "keywords": [
+        "security",
+        "appsec",
+        "vulnerability",
+        "wstg",
+        "dependency-audit",
+        "code-review"
+      ]
+    },
+    {
+      "name": "testing-philosophy",
+      "source": "./skills/testing-philosophy",
+      "description": "Defines what a good test is: behavior over implementation, the Testing Trophy, and an e2e floor for user-facing features. Stack-agnostic (TS/Rust/Go/Elixir/Python). Kent Dodds, generalized.",
+      "version": "0.1.0",
+      "author": {
+        "name": "Matheus Malagris"
+      },
+      "category": "engineering-workflow",
+      "keywords": [
+        "testing",
+        "testing-trophy",
+        "integration-tests",
+        "e2e",
+        "kent-dodds"
+      ]
+    },
+    {
+      "name": "parallel-worktrees",
+      "source": "./skills/parallel-worktrees",
+      "description": "Playbook for parallel work across git worktrees: go/no-go, file partitioning, isolation mechanism, integration and cleanup. The plan-optional counterpart to maestro.",
+      "version": "0.1.0",
+      "author": {
+        "name": "Matheus Malagris"
+      },
+      "category": "engineering-workflow",
+      "keywords": [
+        "git-worktree",
+        "parallel-execution",
+        "multi-agent",
+        "orchestration"
+      ]
+    },
+    {
+      "name": "brag-doc",
+      "source": "./skills/brag-doc",
+      "description": "Maintain a monthly brag document and roll it up into a promo packet, self-review, or CV material. Lucas Faria's 4-field template + Julia Evans' impact-first categories. Feeds cv-craft.",
+      "version": "0.1.0",
+      "author": {
+        "name": "Matheus Malagris"
+      },
+      "category": "career",
+      "keywords": [
+        "brag-document",
+        "career",
+        "self-review",
+        "promotion",
+        "cv-source"
+      ]
+    },
+    {
+      "name": "cagan-check",
+      "source": "./skills/cagan-check",
+      "description": "Apply Marty Cagan (SVPG) + Teresa Torres Continuous Discovery to a dev's workflow: feature kickoff, planning/estimation, discovery calls, PR review. Flags feature-factory smells; green/yellow/red per dimension.",
+      "version": "0.1.0",
+      "author": {
+        "name": "Matheus Malagris"
+      },
+      "category": "product",
+      "keywords": [
+        "product",
+        "cagan",
+        "svpg",
+        "continuous-discovery",
+        "product-trio"
+      ]
     }
   ]
 }
