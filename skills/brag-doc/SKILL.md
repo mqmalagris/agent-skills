@@ -1,6 +1,7 @@
 ---
 name: brag-doc
-description: Maintain a monthly brag document (accomplishment log) and roll it up into a promo packet, self-review, or CV material. Blends Lucas Faria's 4-field monthly template with Julia Evans' impact-first categories. Use when the user wants to log what they shipped, prep for a performance or promotion cycle, write a self-review, remember work from months ago, feed achievements to cv-craft, or runs /brag-doc. Modes: draft, example, review, compile. Targets: al (Arctic Leaf employment), side (public / side-project work).
+description: >-
+  Maintain a monthly brag document (accomplishment log) and roll it up into a promo packet, self-review, or CV material. Blends Lucas Faria's 4-field monthly template with Julia Evans' impact-first categories. Use when the user wants to log what they shipped, prep for a performance or promotion cycle, write a self-review, remember work from months ago, feed achievements to cv-craft, or runs /brag-doc. Modes: draft, example, review, compile. Targets: al (Arctic Leaf employment), side (public / side-project work).
 ---
 
 # Brag Doc

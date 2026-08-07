@@ -301,23 +301,6 @@
       ]
     },
     {
-      "name": "brag-doc",
-      "source": "./skills/brag-doc",
-      "description": "Maintain a monthly brag document and roll it up into a promo packet, self-review, or CV material. Lucas Faria's 4-field template + Julia Evans' impact-first categories. Feeds cv-craft.",
-      "version": "0.1.0",
-      "author": {
-        "name": "Matheus Malagris"
-      },
-      "category": "career",
-      "keywords": [
-        "brag-document",
-        "career",
-        "self-review",
-        "promotion",
-        "cv-source"
-      ]
-    },
-    {
       "name": "commit-report",
       "source": "./skills/commit-report",
       "description": "Dual-format commit report (prose + bullets) from recent git activity, tunable to audience (dev / pm / client).",
@@ -364,6 +347,23 @@
         "marketplace",
         "bunx-skills",
         "git"
+      ]
+    },
+    {
+      "name": "brag-doc",
+      "source": "./skills/brag-doc",
+      "description": "Maintain a monthly brag document and roll it up into a promo packet, self-review, or CV material. Lucas Faria's 4-field template + Julia Evans' impact-first categories. Feeds cv-craft.",
+      "version": "0.1.1",
+      "author": {
+        "name": "Matheus Malagris"
+      },
+      "category": "career",
+      "keywords": [
+        "brag-document",
+        "career",
+        "self-review",
+        "promotion",
+        "cv-source"
       ]
     }
   ]
