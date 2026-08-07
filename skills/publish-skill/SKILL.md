@@ -1,6 +1,6 @@
 ---
 name: publish-skill
-description: "Publish one of the user's own skills from ~/.claude/skills to the mqmalagris/agent-skills GitHub repo — copies the skill under skills/<name>/, mints its .claude-plugin/plugin.json, upserts the marketplace.json entry, then commits and pushes to main. Use when the user says 'publish this skill', 'push <skill> to my repo', 'add <skill> to agent-skills', 'ship this skill', or wants a locally-authored skill added to their public skill collection. NOT for third-party skills (those go in THIRD_PARTY.md, not vendored) or for editing skill content."
+description: "Publish one of the user's own skills from ~/.claude/skills to the mqmalagris/agent-skills GitHub repo — copies the skill under skills/<name>/, mints its .claude-plugin/plugin.json, upserts the marketplace.json entry, bumps its version, and opens a PR against main (CI-gated). Use when the user says 'publish this skill', 'push <skill> to my repo', 'add <skill> to agent-skills', 'ship this skill', or wants a locally-authored skill added to their public skill collection. NOT for third-party skills (those go in THIRD_PARTY.md, not vendored) or for editing skill content."
 ---
 
 # publish-skill
@@ -18,9 +18,9 @@ Do not use this for third-party skills — those belong in the repo's `THIRD_PAR
    python3 ~/.claude/skills/publish-skill/scripts/publish_skill.py <skill-name> \
      --category <category> --keywords tag-a,tag-b,tag-c
    ```
-   It refreshes a repo cache, copies the skill, mints `plugin.json`, upserts `marketplace.json`, **bumps the skill's version** (PATCH on update), **logs a `CHANGELOG.md` `[Unreleased]` line**, validates all JSON, commits, and pushes to `main` (verifying the remote SHA). Overrides: `--bump minor|major`, `--version X.Y.Z`, `--no-bump` (hold version), `--changelog "text"`, `--description "..."`, `--no-push`, `--dry-run`.
-4. **Update the README table.** The script prints a suggested row and the target `skills/` path. Add that row to the right group section in the repo's `README.md`, then commit + push it (the script does not touch README — groupings are editorial). Skip only if the user says the README doesn't matter.
-5. **Report** the pushed commit SHA + new version, and the install commands: `bunx skills add mqmalagris/agent-skills -s <name>` and `/plugin install <name>@agent-skills`.
+   It refreshes a repo cache, copies the skill, mints `plugin.json`, upserts `marketplace.json`, **bumps the skill's version** (PATCH on update), **logs a `CHANGELOG.md` `[Unreleased]` line**, validates all JSON, commits on a `publish/<name>-v<version>` branch, and **opens a PR against `main`** (CI `validate` gates it). Merge overrides: `--auto-merge` (merge when CI passes), `--merge` (merge now, squash+admin), `--push-main` (legacy: push straight to `main`, no PR). Other: `--bump minor|major`, `--version X.Y.Z`, `--no-bump`, `--changelog "text"`, `--description "..."`, `--no-push`, `--dry-run`.
+4. **Update the README table.** The script prints a suggested row and the target `skills/` path. Add that row to the right group section in the repo's `README.md` (goes in the same PR branch, or a follow-up PR). Skip only if the user says the README doesn't matter.
+5. **Report** the PR URL + new version, and (post-merge) the install commands: `bunx skills add mqmalagris/agent-skills -s <name>` and `/plugin install <name>@agent-skills`.
 6. **Cutting a release (optional, when done publishing).** Per-skill publishes accumulate under CHANGELOG `[Unreleased]`. To snapshot the collection, run the repo's release cutter (it validates, bumps the collection version, rolls the changelog, tags `vX.Y.Z`, and creates a GitHub Release):
    ```bash
    python3 ~/.cache/agent-skills-publish/scripts/release.py --bump minor   # or --version X.Y.Z

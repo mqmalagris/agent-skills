@@ -96,6 +96,9 @@ def main():
     ap.add_argument("--author-name", default=AUTHOR["name"])
     ap.add_argument("--local-skills-dir", type=Path, default=DEFAULT_LOCAL)
     ap.add_argument("--repo-dir", type=Path, default=DEFAULT_REPO_DIR)
+    ap.add_argument("--push-main", action="store_true", help="push directly to main instead of opening a PR (legacy / release use)")
+    ap.add_argument("--auto-merge", action="store_true", help="open the PR with squash auto-merge (merges when CI passes)")
+    ap.add_argument("--merge", action="store_true", help="merge the PR immediately (squash, admin)")
     ap.add_argument("--no-push", action="store_true")
     ap.add_argument("--dry-run", action="store_true")
     args = ap.parse_args()
@@ -171,21 +174,45 @@ def main():
         print("dry-run: no commit/push. Repo prepared at", args.repo_dir)
         return
 
-    run(["git", "add", "-A"], cwd=args.repo_dir)
-    if run(["git", "diff", "--cached", "--quiet"], cwd=args.repo_dir, check=False).returncode == 0:
+    repo = args.repo_dir
+    title = f"{action} skill: {name} v{version}"
+    branch = f"publish/{name}-v{version}"
+    if not args.push_main:
+        run(["git", "checkout", "-b", branch], cwd=repo)  # carries the working-tree changes onto the branch
+    run(["git", "add", "-A"], cwd=repo)
+    if run(["git", "diff", "--cached", "--quiet"], cwd=repo, check=False).returncode == 0:
         print("no changes to commit (already in sync)")
         return
-    run(["git", "commit", "-m", f"{action} skill: {name} v{version}"], cwd=args.repo_dir)
-    local_sha = run(["git", "rev-parse", "HEAD"], cwd=args.repo_dir).stdout.strip()
-    if args.no_push:
-        print(f"committed {local_sha[:7]} locally (--no-push). Push with: git -C {args.repo_dir} push origin main")
+    run(["git", "commit", "-m", title], cwd=repo)
+    sha = run(["git", "rev-parse", "HEAD"], cwd=repo).stdout.strip()
+
+    if args.push_main:
+        if args.no_push:
+            print(f"committed {sha[:7]} on main locally (--no-push).")
+            return
+        run(["git", "push", "origin", "HEAD:main"], cwd=repo)
+        remote = run(["git", "ls-remote", "origin", "-h", "refs/heads/main"], cwd=repo).stdout.split()[0]
+        ok = sha == remote
+        print(f"{'OK pushed' if ok else 'MISMATCH'} {sha[:7]} -> origin/main ({OWNER_NAME})")
+        if not ok:
+            sys.exit("! push did not land; check remote")
         return
-    run(["git", "push", "origin", "HEAD:main"], cwd=args.repo_dir)
-    remote_sha = run(["git", "ls-remote", "origin", "-h", "refs/heads/main"], cwd=args.repo_dir).stdout.split()[0]
-    ok = local_sha == remote_sha
-    print(f"{'OK pushed' if ok else 'MISMATCH'} {local_sha[:7]} -> origin/main ({OWNER_NAME})")
-    if not ok:
-        sys.exit("! push did not land; check remote")
+
+    # PR mode (default)
+    if args.no_push:
+        print(f"committed {sha[:7]} on branch {branch} locally (--no-push).")
+        return
+    run(["git", "push", "-u", "origin", branch], cwd=repo)
+    pr = run(["gh", "pr", "create", "--base", "main", "--head", branch, "--title", title,
+              "--body", f"{cl_line}\n\nOpened by publish-skill. CI (`validate`) gates this PR."], cwd=repo)
+    url = (pr.stdout.strip().splitlines() or [""])[-1]
+    print(f"PR opened: {url}")
+    if args.merge:
+        run(["gh", "pr", "merge", branch, "--squash", "--admin", "--delete-branch"], cwd=repo)
+        print(f"merged {branch} -> main (squash)")
+    elif args.auto_merge:
+        run(["gh", "pr", "merge", branch, "--squash", "--auto", "--delete-branch"], cwd=repo)
+        print("auto-merge enabled; merges when CI passes")
 
 
 if __name__ == "__main__":
