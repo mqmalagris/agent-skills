@@ -25,7 +25,7 @@ bunx skills add mqmalagris/agent-skills --all -g    # everything, installed glob
 
 Each skill is a directory under [`skills/`](skills/) with a `SKILL.md` (plus optional `references/`, `scripts/`, or templates). [`.claude-plugin/marketplace.json`](.claude-plugin/marketplace.json) indexes them for Claude Code; `bunx skills` discovers the same directories directly.
 
-## What's in here (20 skills)
+## What's in here (21 skills)
 
 ### Dev pipeline (8)
 
@@ -72,11 +72,12 @@ The loop I use to take a feature from vague hunch to merged code without writing
 |-------|--------------|
 | [`cagan-check`](skills/cagan-check/) | Apply Marty Cagan (SVPG) + Teresa Torres Continuous Discovery to a dev's workflow. Flags feature-factory smells; green/yellow/red per dimension. |
 
-### Meta (1)
+### Meta (2)
 
 | Skill | What it does |
 |-------|--------------|
 | [`write-a-skill`](skills/write-a-skill/) | Create new skills with proper structure, progressive disclosure, and bundled resources. |
+| [`publish-skill`](skills/publish-skill/) | Publish one of my own skills to this repo: copies it under `skills/<name>/`, mints its `plugin.json`, upserts `marketplace.json`, and pushes to main. Idempotent. |
 
 ### Marketing (1)
 
