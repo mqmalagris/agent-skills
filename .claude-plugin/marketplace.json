@@ -220,23 +220,6 @@
       ]
     },
     {
-      "name": "cagan-check",
-      "source": "./skills/cagan-check",
-      "description": "Apply Marty Cagan (SVPG) + Teresa Torres Continuous Discovery to a dev's workflow: feature kickoff, planning/estimation, discovery calls, PR review. Flags feature-factory smells; green/yellow/red per dimension.",
-      "version": "0.1.0",
-      "author": {
-        "name": "Matheus Malagris"
-      },
-      "category": "product",
-      "keywords": [
-        "product",
-        "cagan",
-        "svpg",
-        "continuous-discovery",
-        "product-trio"
-      ]
-    },
-    {
       "name": "to-prd",
       "source": "./skills/to-prd",
       "description": "Synthesize conversation context into a PRD. Writes docs/prds/NNNN-<slug>.md + publishes to GitHub Issues. Includes Glossary section. Adapted from mattpocock/skills.",
@@ -364,6 +347,23 @@
         "self-review",
         "promotion",
         "cv-source"
+      ]
+    },
+    {
+      "name": "cagan-check",
+      "source": "./skills/cagan-check",
+      "description": "Apply Marty Cagan (SVPG) + Teresa Torres Continuous Discovery to a dev's workflow: feature kickoff, planning/estimation, discovery calls, PR review. Flags feature-factory smells; green/yellow/red per dimension.",
+      "version": "0.1.1",
+      "author": {
+        "name": "Matheus Malagris"
+      },
+      "category": "product",
+      "keywords": [
+        "product",
+        "cagan",
+        "svpg",
+        "continuous-discovery",
+        "product-trio"
       ]
     }
   ]
