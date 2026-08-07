@@ -31,7 +31,7 @@ Each skill is a directory under [`skills/`](skills/) with a `SKILL.md` (plus opt
 
 Each skill is versioned independently (SemVer in its `plugin.json`); the collection is snapshotted with git tags `vX.Y.Z` and [GitHub Releases](https://github.com/mqmalagris/agent-skills/releases). See [`CHANGELOG.md`](CHANGELOG.md) and [`VERSIONING.md`](VERSIONING.md). Manifests are validated in CI on every push and PR.
 
-## What's in here (21 skills)
+## What's in here (22 skills)
 
 ### Dev pipeline (8)
 
@@ -48,13 +48,14 @@ The loop I use to take a feature from vague hunch to merged code without writing
 | [`parallel-worktrees`](skills/parallel-worktrees/) | Plan-optional counterpart to maestro: go/no-go, file partitioning, isolation mechanism, integration + cleanup for ad-hoc parallel work. |
 | [`pr-craft`](skills/pr-craft/) | Open a PR with a structured body (Problem / Root cause / Fix / Test / Out of scope). Drives branch → commit → push → `gh pr create`. |
 
-### Quality & review (5)
+### Quality & review (6)
 
 | Skill | What it does |
 |-------|--------------|
 | [`implementation-review`](skills/implementation-review/) | Pre-commit quality gate: seven parallel-subagent checks (plan gaps, use-case coverage, test scenarios, test philosophy, SOLID, Clean Code, security). Runs after `verify`, before commit. |
 | [`testing-philosophy`](skills/testing-philosophy/) | What a good test is: behavior over implementation, the Testing Trophy, an e2e floor for user-facing features. Stack-agnostic (TS/Rust/Go/Elixir/Python). |
 | [`security-audit`](skills/security-audit/) | High-confidence security review of a diff, layered on `wstg-security-testing`. Confidence gate, false-positive precedents, WSTG-ID mapping, dependency audit. |
+| [`semver`](skills/semver/) | Decide the SemVer bump for a change (major/minor/patch): analyze the diff against the public surface, run the ecosystem's breaking-change detector, then apply. Stack-agnostic; feeds `publish-skill` / `release.py`. |
 | [`code-craft`](skills/code-craft/) | Language- and framework-specific idioms; reader and reviewer modes. 7 languages + 12 frameworks. Tactical complement to `compass`. |
 | [`wstg-security-testing`](skills/wstg-security-testing/) | OWASP WSTG web-security testing: 12 categories, ~109 test cases, four modes. Methodology from [OWASP/wstg](https://github.com/OWASP/wstg). Authorized/defensive use only. |
 
