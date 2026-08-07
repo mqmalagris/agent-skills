@@ -1,26 +1,59 @@
 #!/usr/bin/env python3
-"""Validate the agent-skills repo: structure, manifests, version consistency.
+"""Validate the agent-skills repo: structure, manifests, version consistency,
+and SKILL.md YAML frontmatter validity.
 
 Exit 0 = clean, 1 = problems (printed). Used by CI (.github/workflows) and by
-release.py as a pre-flight gate. No third-party deps.
+release.py as a pre-flight gate. Strict-parses frontmatter with PyYAML when
+available (CI installs it); otherwise falls back to a colon-space heuristic so
+the common "unquoted ': ' in description" break is still caught locally.
 """
 import json, re, sys
 from pathlib import Path
+
+try:
+    import yaml
+except ImportError:
+    yaml = None
 
 ROOT = Path(__file__).resolve().parent.parent
 SEMVER = re.compile(r"^\d+\.\d+\.\d+$")
 KEBAB = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
 
 
-def frontmatter(text):
+def frontmatter_block(text):
     m = re.match(r"^---\s*\n(.*?)\n---", text, re.S)
-    fields = {}
-    if m:
-        for line in m.group(1).splitlines():
+    return m.group(1) if m else None
+
+
+def check_frontmatter(text, name, problems):
+    fm = frontmatter_block(text)
+    if fm is None:
+        problems.append(f"{name}: SKILL.md has no YAML frontmatter"); return
+    if yaml is not None:
+        try:
+            data = yaml.safe_load(fm)
+        except yaml.YAMLError as e:
+            problems.append(f"{name}: SKILL.md frontmatter invalid YAML: {str(e).splitlines()[0]}"); return
+        if not isinstance(data, dict):
+            problems.append(f"{name}: SKILL.md frontmatter is not a mapping"); return
+        if data.get("name", name) != name:
+            problems.append(f"{name}: SKILL.md name '{data.get('name')}' != dir")
+        if not data.get("description"):
+            problems.append(f"{name}: SKILL.md missing frontmatter description")
+    else:
+        fields = {}
+        for line in fm.splitlines():
             mm = re.match(r"^(\w+):\s*(.*)$", line)
             if mm and mm.group(1) not in fields:
                 fields[mm.group(1)] = mm.group(2).strip()
-    return fields
+        if fields.get("name", name) != name:
+            problems.append(f"{name}: SKILL.md name '{fields.get('name')}' != dir")
+        dm = re.search(r"^description:[ \t]*(.*)$", fm, re.M)
+        dval = dm.group(1).strip() if dm else ""
+        if not dm:
+            problems.append(f"{name}: SKILL.md missing frontmatter description")
+        elif dval[:1] not in ('"', "'") and dval not in ("|", ">", "|-", ">-", "") and ": " in dval:
+            problems.append(f"{name}: SKILL.md description has an unquoted ': ' (invalid YAML; quote it or use a '>-' block scalar)")
 
 
 def main():
@@ -35,14 +68,11 @@ def main():
         dir_names.add(name)
         if not KEBAB.match(name):
             problems.append(f"{name}: dir name not kebab-case")
-        if not (d / "SKILL.md").exists():
+        skill_md = d / "SKILL.md"
+        if not skill_md.exists():
             problems.append(f"{name}: missing SKILL.md")
         else:
-            fm = frontmatter((d / "SKILL.md").read_text(encoding="utf-8"))
-            if fm.get("name", name) != name:
-                problems.append(f"{name}: SKILL.md frontmatter name '{fm.get('name')}' != dir")
-            if not fm.get("description"):
-                problems.append(f"{name}: SKILL.md missing frontmatter description")
+            check_frontmatter(skill_md.read_text(encoding="utf-8"), name, problems)
         pj = d / ".claude-plugin" / "plugin.json"
         if not pj.exists():
             problems.append(f"{name}: missing .claude-plugin/plugin.json"); continue
@@ -81,7 +111,8 @@ def main():
         for p in problems:
             print("  -", p)
         sys.exit(1)
-    print(f"OK: {len(skill_dirs)} skills, marketplace v{mp['metadata']['version']}, all manifests consistent")
+    engine = "PyYAML strict" if yaml else "heuristic (no PyYAML)"
+    print(f"OK: {len(skill_dirs)} skills, marketplace v{mp['metadata']['version']}, manifests + frontmatter consistent [{engine}]")
 
 
 if __name__ == "__main__":
