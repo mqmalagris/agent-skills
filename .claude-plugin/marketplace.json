@@ -252,23 +252,6 @@
       ]
     },
     {
-      "name": "brag-doc",
-      "source": "./skills/brag-doc",
-      "description": "Maintain a monthly brag document and roll it up into a promo packet, self-review, or CV material. Lucas Faria's 4-field template + Julia Evans' impact-first categories. Feeds cv-craft.",
-      "version": "0.1.0",
-      "author": {
-        "name": "Matheus Malagris"
-      },
-      "category": "career",
-      "keywords": [
-        "brag-document",
-        "career",
-        "self-review",
-        "promotion",
-        "cv-source"
-      ]
-    },
-    {
       "name": "cagan-check",
       "source": "./skills/cagan-check",
       "description": "Apply Marty Cagan (SVPG) + Teresa Torres Continuous Discovery to a dev's workflow: feature kickoff, planning/estimation, discovery calls, PR review. Flags feature-factory smells; green/yellow/red per dimension.",
@@ -363,6 +346,23 @@
       "keywords": [
         "portfolio",
         "project-archive",
+        "cv-source"
+      ]
+    },
+    {
+      "name": "brag-doc",
+      "source": "./skills/brag-doc",
+      "description": "Maintain a monthly brag document and roll it up into a promo packet, self-review, or CV material. Lucas Faria's 4-field template + Julia Evans' impact-first categories. Feeds cv-craft.",
+      "version": "0.1.0",
+      "author": {
+        "name": "Matheus Malagris"
+      },
+      "category": "career",
+      "keywords": [
+        "brag-document",
+        "career",
+        "self-review",
+        "promotion",
         "cv-source"
       ]
     }
