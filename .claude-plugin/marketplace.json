@@ -43,27 +43,6 @@
       ]
     },
     {
-      "name": "code-craft",
-      "source": "./skills/code-craft",
-      "description": "Language- and framework-specific best practices and idioms. Reader and reviewer modes. Ships 7 languages + 12 frameworks (TS, Rust, CSS, Tailwind, Dart, Go, Python, React, Next, RN+Expo, Hono, Workers, Astro, Svelte, Drizzle, Supabase, Lambda, Terraform, Flutter).",
-      "version": "0.2.0",
-      "author": {
-        "name": "Matheus Malagris"
-      },
-      "category": "development",
-      "keywords": [
-        "code-review",
-        "idioms",
-        "typescript",
-        "rust",
-        "react",
-        "nextjs",
-        "go",
-        "python",
-        "flutter"
-      ]
-    },
-    {
       "name": "cv-craft",
       "source": "./skills/cv-craft",
       "description": "Maintain a canonical master CV in Markdown and produce tailored, ATS-friendly resumes and recruiter-screen prep packs from job descriptions.",
@@ -364,6 +343,27 @@
         "svpg",
         "continuous-discovery",
         "product-trio"
+      ]
+    },
+    {
+      "name": "code-craft",
+      "source": "./skills/code-craft",
+      "description": "Language- and framework-specific best practices and idioms. Reader and reviewer modes. Ships 7 languages + 12 frameworks (TS, Rust, CSS, Tailwind, Dart, Go, Python, React, Next, RN+Expo, Hono, Workers, Astro, Svelte, Drizzle, Supabase, Lambda, Terraform, Flutter).",
+      "version": "0.2.1",
+      "author": {
+        "name": "Matheus Malagris"
+      },
+      "category": "development",
+      "keywords": [
+        "code-review",
+        "idioms",
+        "typescript",
+        "rust",
+        "react",
+        "nextjs",
+        "go",
+        "python",
+        "flutter"
       ]
     }
   ]

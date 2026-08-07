@@ -1,6 +1,7 @@
 ---
 name: code-craft
-description: Language- and framework-specific code best practices and idioms — complementary to compass (stack-agnostic architecture coach). Two modes: reader (rule + reason + example for a topic) and reviewer (apply rules to user code, flag violations with fixes). Ships rules for TypeScript, Rust, CSS/SASS, Tailwind, Dart, Go, Python and frameworks React, Next.js, RN+Expo, Hono, Cloudflare Workers, Astro, Svelte, Drizzle, Supabase, AWS Lambda+SAM, Terraform, Flutter. Use when the user asks for language-specific best practices ("TS best practices", "is this idiomatic Rust", "/code-craft ts"), wants a code review focused on language idioms (not architecture — see compass), or asks how to do X the right way in a specific language/framework.
+description: >-
+  Language- and framework-specific code best practices and idioms — complementary to compass (stack-agnostic architecture coach). Two modes: reader (rule + reason + example for a topic) and reviewer (apply rules to user code, flag violations with fixes). Ships rules for TypeScript, Rust, CSS/SASS, Tailwind, Dart, Go, Python and frameworks React, Next.js, RN+Expo, Hono, Cloudflare Workers, Astro, Svelte, Drizzle, Supabase, AWS Lambda+SAM, Terraform, Flutter. Use when the user asks for language-specific best practices ("TS best practices", "is this idiomatic Rust", "/code-craft ts"), wants a code review focused on language idioms (not architecture — see compass), or asks how to do X the right way in a specific language/framework.
 ---
 
 # code-craft

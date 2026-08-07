@@ -1,7 +1,7 @@
 {
   "name": "code-craft",
-  "version": "0.2.0",
-  "description": "Language- and framework-specific code best practices and idioms for Claude Code \u2014 complementary to compass (stack-agnostic architecture coach). Two modes: reader (rule + reason + example for a topic) and reviewer (apply rules to user code, flag violations with fixes). Ships rules for TypeScript, Rust, CSS/SASS, Tailwind, Dart, Go, Python and frameworks React, Next.js, RN+Expo, Hono, Cloudflare Workers, Astro, Svelte, Drizzle, Supabase, AWS Lambda+SAM, Terraform, Flutter.",
+  "version": "0.2.1",
+  "description": "Language- and framework-specific best practices and idioms. Reader and reviewer modes. Ships 7 languages + 12 frameworks (TS, Rust, CSS, Tailwind, Dart, Go, Python, React, Next, RN+Expo, Hono, Workers, Astro, Svelte, Drizzle, Supabase, Lambda, Terraform, Flutter).",
   "author": {
     "name": "Matheus Malagris",
     "url": "https://github.com/mqmalagris"
@@ -11,27 +11,14 @@
   "license": "MIT",
   "keywords": [
     "code-review",
-    "best-practices",
     "idioms",
     "typescript",
     "rust",
     "react",
     "nextjs",
-    "react-native",
-    "expo",
-    "hono",
-    "css",
-    "sass",
-    "tailwind",
-    "dart",
-    "flutter",
     "go",
     "python",
-    "astro",
-    "svelte",
-    "drizzle",
-    "supabase",
-    "aws-lambda",
-    "terraform"
+    "flutter",
+    "development"
   ]
 }

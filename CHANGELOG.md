@@ -3,6 +3,7 @@
 All notable changes to this collection are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); the collection follows [SemVer](https://semver.org). See [VERSIONING.md](VERSIONING.md) for the per-skill vs collection model.
 
 ## [Unreleased]
+- `code-craft` — fix YAML frontmatter (block-scalar description) so strict parsers / skills.sh index it
 - `cagan-check` — fix YAML frontmatter (block-scalar description) so strict parsers / skills.sh index it
 - `brag-doc` — fix YAML frontmatter (block-scalar description) so strict parsers / skills.sh index it
 
