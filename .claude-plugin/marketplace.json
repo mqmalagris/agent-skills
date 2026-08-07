@@ -26,24 +26,6 @@
       ]
     },
     {
-      "name": "compass",
-      "source": "./skills/compass",
-      "description": "Multi-mode software engineering coach: architect, advisor, reviewer, refactor, legacy, and explainer workflows. Auto-writes ADRs to docs/adr/.",
-      "version": "0.2.0",
-      "author": {
-        "name": "Matheus Malagris"
-      },
-      "category": "development",
-      "keywords": [
-        "software-engineering",
-        "architecture",
-        "design-patterns",
-        "solid",
-        "ddd",
-        "adr"
-      ]
-    },
-    {
       "name": "maestro",
       "source": "./skills/maestro",
       "description": "Verify parallel feasibility across plans, orchestrate agents in git worktrees, run integration tests, clean up. Deterministic branch names (parallel/<slug>).",
@@ -363,6 +345,24 @@
         "planning",
         "implementation-plan",
         "prd",
+        "adr"
+      ]
+    },
+    {
+      "name": "compass",
+      "source": "./skills/compass",
+      "description": "Multi-mode software engineering coach: architect, advisor, reviewer, refactor, legacy, and explainer workflows. Auto-writes ADRs to docs/adr/.",
+      "version": "0.2.0",
+      "author": {
+        "name": "Matheus Malagris"
+      },
+      "category": "development",
+      "keywords": [
+        "software-engineering",
+        "architecture",
+        "design-patterns",
+        "solid",
+        "ddd",
         "adr"
       ]
     }
