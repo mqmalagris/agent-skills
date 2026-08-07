@@ -6,8 +6,8 @@
     "name": "Matheus Malagris",
     "url": "https://github.com/mqmalagris"
   },
-  "homepage": "https://github.com/mqmalagris/claude-skills/tree/main/skills/grill-me",
-  "repository": "https://github.com/mqmalagris/claude-skills",
+  "homepage": "https://github.com/mqmalagris/agent-skills/tree/main/skills/grill-me",
+  "repository": "https://github.com/mqmalagris/agent-skills",
   "license": "MIT",
   "keywords": [
     "design-review",

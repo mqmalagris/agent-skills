@@ -50,8 +50,8 @@ Every rule has: short name, one-sentence rule, one-line reason, 3–10 line wron
 ## Install
 
 ```text
-/plugin marketplace add mqmalagris/claude-skills
-/plugin install code-craft@claude-skills
+/plugin marketplace add mqmalagris/agent-skills
+/plugin install code-craft@agent-skills
 /reload-plugins
 ```
 

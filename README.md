@@ -1,4 +1,4 @@
-# claude-skills
+# agent-skills
 
 A curated, **dual-format** collection of [Agent Skills](https://www.anthropic.com/news/skills). Install it as a [Claude Code](https://claude.com/claude-code) plugin marketplace, **or** with [`bunx skills`](https://www.skills.sh/) into any of 75+ agents (Cursor, Copilot, Windsurf, Codex, …) — same `SKILL.md` files, either way.
 
@@ -9,16 +9,16 @@ Most skills are mine; a few are forks/adaptations of public skills, attributed p
 **With `bunx skills` (any agent):**
 
 ```bash
-bunx skills add mqmalagris/claude-skills             # pick skills interactively
-bunx skills add mqmalagris/claude-skills -s heist    # just one
-bunx skills add mqmalagris/claude-skills --all -g    # everything, installed globally
+bunx skills add mqmalagris/agent-skills             # pick skills interactively
+bunx skills add mqmalagris/agent-skills -s heist    # just one
+bunx skills add mqmalagris/agent-skills --all -g    # everything, installed globally
 ```
 
 **With Claude Code (plugin marketplace):**
 
 ```text
-/plugin marketplace add mqmalagris/claude-skills
-/plugin install heist@claude-skills
+/plugin marketplace add mqmalagris/agent-skills
+/plugin install heist@agent-skills
 ```
 
 ## Layout

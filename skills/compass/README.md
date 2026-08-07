@@ -17,8 +17,8 @@ Routes the user's request to one of five workflows backed by topic and reference
 ## Install
 
 ```text
-/plugin marketplace add mqmalagris/claude-skills
-/plugin install swe-compass@claude-skills
+/plugin marketplace add mqmalagris/agent-skills
+/plugin install swe-compass@agent-skills
 /reload-plugins
 ```
 
