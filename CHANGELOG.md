@@ -3,6 +3,7 @@
 All notable changes to this collection are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); the collection follows [SemVer](https://semver.org). See [VERSIONING.md](VERSIONING.md) for the per-skill vs collection model.
 
 ## [Unreleased]
+- `publish-skill` — add per-skill version bump + CHANGELOG automation (--bump/--no-bump/--changelog)
 
 ### Added
 - Seven skills: `implementation-review`, `security-audit`, `testing-philosophy`, `parallel-worktrees`, `pr-craft`, `brag-doc`, `cagan-check`.

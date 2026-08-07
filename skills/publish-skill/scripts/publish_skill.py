@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 """Publish one local skill to mqmalagris/agent-skills.
 
-Mechanical pipeline only (the agent supplies category/keywords/description for
-new skills; on update they default to the existing marketplace entry):
-  refresh a repo clone -> copy skills/<name> -> mint .claude-plugin/plugin.json
-  -> upsert marketplace.json entry -> validate JSON -> commit + push to main.
+Mechanical pipeline: refresh a repo clone -> copy skills/<name> -> mint
+.claude-plugin/plugin.json -> upsert marketplace.json entry -> bump the skill's
+version -> log a CHANGELOG [Unreleased] entry -> validate JSON -> commit + push.
 
-Idempotent: re-running for the same skill updates it instead of duplicating,
-and preserves its existing category/keywords/description/version unless you
-override them with flags.
+Idempotent. On UPDATE it preserves the existing category/keywords/description
+and bumps the PATCH version by default (--bump minor|major or --version to
+override, --no-bump to hold). On a NEW skill it uses --version (default 0.1.0).
+Collection releases are cut separately with scripts/release.py in the repo.
 """
 import argparse, json, re, shutil, subprocess, sys
 from pathlib import Path
@@ -18,6 +18,7 @@ OWNER_NAME = "mqmalagris/agent-skills"
 AUTHOR = {"name": "Matheus Malagris", "url": "https://github.com/mqmalagris"}
 DEFAULT_LOCAL = Path.home() / ".claude" / "skills"
 DEFAULT_REPO_DIR = Path.home() / ".cache" / "agent-skills-publish"
+SEMVER = re.compile(r"^(\d+)\.(\d+)\.(\d+)$")
 
 
 def run(cmd, cwd=None, check=True):
@@ -27,14 +28,19 @@ def run(cmd, cwd=None, check=True):
     return r
 
 
+def bump_semver(v, part):
+    m = SEMVER.match(v or "0.0.0")
+    M, mi, p = (int(x) for x in m.groups()) if m else (0, 0, 0)
+    return {"major": f"{M+1}.0.0", "minor": f"{M}.{mi+1}.0", "patch": f"{M}.{mi}.{p+1}"}[part]
+
+
 def frontmatter_description(skill_md: Path) -> str:
-    """Best-effort concise description from SKILL.md YAML frontmatter (inline or block scalar)."""
     text = skill_md.read_text(encoding="utf-8")
     m = re.match(r"^---\s*\n(.*?)\n---", text, re.S)
     if not m:
         return ""
-    fm, desc, capturing = m.group(1), [], False
-    for line in fm.splitlines():
+    desc, capturing = [], False
+    for line in m.group(1).splitlines():
         dm = re.match(r"^description:\s*(.*)$", line)
         if dm:
             val = dm.group(1).strip()
@@ -44,7 +50,7 @@ def frontmatter_description(skill_md: Path) -> str:
             desc = [val.strip().strip('"').strip("'")]
             break
         if capturing:
-            if re.match(r"^\S", line):  # next top-level key ends the block
+            if re.match(r"^\S", line):
                 break
             desc.append(line.strip())
     joined = re.sub(r"\s+", " ", " ".join(desc)).strip()
@@ -62,19 +68,36 @@ def ensure_repo(repo_dir: Path):
         run(["git", "clone", REPO + ".git", str(repo_dir)])
 
 
+def changelog_add(repo_dir: Path, entry: str):
+    cl = repo_dir / "CHANGELOG.md"
+    if not cl.exists():
+        return False
+    text = cl.read_text(encoding="utf-8")
+    i = text.find("## [Unreleased]")
+    if i == -1:
+        return False
+    j = text.find("\n", i) + 1
+    cl.write_text(text[:j] + f"- {entry}\n" + text[j:], encoding="utf-8")
+    return True
+
+
 def main():
     ap = argparse.ArgumentParser(description="Publish a local skill to " + OWNER_NAME)
     ap.add_argument("skill", help="skill name = dir under the local skills dir")
     ap.add_argument("--category", default=None,
-                    help="marketplace category (required for a NEW skill; kept from the existing entry on update)")
-    ap.add_argument("--keywords", default=None, help="comma-separated keywords (kept from existing entry on update if omitted)")
-    ap.add_argument("--description", default="", help="concise description (kept from existing entry, else derived from SKILL.md)")
-    ap.add_argument("--version", default=None, help="semver (default 0.1.0 for new; kept from existing entry on update)")
+                    help="marketplace category (required for a NEW skill; kept from existing on update)")
+    ap.add_argument("--keywords", default=None, help="comma-separated keywords (kept from existing on update if omitted)")
+    ap.add_argument("--description", default="", help="concise description (kept from existing, else derived from SKILL.md)")
+    ap.add_argument("--version", default=None, help="set an explicit version X.Y.Z")
+    ap.add_argument("--bump", choices=["major", "minor", "patch"], default=None,
+                    help="on update, bump this part (default: patch)")
+    ap.add_argument("--no-bump", action="store_true", help="on update, keep the existing version")
+    ap.add_argument("--changelog", default=None, help="CHANGELOG [Unreleased] line (default auto)")
     ap.add_argument("--author-name", default=AUTHOR["name"])
     ap.add_argument("--local-skills-dir", type=Path, default=DEFAULT_LOCAL)
     ap.add_argument("--repo-dir", type=Path, default=DEFAULT_REPO_DIR)
-    ap.add_argument("--no-push", action="store_true", help="commit locally, do not push")
-    ap.add_argument("--dry-run", action="store_true", help="prepare files, no git commit/push")
+    ap.add_argument("--no-push", action="store_true")
+    ap.add_argument("--dry-run", action="store_true")
     args = ap.parse_args()
 
     name = args.skill
@@ -89,26 +112,32 @@ def main():
     mp = json.loads(mp_path.read_text(encoding="utf-8"))
     existing = next((p for p in mp["plugins"] if p["name"] == name), None)
 
-    # resolve metadata: explicit flag > existing marketplace entry > SKILL.md / default
     category = args.category or (existing or {}).get("category")
     if not category:
         sys.exit("! --category is required for a new skill")
-    if args.keywords is not None:
-        kw = [k.strip() for k in args.keywords.split(",") if k.strip()]
-    else:
-        kw = list((existing or {}).get("keywords", []))
+    kw = ([k.strip() for k in args.keywords.split(",") if k.strip()]
+          if args.keywords is not None else list((existing or {}).get("keywords", [])))
     desc = (args.description.strip() or (existing or {}).get("description")
             or frontmatter_description(src / "SKILL.md"))
     if not desc:
         sys.exit("! no description given and none parseable from SKILL.md; pass --description")
-    version = args.version or (existing or {}).get("version") or "0.1.0"
+
+    # version: explicit > (update: bump/keep) > (new: 0.1.0)
+    prev = (existing or {}).get("version")
+    if args.version:
+        version = args.version
+    elif existing and not args.no_bump:
+        version = bump_semver(prev, args.bump or "patch")
+    else:
+        version = prev or "0.1.0"
+    if not SEMVER.match(version):
+        sys.exit(f"! version '{version}' not X.Y.Z")
 
     dst = args.repo_dir / "skills" / name
     if dst.exists():
         shutil.rmtree(dst)
     shutil.copytree(src, dst)
 
-    # mint plugin.json (keywords include the category, matching repo convention)
     plugin = {
         "name": name, "version": version, "description": desc,
         "author": {"name": args.author_name, "url": AUTHOR["url"]},
@@ -116,11 +145,9 @@ def main():
         "repository": REPO, "license": "MIT",
         "keywords": kw + [category],
     }
-    pj_dir = dst / ".claude-plugin"
-    pj_dir.mkdir(parents=True, exist_ok=True)
-    (pj_dir / "plugin.json").write_text(json.dumps(plugin, indent=2) + "\n", encoding="utf-8")
+    (dst / ".claude-plugin").mkdir(parents=True, exist_ok=True)
+    (dst / ".claude-plugin" / "plugin.json").write_text(json.dumps(plugin, indent=2) + "\n", encoding="utf-8")
 
-    # upsert marketplace entry
     entry = {
         "name": name, "source": f"./skills/{name}", "description": desc,
         "version": version, "author": {"name": args.author_name},
@@ -129,12 +156,15 @@ def main():
     mp["plugins"] = [p for p in mp["plugins"] if p["name"] != name] + [entry]
     mp_path.write_text(json.dumps(mp, indent=2) + "\n", encoding="utf-8")
 
+    action = "updated" if existing else "added"
+    cl_line = args.changelog or f"`{name}` {version} — {'updated' if existing else 'new skill'}"
+    logged = changelog_add(args.repo_dir, cl_line)
+
     # validate every manifest parses
     for p in [mp_path] + list((args.repo_dir / "skills").glob("*/.claude-plugin/plugin.json")):
         json.loads(p.read_text(encoding="utf-8"))
 
-    action = "updated" if existing else "added"
-    print(f"{action} skills/{name} ({len(mp['plugins'])} plugins in marketplace)")
+    print(f"{action} skills/{name} v{version} ({len(mp['plugins'])} plugins)" + ("" if logged else "  [no CHANGELOG]"))
     print(f'README row -> | [`{name}`](skills/{name}/) | {desc} |')
 
     if args.dry_run:
@@ -145,7 +175,7 @@ def main():
     if run(["git", "diff", "--cached", "--quiet"], cwd=args.repo_dir, check=False).returncode == 0:
         print("no changes to commit (already in sync)")
         return
-    run(["git", "commit", "-m", f"{action} skill: {name}"], cwd=args.repo_dir)
+    run(["git", "commit", "-m", f"{action} skill: {name} v{version}"], cwd=args.repo_dir)
     local_sha = run(["git", "rev-parse", "HEAD"], cwd=args.repo_dir).stdout.strip()
     if args.no_push:
         print(f"committed {local_sha[:7]} locally (--no-push). Push with: git -C {args.repo_dir} push origin main")
