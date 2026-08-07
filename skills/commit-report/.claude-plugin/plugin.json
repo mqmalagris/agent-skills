@@ -1,6 +1,6 @@
 {
   "name": "commit-report",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Dual-format commit report (prose + bullets) from recent git activity, tunable to audience (dev / pm / client).",
   "author": {
     "name": "Matheus Malagris",
