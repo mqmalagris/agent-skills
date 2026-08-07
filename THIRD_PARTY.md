@@ -17,6 +17,4 @@ These are **not part of this repo** — they're skills authored by others that I
 | `interview-coach` | High-rigor interview prep: transcript analysis, practice drills, storybank, performance tracking. | external |
 | `teach` | Teach a new skill or concept within the current workspace. | external |
 
-> `al-cli` (Arctic Leaf Teamwork CLI) is an internal tool and is intentionally not listed or published here.
-
 Where **upstream** says "external", I use the skill locally but haven't pinned its canonical source — fill in when confirmed.
