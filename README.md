@@ -64,7 +64,7 @@ The loop I use to take a feature from vague hunch to merged code without writing
 
 | Skill | What it does |
 |-------|--------------|
-| [`commit-report`](skills/commit-report/) | Dual-format commit report (prose + bullets) from recent git activity, tunable to audience (dev / pm / client). |
+| [`commit-report`](skills/commit-report/) | Work report in two modes — `quick` (git-only: prose + bullets from the current repo) and `standup` (multi-source: GitHub PRs/reviews/comments, git across repos, deploys) — tunable to audience (dev / pm / client), delivered as a copy-ready channel block or a `--doc` file. |
 
 ### Career (3)
 

@@ -1,7 +1,7 @@
 {
   "name": "commit-report",
-  "version": "0.1.2",
-  "description": "Dual-format commit report (prose + bullets) from recent git activity, tunable to audience (dev / pm / client).",
+  "version": "0.1.3",
+  "description": "Work report in two modes \u2014 quick (git-only: prose + bullets from the current repo) and standup (multi-source: GitHub PRs/reviews/comments, git across repos, deploys) \u2014 tunable to audience (dev / pm / client), delivered as a copy-ready channel block or a doc file.",
   "author": {
     "name": "Matheus Malagris",
     "url": "https://github.com/mqmalagris"
