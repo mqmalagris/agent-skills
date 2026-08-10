@@ -63,6 +63,7 @@ def ensure_repo(repo_dir: Path):
         run(["git", "fetch", "origin", "main"], cwd=repo_dir)
         run(["git", "checkout", "main"], cwd=repo_dir)
         run(["git", "reset", "--hard", "origin/main"], cwd=repo_dir)
+        run(["git", "clean", "-fd"], cwd=repo_dir)  # drop stray untracked dirs (e.g. a prior dry-run's skill copy) that reset --hard leaves behind
     else:
         repo_dir.parent.mkdir(parents=True, exist_ok=True)
         run(["git", "clone", REPO + ".git", str(repo_dir)])
