@@ -31,9 +31,9 @@ Each skill is a directory under [`skills/`](skills/) with a `SKILL.md` (plus opt
 
 Each skill is versioned independently (SemVer in its `plugin.json`); the collection is snapshotted with git tags `vX.Y.Z` and [GitHub Releases](https://github.com/mqmalagris/agent-skills/releases). See [`CHANGELOG.md`](CHANGELOG.md) and [`VERSIONING.md`](VERSIONING.md). Manifests are validated in CI on every push and PR.
 
-## What's in here (22 skills)
+## What's in here (23 skills)
 
-### Dev pipeline (8)
+### Dev pipeline (9)
 
 The loop I use to take a feature from vague hunch to merged code without writing fiction at any step. `dev-flow` conducts; the rest are its stages.
 
@@ -47,6 +47,7 @@ The loop I use to take a feature from vague hunch to merged code without writing
 | [`maestro`](skills/maestro/) | Verify plans for parallel feasibility, build a conflict graph, orchestrate agents in git worktrees (`parallel/<slug>`), run integration tests, clean up. |
 | [`parallel-worktrees`](skills/parallel-worktrees/) | Plan-optional counterpart to maestro: go/no-go, file partitioning, isolation mechanism, integration + cleanup for ad-hoc parallel work. |
 | [`pr-craft`](skills/pr-craft/) | Open a PR with a structured body (Problem / Root cause / Fix / Test / Out of scope). Drives branch → commit → push → `gh pr create`. |
+| [`babysit-prs`](skills/babysit-prs/) | Drive a PR through review on its own loop: fetch feedback (human + bots like Copilot/Qodo/CodeRabbit), triage, fix, report per item with the commit SHA, resolve threads, push — repeating until MERGED. Never merges itself. |
 
 ### Quality & review (6)
 
