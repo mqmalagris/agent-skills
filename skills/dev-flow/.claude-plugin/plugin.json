@@ -1,7 +1,7 @@
 {
   "name": "dev-flow",
-  "version": "0.1.0",
-  "description": "Conductor for the dev pipeline: routes a task through the right subset of the canonical chain (grill-me \u2192 to-prd \u2192 compass \u2192 heist \u2192 maestro \u2192 verify \u2192 code-review) by detecting its tier (bug / feature / architecture / client), prints the exact stages it will run and skip with reasons, confirms, then drives the sub-skills in order. Matches ceremony to stakes instead of running every stage every time.",
+  "version": "0.2.0",
+  "description": "Conductor for the dev pipeline: detects a task's tier (bug / feature / architecture / client), prints the exact chain of sub-skills it will run and skip with reasons, confirms, then drives them in order. Matches ceremony to stakes.",
   "author": {
     "name": "Matheus Malagris",
     "url": "https://github.com/mqmalagris"
@@ -14,7 +14,7 @@
     "router",
     "conductor",
     "pipeline",
-    "engineering-workflow",
-    "meta"
+    "meta",
+    "engineering-workflow"
   ]
 }
