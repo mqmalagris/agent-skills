@@ -1,6 +1,6 @@
 {
   "name": "commit-report",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Dual-format commit report (prose + bullets) from recent git activity, tunable to audience (dev / pm / client).",
   "author": {
     "name": "Matheus Malagris",
@@ -10,10 +10,11 @@
   "repository": "https://github.com/mqmalagris/agent-skills",
   "license": "MIT",
   "keywords": [
-    "git",
     "standup",
+    "git-log",
+    "work-report",
     "status-update",
-    "reporting",
+    "conventional-commits",
     "reporting"
   ]
 }

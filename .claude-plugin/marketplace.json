@@ -302,22 +302,6 @@
       ]
     },
     {
-      "name": "commit-report",
-      "source": "./skills/commit-report",
-      "description": "Dual-format commit report (prose + bullets) from recent git activity, tunable to audience (dev / pm / client).",
-      "version": "0.1.1",
-      "author": {
-        "name": "Matheus Malagris"
-      },
-      "category": "reporting",
-      "keywords": [
-        "git",
-        "standup",
-        "status-update",
-        "reporting"
-      ]
-    },
-    {
       "name": "portfolio-sync",
       "source": "./skills/portfolio-sync",
       "description": "Sync the current project into a central project-portfolio Markdown archive. Source data for cv-craft.",
@@ -381,6 +365,23 @@
         "conductor",
         "pipeline",
         "meta"
+      ]
+    },
+    {
+      "name": "commit-report",
+      "source": "./skills/commit-report",
+      "description": "Dual-format commit report (prose + bullets) from recent git activity, tunable to audience (dev / pm / client).",
+      "version": "0.1.2",
+      "author": {
+        "name": "Matheus Malagris"
+      },
+      "category": "reporting",
+      "keywords": [
+        "standup",
+        "git-log",
+        "work-report",
+        "status-update",
+        "conventional-commits"
       ]
     }
   ]
