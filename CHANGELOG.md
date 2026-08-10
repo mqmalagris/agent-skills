@@ -3,6 +3,9 @@
 All notable changes to this collection are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); the collection follows [SemVer](https://semver.org). See [VERSIONING.md](VERSIONING.md) for the per-skill vs collection model.
 
 ## [Unreleased]
+
+## [0.7.0] - 2026-08-10
+
 - `commit-report` 0.1.3 — updated
 - `babysit-prs` 0.1.0 — new skill
 - `commit-report` 0.1.2 — updated
