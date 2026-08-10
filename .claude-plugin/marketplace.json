@@ -383,6 +383,23 @@
         "status-update",
         "conventional-commits"
       ]
+    },
+    {
+      "name": "babysit-prs",
+      "source": "./skills/babysit-prs",
+      "description": "Babysit a GitHub PR from review all the way to MERGED.",
+      "version": "0.1.0",
+      "author": {
+        "name": "Matheus Malagris"
+      },
+      "category": "engineering-workflow",
+      "keywords": [
+        "pull-request",
+        "code-review",
+        "github",
+        "ci",
+        "automation"
+      ]
     }
   ]
 }
