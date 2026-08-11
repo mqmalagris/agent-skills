@@ -49,6 +49,7 @@ Detect from the task. When in doubt, pick the lower-ceremony tier and let the us
 - **Artifacts flow forward.** grill-me's Glossary → to-prd → heist, verbatim. Don't paraphrase domain terms between stages.
 - **Respect existing artifacts.** If a PRD/ADR/plan already exists for this work, mark that stage SKIP (done) and start from the next.
 - **This skill drives; it doesn't decide inside a stage.** Once a sub-skill is invoked, follow that skill's own instructions — don't second-guess its internals.
+- **Large layered change → stacked PR.** When the work is built as ordered *dependent* layers (e.g. heist phases that each stand alone as a reviewable slice: schema → API → UI), tell pr-craft to open a **stack** — one PR per layer — instead of one giant PR. This complements maestro/parallel-worktrees, which parallelize *independent* plans; stacking chains *dependent* layers so each stays small to review and lower layers can merge first.
 - **Obey CLAUDE.md conventions** (shell-command wrappers, commit-message trailers, etc.) — sub-skills that touch the shell already honor these; don't override them.
 
 ## When to skip dev-flow entirely
