@@ -95,23 +95,6 @@
       ]
     },
     {
-      "name": "pr-craft",
-      "source": "./skills/pr-craft",
-      "description": "Create a pull request with a structured description (Problem / Root cause / Fix / Test / Out of scope) derived from the diff and conversation. Drives the branch -> commit -> push -> gh pr create flow.",
-      "version": "0.1.0",
-      "author": {
-        "name": "Matheus Malagris"
-      },
-      "category": "engineering-workflow",
-      "keywords": [
-        "pull-request",
-        "git",
-        "gh",
-        "code-review",
-        "engineering-workflow"
-      ]
-    },
-    {
       "name": "implementation-review",
       "source": "./skills/implementation-review",
       "description": "Pre-commit quality gate: seven parallel-subagent checks (plan gaps, use-case coverage, test scenarios, test philosophy, SOLID, Clean Code, security). Runs after /verify, before commit.",
@@ -399,6 +382,23 @@
         "marketplace",
         "bunx-skills",
         "git"
+      ]
+    },
+    {
+      "name": "pr-craft",
+      "source": "./skills/pr-craft",
+      "description": "Create a pull request with a structured description (Problem / Root cause / Fix / Test / Out of scope) derived from the diff and conversation. Drives the branch -> commit -> push -> gh pr create flow.",
+      "version": "0.2.0",
+      "author": {
+        "name": "Matheus Malagris"
+      },
+      "category": "engineering-workflow",
+      "keywords": [
+        "pull-request",
+        "git",
+        "github",
+        "stacked-prs",
+        "gh-cli"
       ]
     }
   ]
