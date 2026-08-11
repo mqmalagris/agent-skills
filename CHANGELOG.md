@@ -3,6 +3,9 @@
 All notable changes to this collection are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); the collection follows [SemVer](https://semver.org). See [VERSIONING.md](VERSIONING.md) for the per-skill vs collection model.
 
 ## [Unreleased]
+
+## [0.8.0] - 2026-08-11
+
 - `dev-flow` 0.2.1 — updated
 - `pr-craft` 0.2.0 — updated
 - `publish-skill` 0.1.2 — fix: `git clean -fd` in ensure_repo so a stray dry-run skill dir cannot be swept into the next publish
