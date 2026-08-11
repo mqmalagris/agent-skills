@@ -1,11 +1,11 @@
 ---
 name: pr-craft
-description: Create a pull request with a structured, concise description derived from the diff and conversation context. Use when the user asks to "create a PR", "open a PR", "PR to <branch>", "raise a pull request", or wants the full branch → commit → push → gh pr create flow. Produces a body with Problem / Root cause / Fix / Test / Out of scope sections and references task/ticket IDs.
+description: Create a pull request with a structured, concise description derived from the diff and conversation context. Use when the user asks to "create a PR", "open a PR", "PR to <branch>", "raise a pull request", or wants the full branch → commit → push → gh pr create flow. Also opens GitHub-native stacked PRs — an ordered series of dependent PRs, one per layer — when the user says "stack this", "stacked PR", or the change is too large/layered to review as one. Produces a body with Problem / Root cause / Fix / Test / Out of scope sections and references task/ticket IDs.
 ---
 
 # pr-craft
 
-Drive a clean PR end to end: branch, stage only the relevant files, conventional-commit, push, open the PR with a structured body.
+Drive a clean PR end to end: branch, stage only the relevant files, conventional-commit, push, open the PR with a structured body. Default to one focused PR; for a large change that splits into ordered dependent layers, open a **stack** instead (see [Stacked PRs](#stacked-prs-large-layered-changes)).
 
 ## Flow
 
@@ -40,6 +40,22 @@ Why it happens, by layer/file. Cite `file:line` or function names.
 
 Refs task <id>
 ```
+
+## Stacked PRs (large, layered changes)
+
+Default to one focused PR. Reach for a **stack** when the change decomposes into ordered *dependent* layers (e.g. schema → API → UI) or is too big to review in one sitting — each layer becomes its own small PR, reviewable in parallel, and lower layers can merge first. This is GitHub's native stacked pull requests (public preview, since July 2026): each PR targets the layer below and shows only its own diff, with a stack map at the top.
+
+Prereq (once per machine): `gh extension install github/gh-stack`.
+
+1. **Bottom layer.** From the base branch: `gh stack init <layer-1-branch>`. Do that layer's work with the *same* explicit-staging + conventional-commit rules as the single-PR flow above.
+2. **Stack up.** For each next layer: `gh stack add <layer-n-branch>`, then commit its work. Each layer depends on the one below it.
+3. **Submit.** `gh stack submit` — pushes every branch, opens one PR per layer, and links them as a stack (each PR based on the layer below). Give each PR the same structured body, scoped to its own layer.
+4. **Inspect.** `gh stack view` prints the stack map / status.
+5. **Revise a lower layer.** Commit on it, then `gh stack sync` to rebase + retarget the layers above (conflicts: `gh stack rebase` → resolve → `gh stack rebase --continue`).
+6. **Merge.** Merge the bottom PR (or any layer) — it and every *unmerged layer below* land in one operation; PRs above stay open and auto-rebase/retarget on GitHub's servers. Existing branch protections and required checks still govern the base.
+7. **Report** the stack: each PR URL + the merge order.
+
+Notes: split by *reviewable seam*, not commit count — a layer that can't be reviewed or reverted on its own isn't a layer. Reordering is CLI-only (`gh stack modify`) during the preview; merge-queue support is still rolling out.
 
 ## Gotchas
 
