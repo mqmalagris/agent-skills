@@ -46,7 +46,7 @@ The loop I use to take a feature from vague hunch to merged code without writing
 | [`heist`](skills/heist/) | Turn a settled scope into an implementation plan at `docs/plans/NNNN-<slug>.md`: crew, sequence, getaway, payoff. Consumes PRDs + ADRs. |
 | [`maestro`](skills/maestro/) | Verify plans for parallel feasibility, build a conflict graph, orchestrate agents in git worktrees (`parallel/<slug>`), run integration tests, clean up. |
 | [`parallel-worktrees`](skills/parallel-worktrees/) | Plan-optional counterpart to maestro: go/no-go, file partitioning, isolation mechanism, integration + cleanup for ad-hoc parallel work. |
-| [`pr-craft`](skills/pr-craft/) | Open a PR with a structured body (Problem / Root cause / Fix / Test / Out of scope). Drives branch → commit → push → `gh pr create`. |
+| [`pr-craft`](skills/pr-craft/) | Open a PR with a structured body (Problem / Root cause / Fix / Test / Out of scope). Drives branch → commit → push → `gh pr create`, and opens GitHub-native **stacked PRs** (one PR per dependent layer) for large, layered changes. |
 | [`babysit-prs`](skills/babysit-prs/) | Drive a PR through review on its own loop: fetch feedback (human + bots like Copilot/Qodo/CodeRabbit), triage, fix, report per item with the commit SHA, resolve threads, push — repeating until MERGED. Never merges itself. |
 
 ### Quality & review (6)
