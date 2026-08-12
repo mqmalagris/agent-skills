@@ -31,10 +31,12 @@ This is the step that makes or breaks it. Split the task so **no two slices writ
 |---|---|---|
 | one agent dispatching N subagents that each edit files | **`Agent` tool with `isolation: "worktree"`** | each subagent gets a fresh worktree, auto-removed if it changed nothing |
 | running a deterministic fan-out / pipeline over many items that mutate files | **`Workflow` with `opts.isolation: 'worktree'`** | same isolation, inside orchestrated stages |
-| the current session, isolating your own work | **`EnterWorktree`** (leave with `ExitWorktree`) | switches this session into `.claude/worktrees/<name>` |
+| the current session, isolating your own work | **`EnterWorktree`** (leave with `ExitWorktree`) | switches this session into `.claude/worktrees/<name>`; branch is auto-named `worktree-<name>` — no override (see Branch naming below) |
 | outside the harness helpers, or need explicit control | **manual `git worktree`** | full control, you own cleanup |
 
 Prefer the harness helpers: they clean up automatically and keep the worktree under `.claude/worktrees/`. Reach for manual only when you need a worktree the harness will not manage.
+
+**Branch naming:** `EnterWorktree name:` has no branch override — it always mints `worktree-<name>`, which reads badly as a PR title. For a clean conventional branch (`<type>/<slug>` — `feat/`, `fix/`, `chore/`, `refactor/`, etc. by what the work is), create it manually and enter by path: `git worktree add -b feat/<slug> .claude/worktrees/<slug> "$BASE"` then `EnterWorktree path:.claude/worktrees/<slug>`. A path-entered worktree is kept by `ExitWorktree` (it won't auto-remove one you didn't create via `name:`).
 
 ## Rung 3: dispatch
 
