@@ -388,17 +388,17 @@
       "name": "dev-flow",
       "source": "./skills/dev-flow",
       "description": "Conductor for the dev pipeline: detects a task's tier (bug / feature / architecture / client), prints the exact chain of sub-skills it will run and skip with reasons, confirms, then drives them in order. Matches ceremony to stakes.",
-      "version": "0.2.1",
+      "version": "0.3.0",
       "author": {
         "name": "Matheus Malagris"
       },
       "category": "engineering-workflow",
       "keywords": [
-        "workflow-orchestration",
-        "dev-chain",
-        "skill-routing",
-        "pull-request",
-        "planning"
+        "dev-workflow",
+        "skill-chain",
+        "orchestration",
+        "task-routing",
+        "testing-gate"
       ]
     }
   ]
