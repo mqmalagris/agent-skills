@@ -149,22 +149,6 @@
       ]
     },
     {
-      "name": "parallel-worktrees",
-      "source": "./skills/parallel-worktrees",
-      "description": "Playbook for parallel work across git worktrees: go/no-go, file partitioning, isolation mechanism, integration and cleanup. The plan-optional counterpart to maestro.",
-      "version": "0.1.0",
-      "author": {
-        "name": "Matheus Malagris"
-      },
-      "category": "engineering-workflow",
-      "keywords": [
-        "git-worktree",
-        "parallel-execution",
-        "multi-agent",
-        "orchestration"
-      ]
-    },
-    {
       "name": "to-prd",
       "source": "./skills/to-prd",
       "description": "Synthesize conversation context into a PRD. Writes docs/prds/NNNN-<slug>.md + publishes to GitHub Issues. Includes Glossary section. Adapted from mattpocock/skills.",
@@ -399,6 +383,23 @@
         "task-routing",
         "worktree",
         "skill-conductor"
+      ]
+    },
+    {
+      "name": "parallel-worktrees",
+      "source": "./skills/parallel-worktrees",
+      "description": "Playbook for parallel work across git worktrees: go/no-go, file partitioning, isolation mechanism, integration and cleanup. The plan-optional counterpart to maestro.",
+      "version": "0.1.1",
+      "author": {
+        "name": "Matheus Malagris"
+      },
+      "category": "engineering-workflow",
+      "keywords": [
+        "git-worktree",
+        "parallel-agents",
+        "isolation",
+        "fan-out",
+        "concurrency"
       ]
     }
   ]

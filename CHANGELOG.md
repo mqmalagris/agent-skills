@@ -4,6 +4,7 @@ All notable changes to this collection are documented here. Format follows [Keep
 
 ## [Unreleased]
 - `dev-flow` 0.4.1 — updated
+- `parallel-worktrees` 0.1.1 — updated
 
 ## [0.9.0] - 2026-08-12
 
