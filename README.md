@@ -31,7 +31,7 @@ Each skill is a directory under [`skills/`](skills/) with a `SKILL.md` (plus opt
 
 Each skill is versioned independently (SemVer in its `plugin.json`); the collection is snapshotted with git tags `vX.Y.Z` and [GitHub Releases](https://github.com/mqmalagris/agent-skills/releases). See [`CHANGELOG.md`](CHANGELOG.md) and [`VERSIONING.md`](VERSIONING.md). Manifests are validated in CI on every push and PR.
 
-## What's in here (23 skills)
+## What's in here (26 skills)
 
 ### Dev pipeline (9)
 
@@ -49,10 +49,11 @@ The loop I use to take a feature from vague hunch to merged code without writing
 | [`pr-craft`](skills/pr-craft/) | Open a PR with a structured body (Problem / Root cause / Fix / Test / Out of scope). Drives branch → commit → push → `gh pr create`, and opens GitHub-native **stacked PRs** (one PR per dependent layer) for large, layered changes. |
 | [`babysit-prs`](skills/babysit-prs/) | Drive a PR through review on its own loop: fetch feedback (human + bots like Copilot/Qodo/CodeRabbit), triage, fix, report per item with the commit SHA, resolve threads, push — repeating until MERGED. Never merges itself. |
 
-### Quality & review (6)
+### Quality & review (7)
 
 | Skill | What it does |
 |-------|--------------|
+| [`review-pass`](skills/review-pass/) | Review-only entry point for a diff you already have: runs `verify` → `code-review` → `implementation-review` (plus `security-audit` only on trust-boundary changes), then merges every finding into one ranked go/no-go verdict. |
 | [`implementation-review`](skills/implementation-review/) | Pre-commit quality gate: seven parallel-subagent checks (plan gaps, use-case coverage, test scenarios, test philosophy, SOLID, Clean Code, security). Runs after `verify`, before commit. |
 | [`testing-philosophy`](skills/testing-philosophy/) | What a good test is: behavior over implementation, the Testing Trophy, an e2e floor for user-facing features. Stack-agnostic (TS/Rust/Go/Elixir/Python). |
 | [`security-audit`](skills/security-audit/) | High-confidence security review of a diff, layered on `wstg-security-testing`. Confidence gate, false-positive precedents, WSTG-ID mapping, dependency audit. |
@@ -80,17 +81,19 @@ The loop I use to take a feature from vague hunch to merged code without writing
 |-------|--------------|
 | [`cagan-check`](skills/cagan-check/) | Apply Marty Cagan (SVPG) + Teresa Torres Continuous Discovery to a dev's workflow. Flags feature-factory smells; green/yellow/red per dimension. |
 
-### Meta (2)
+### Meta (3)
 
 | Skill | What it does |
 |-------|--------------|
+| [`llm-wiki`](skills/llm-wiki/) | Build and maintain an interlinked Markdown knowledge base distilled from curated sources (Karpathy's LLM Wiki pattern). Three operations: ingest, query, lint. Path-agnostic — you pick where the wiki lives. |
 | [`write-a-skill`](skills/write-a-skill/) | Create new skills with proper structure, progressive disclosure, and bundled resources. |
 | [`publish-skill`](skills/publish-skill/) | Publish one of my own skills to this repo: copies it under `skills/<name>/`, mints its `plugin.json`, upserts `marketplace.json`, bumps its SemVer, and opens a CI-gated PR. Idempotent. |
 
-### Marketing (1)
+### Marketing (2)
 
 | Skill | What it does |
 |-------|--------------|
+| [`aso-craft`](skills/aso-craft/) | App Store Optimization for iOS and Android from one per-locale Markdown source: free live-store keyword probing, per-surface assignment, and a listing linter (limits, coverage gaps, wasted keyword budget, stuffing). |
 | [`seo`](skills/seo/) | Deterministic LLM-first SEO audits for sites, posts, and repos. Adapted from [Bhanunamikaze/Agentic-SEO-Skill](https://github.com/Bhanunamikaze/Agentic-SEO-Skill) (originally AgriciDaniel/claude-seo). |
 
 ## Attribution & license
