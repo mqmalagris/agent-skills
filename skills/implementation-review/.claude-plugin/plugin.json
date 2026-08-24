@@ -1,6 +1,6 @@
 {
   "name": "implementation-review",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Pre-commit quality gate: seven parallel-subagent checks (plan gaps, use-case coverage, test scenarios, test philosophy, SOLID, Clean Code, security). Runs after /verify, before commit.",
   "author": {
     "name": "Matheus Malagris",
