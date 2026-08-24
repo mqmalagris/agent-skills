@@ -16,8 +16,8 @@ from urllib.parse import urlparse
 try:
     from playwright.sync_api import sync_playwright, TimeoutError as PlaywrightTimeout
 except ImportError:
-    print("Error: playwright required. Install with: pip install playwright && playwright install chromium")
-    sys.exit(1)
+    sync_playwright = None
+    PlaywrightTimeout = TimeoutError
 
 
 def analyze_visual(url: str, timeout: int = 30000) -> dict:
@@ -53,6 +53,10 @@ def analyze_visual(url: str, timeout: int = 30000) -> dict:
         },
         "error": None,
     }
+
+    if sync_playwright is None:
+        result["error"] = "playwright required. Install with: pip install playwright && playwright install chromium"
+        return result
 
     # SSRF prevention: block private/internal IPs
     try:

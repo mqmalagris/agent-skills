@@ -16,7 +16,6 @@ import argparse
 import json
 import re
 import sys
-import urllib.request
 import urllib.parse
 from urllib.parse import urlparse
 
@@ -26,8 +25,10 @@ except ImportError:
     print("Error: beautifulsoup4 required. Install with: pip install beautifulsoup4")
     sys.exit(1)
 
-
-USER_AGENT = "Mozilla/5.0 (compatible; SEOSkill-Entity/1.0)"
+try:
+    from lib.safe_http import safe_get, safe_head
+except ImportError:
+    from scripts.lib.safe_http import safe_get, safe_head
 
 # Authoritative sameAs targets (ranked by KG signal strength)
 SAMEAS_PLATFORMS = {
@@ -50,9 +51,7 @@ SAMEAS_PLATFORMS = {
 
 def fetch_html(url: str, timeout: int = 12) -> str:
     try:
-        req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
-        with urllib.request.urlopen(req, timeout=timeout) as resp:
-            return resp.read().decode("utf-8", errors="ignore")
+        return safe_get(url, timeout=timeout).text
     except Exception as exc:
         print(f"Error fetching {url}: {exc}", file=sys.stderr)
         return ""
@@ -153,14 +152,13 @@ def analyze_sameas(same_as_list: list) -> dict:
     for name, data in list(found.items())[:3]:
         url = data["url"]
         try:
-            req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT}, method="HEAD")
-            with urllib.request.urlopen(req, timeout=6) as resp:
-                if resp.status >= 400:
-                    issues.append({
-                        "severity": "Warning",
-                        "finding": f"sameAs URL returns HTTP {resp.status}: {url}",
-                        "fix": f"Update sameAs URL for {name} to a valid, non-redirecting destination.",
-                    })
+            resp = safe_head(url, timeout=6)
+            if resp.status_code >= 400:
+                issues.append({
+                    "severity": "Warning",
+                    "finding": f"sameAs URL returns HTTP {resp.status_code}: {url}",
+                    "fix": f"Update sameAs URL for {name} to a valid, non-redirecting destination.",
+                })
         except Exception:
             issues.append({
                 "severity": "Info",
@@ -189,9 +187,7 @@ def check_wikidata(entity_name: str) -> dict:
     try:
         query = urllib.parse.quote(entity_name)
         url = f"https://www.wikidata.org/w/api.php?action=wbsearchentities&search={query}&language=en&format=json&limit=3"
-        req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
-        with urllib.request.urlopen(req, timeout=8) as resp:
-            data = json.loads(resp.read().decode("utf-8"))
+        data = safe_get(url, timeout=8).json()
 
         results = data.get("search", [])
         if results:
@@ -222,9 +218,7 @@ def check_wikipedia(entity_name: str) -> dict:
     try:
         query = urllib.parse.quote(entity_name.replace(" ", "_"))
         url = f"https://en.wikipedia.org/w/api.php?action=query&titles={query}&format=json&redirects=1"
-        req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
-        with urllib.request.urlopen(req, timeout=8) as resp:
-            data = json.loads(resp.read().decode("utf-8"))
+        data = safe_get(url, timeout=8).json()
 
         pages = data.get("query", {}).get("pages", {})
         for page_id, page_data in pages.items():
@@ -238,6 +232,47 @@ def check_wikipedia(entity_name: str) -> dict:
         pass
 
     return {"found": False, "url": None}
+
+
+def check_google_knowledge_graph(entity_name: str, api_key: str = "") -> dict:
+    """Search Google Knowledge Graph Search API when a key is available."""
+    if not api_key:
+        return {"checked": False, "found": False, "result": None}
+    if not entity_name:
+        return {"checked": True, "found": False, "result": None, "error": "No entity name to search"}
+
+    try:
+        response = safe_get(
+            "https://kgsearch.googleapis.com/v1/entities:search",
+            params={
+                "query": entity_name,
+                "key": api_key,
+                "limit": 3,
+                "indent": "false",
+            },
+            timeout=8,
+            max_response_bytes=1_000_000,
+        )
+        data = response.json()
+        items = data.get("itemListElement", [])
+        if not items:
+            return {"checked": True, "found": False, "result": None}
+
+        best = items[0]
+        result = best.get("result", {}) if isinstance(best, dict) else {}
+        return {
+            "checked": True,
+            "found": True,
+            "name": result.get("name"),
+            "kg_id": result.get("@id"),
+            "description": result.get("description"),
+            "detailed_description": (result.get("detailedDescription") or {}).get("articleBody", ""),
+            "url": (result.get("detailedDescription") or {}).get("url"),
+            "types": result.get("@type", []),
+            "score": best.get("resultScore"),
+        }
+    except Exception as exc:
+        return {"checked": True, "found": False, "result": None, "error": str(exc)}
 
 
 # ---------------------------------------------------------------------------
@@ -321,6 +356,8 @@ def run_entity_check(url: str, entity_name: str = "", kg_api_key: str = "") -> d
     # External lookups
     wikidata = check_wikidata(entity_name)
     wikipedia = check_wikipedia(entity_name)
+    google_kg = check_google_knowledge_graph(entity_name, kg_api_key)
+    has_notability_signal = bool(wikidata.get("found") or wikipedia.get("found") or google_kg.get("found"))
 
     # NAP consistency
     nap_issues = check_nap_consistency(soup, entities)
@@ -346,10 +383,10 @@ def run_entity_check(url: str, entity_name: str = "", kg_api_key: str = "") -> d
 
     if not wikidata["found"]:
         issues.append({
-            "severity": "Warning",
+            "severity": "Info",
             "area": "Wikidata",
             "finding": f"No Wikidata entry found for '{entity_name}'.",
-            "fix": "Create a Wikidata item for your entity with accurate properties to improve Knowledge Graph presence.",
+            "fix": "If the entity meets Wikidata notability guidelines, create or improve an item with accurate third-party references. Do not create one solely for SEO.",
         })
 
     if not wikipedia["found"]:
@@ -357,15 +394,28 @@ def run_entity_check(url: str, entity_name: str = "", kg_api_key: str = "") -> d
             "severity": "Info",
             "area": "Wikipedia",
             "finding": f"No Wikipedia article found for '{entity_name}'.",
-            "fix": "Pursue notability through press coverage and third-party references. Wikipedia articles significantly boost Knowledge Panel eligibility.",
+            "fix": "Only pursue Wikipedia if the entity meets independent notability standards. Otherwise, strengthen official schema, sameAs profiles, citations, and About/Contact signals.",
+        })
+
+    if google_kg.get("checked") and not google_kg.get("found"):
+        issues.append({
+            "severity": "Info",
+            "area": "Google Knowledge Graph",
+            "finding": f"No Google Knowledge Graph Search API match found for '{entity_name}'.",
+            "fix": "Improve entity consistency across official site schema, sameAs profiles, authoritative mentions, and organization/person pages.",
         })
 
     for name, data in sameas_analysis.get("missing", {}).items():
+        missing_primary_kg_profile = name in ("Wikipedia", "Wikidata")
         issues.append({
-            "severity": "Warning" if data["priority"] == "Critical" else "Info",
+            "severity": "Warning" if data["priority"] == "Critical" and has_notability_signal else "Info",
             "area": "sameAs",
             "finding": f"Missing sameAs link to {name} ({data['kg_signal']} KG signal).",
-            "fix": f"Add '{data['domain']}' profile URL to sameAs array in your entity schema.",
+            "fix": (
+                f"Add the existing official '{data['domain']}' URL to sameAs; do not create this profile solely for SEO."
+                if missing_primary_kg_profile
+                else f"Add '{data['domain']}' profile URL to sameAs array in your entity schema."
+            ),
         })
 
     issues.extend(sameas_analysis.get("issues", []))
@@ -378,6 +428,7 @@ def run_entity_check(url: str, entity_name: str = "", kg_api_key: str = "") -> d
         "sameas_analysis": sameas_analysis,
         "wikidata": wikidata,
         "wikipedia": wikipedia,
+        "google_kg": google_kg,
         "nap_issues": nap_issues,
         "issues": issues,
         "summary": {
@@ -386,6 +437,8 @@ def run_entity_check(url: str, entity_name: str = "", kg_api_key: str = "") -> d
             "sameas_missing_critical": sameas_analysis["total_missing_critical"],
             "wikidata_found": wikidata["found"],
             "wikipedia_found": wikipedia["found"],
+            "google_kg_checked": google_kg.get("checked", False),
+            "google_kg_found": google_kg.get("found", False),
             "total_issues": len(issues),
         },
     }
@@ -401,11 +454,13 @@ def main():
     )
     parser.add_argument("url", help="Page URL to check")
     parser.add_argument("--entity", default="", help="Entity name to search (auto-detected from schema/title if omitted)")
-    parser.add_argument("--kg-api-key", default="", help="Google Knowledge Graph API key (optional, for enhanced lookup)")
+    parser.add_argument("--kg-api-key", default="", help="Google Knowledge Graph API key (optional). Falls back to GOOGLE_KG_API_KEY / GOOGLE_API_KEY env vars or .env file.")
     parser.add_argument("--json", action="store_true", help="Output as JSON")
     args = parser.parse_args()
 
-    report = run_entity_check(args.url, entity_name=args.entity, kg_api_key=args.kg_api_key)
+    from env_loader import get_env
+    kg_api_key = args.kg_api_key or get_env("GOOGLE_KG_API_KEY", "GOOGLE_API_KEY")
+    report = run_entity_check(args.url, entity_name=args.entity, kg_api_key=kg_api_key)
 
     if args.json:
         print(json.dumps(report, indent=2, default=str))
@@ -437,6 +492,16 @@ def main():
 
     wp = report["wikipedia"]
     print(f"Wikipedia         : {'✅ ' + wp.get('url', '') if wp['found'] else '❌ Not found'}")
+
+    kg = report.get("google_kg", {})
+    if kg.get("checked"):
+        if kg.get("found"):
+            print(f"Google KG         : ✅ {kg.get('name', '')} ({kg.get('kg_id', '')})")
+        else:
+            suffix = f" — {kg.get('error')}" if kg.get("error") else ""
+            print(f"Google KG         : ❌ Not found{suffix}")
+    else:
+        print("Google KG         : Not checked (no API key)")
 
     if report["issues"]:
         sev_icon = {"Critical": "🔴", "Warning": "⚠️", "Info": "ℹ️"}

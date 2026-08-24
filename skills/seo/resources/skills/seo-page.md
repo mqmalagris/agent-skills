@@ -83,8 +83,9 @@ Ready-to-use JSON-LD code for detected opportunities
 ## Execution Plan
 
 When invoked as an agent to analyze a specific URL, execute these steps:
-1. Run `scripts/parse_html.py "$URL" --json` to get title, meta, links, headings, alt text, and schema.
-2. Run `scripts/readability.py "$URL" --json` for text metrics and grade level.
-3. Run `scripts/pagespeed.py "$URL" --strategy mobile --json` for Core Web Vitals.
-4. If applicable, run `scripts/article_seo.py "$URL" --json` for a deeper dive on content scoring.
-5. Summarize all findings into the Page Score Card and Issues Found according to the evidence rules.
+1. Run `scripts/fetch_page.py "$URL" --output /tmp/page.html` to fetch raw HTML with the shared safe HTTP policy.
+2. Run `scripts/parse_html.py /tmp/page.html --url "$URL" --json` to get title, meta, links, headings, alt text, schema, x-robots, pagination, and resource hints. For one-step usage, `scripts/parse_html.py --fetch "$URL" --json` is also supported.
+3. Run `scripts/readability.py /tmp/page.html --json` for text metrics and grade level.
+4. Run `scripts/pagespeed.py "$URL" --strategy mobile --json` or `--strategy both` for Core Web Vitals.
+5. If applicable, run `scripts/article_seo.py "$URL" --json` for a deeper dive on content scoring.
+6. Summarize all findings into the Page Score Card and Issues Found according to the evidence rules.

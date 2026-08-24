@@ -16,8 +16,8 @@ from urllib.parse import urlparse
 try:
     from playwright.sync_api import sync_playwright, TimeoutError as PlaywrightTimeout
 except ImportError:
-    print("Error: playwright required. Install with: pip install playwright && playwright install chromium")
-    sys.exit(1)
+    sync_playwright = None
+    PlaywrightTimeout = TimeoutError
 
 
 VIEWPORTS = {
@@ -58,6 +58,10 @@ def capture_screenshot(
 
     if viewport not in VIEWPORTS:
         result["error"] = f"Invalid viewport: {viewport}. Choose from: {list(VIEWPORTS.keys())}"
+        return result
+
+    if sync_playwright is None:
+        result["error"] = "playwright required. Install with: pip install playwright && playwright install chromium"
         return result
 
     vp = VIEWPORTS[viewport]

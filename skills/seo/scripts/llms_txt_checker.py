@@ -21,6 +21,11 @@ except ImportError:
     print("Error: requests library required. Install with: pip install requests")
     sys.exit(1)
 
+try:
+    from lib.safe_http import default_headers, safe_get
+except ImportError:
+    from scripts.lib.safe_http import default_headers, safe_get
+
 
 def check_llms_txt(url: str, timeout: int = 15) -> dict:
     """
@@ -64,11 +69,11 @@ def check_llms_txt(url: str, timeout: int = 15) -> dict:
         "error": None,
     }
 
-    headers = {"User-Agent": "Mozilla/5.0 (compatible; SEOSkill/1.0)"}
+    headers = default_headers()
 
     # Check llms.txt
     try:
-        resp = requests.get(f"{base}/llms.txt", timeout=timeout, headers=headers)
+        resp = safe_get(f"{base}/llms.txt", timeout=timeout, headers=headers)
         result["status"] = resp.status_code
 
         if resp.status_code == 200:
@@ -86,7 +91,7 @@ def check_llms_txt(url: str, timeout: int = 15) -> dict:
 
     # Check llms-full.txt (optional extended version)
     try:
-        resp = requests.get(f"{base}/llms-full.txt", timeout=timeout, headers=headers)
+        resp = safe_get(f"{base}/llms-full.txt", timeout=timeout, headers=headers)
         result["full_status"] = resp.status_code
         result["full_exists"] = resp.status_code == 200
     except requests.exceptions.RequestException:

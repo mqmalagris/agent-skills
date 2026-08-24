@@ -4,7 +4,8 @@ Parse HTML and extract SEO-relevant elements.
 
 Usage:
     python parse_html.py page.html
-    python parse_html.py --url https://example.com
+    python parse_html.py page.html --url https://example.com
+    python parse_html.py --fetch https://example.com --json
 """
 
 import argparse
@@ -12,7 +13,7 @@ import json
 import os
 import re
 import sys
-from typing import Optional
+from typing import Any, Optional
 from urllib.parse import urljoin, urlparse
 
 try:
@@ -21,8 +22,65 @@ except ImportError:
     print("Error: beautifulsoup4 required. Install with: pip install beautifulsoup4")
     sys.exit(1)
 
+try:
+    from lib.safe_http import safe_get
+except ImportError:
+    from scripts.lib.safe_http import safe_get
 
-def parse_html(html: str, base_url: Optional[str] = None) -> dict:
+
+def _fetch_url(url: str, timeout: int = 20) -> dict[str, Any]:
+    """Fetch HTML for direct parsing."""
+    response = safe_get(
+        url,
+        timeout=timeout,
+        headers={"Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"},
+    )
+    return {
+        "url": response.url,
+        "content": response.text,
+        "headers": dict(response.headers),
+        "status_code": response.status_code,
+    }
+
+
+def _schema_items(schema_data: Any) -> list[dict[str, Any]]:
+    """Flatten top-level JSON-LD objects and @graph nodes for validation."""
+    if isinstance(schema_data, list):
+        items: list[dict[str, Any]] = []
+        for item in schema_data:
+            items.extend(_schema_items(item))
+        return items
+    if not isinstance(schema_data, dict):
+        return []
+    items = [schema_data]
+    graph = schema_data.get("@graph")
+    if isinstance(graph, list):
+        items.extend([node for node in graph if isinstance(node, dict)])
+    return items
+
+
+def _rel_contains(value: Any, token: str) -> bool:
+    if not value:
+        return False
+    if isinstance(value, str):
+        values = value.lower().split()
+    else:
+        values = [str(item).lower() for item in value]
+    return token in values
+
+
+def _is_responsive_fill_image(img) -> bool:
+    if img.get("data-nimg") == "fill":
+        return True
+    style = re.sub(r"\s+", "", (img.get("style") or "").lower())
+    return "position:absolute" in style and "width:100%" in style and "height:100%" in style
+
+
+def parse_html(
+    html: str,
+    base_url: Optional[str] = None,
+    headers: Optional[dict[str, Any]] = None,
+) -> dict:
     """
     Parse HTML and extract SEO-relevant elements.
 
@@ -34,19 +92,40 @@ def parse_html(html: str, base_url: Optional[str] = None) -> dict:
         Dictionary with extracted SEO data
     """
     soup = BeautifulSoup(html, "lxml" if "lxml" in sys.modules else "html.parser")
+    headers = headers or {}
+    header_lookup = {str(k).lower(): v for k, v in headers.items()}
 
     result = {
         "title": None,
         "meta_description": None,
         "meta_robots": None,
+        "x_robots_tag": header_lookup.get("x-robots-tag"),
         "canonical": None,
+        "lang": None,
+        "charset": None,
+        "viewport": None,
+        "favicon": None,
         "h1": [],
         "h2": [],
         "h3": [],
+        "h4": [],
+        "h5": [],
+        "h6": [],
         "images": [],
         "links": {
             "internal": [],
             "external": [],
+        },
+        "pagination": {
+            "prev": None,
+            "next": None,
+        },
+        "resource_hints": {
+            "preload": [],
+            "preconnect": [],
+            "dns-prefetch": [],
+            "prefetch": [],
+            "prerender": [],
         },
         "schema": [],
         "open_graph": {},
@@ -54,6 +133,10 @@ def parse_html(html: str, base_url: Optional[str] = None) -> dict:
         "word_count": 0,
         "hreflang": [],
     }
+
+    html_tag = soup.find("html")
+    if html_tag:
+        result["lang"] = html_tag.get("lang")
 
     # Title
     title_tag = soup.find("title")
@@ -70,6 +153,15 @@ def parse_html(html: str, base_url: Optional[str] = None) -> dict:
             result["meta_description"] = content
         elif name == "robots":
             result["meta_robots"] = content
+        elif name == "viewport":
+            result["viewport"] = content
+
+        if meta.get("charset"):
+            result["charset"] = meta.get("charset")
+        elif meta.get("http-equiv", "").lower() == "content-type":
+            charset_match = re.search(r"charset=([^;\s]+)", content, re.I)
+            if charset_match:
+                result["charset"] = charset_match.group(1)
 
         # Open Graph
         if property_attr.startswith("og:"):
@@ -82,7 +174,18 @@ def parse_html(html: str, base_url: Optional[str] = None) -> dict:
     # Canonical
     canonical = soup.find("link", rel="canonical")
     if canonical:
-        result["canonical"] = canonical.get("href")
+        href = canonical.get("href")
+        result["canonical"] = urljoin(base_url, href) if base_url and href else href
+
+    for icon in soup.find_all("link"):
+        rel = icon.get("rel")
+        if icon.get("href") and (
+            _rel_contains(rel, "icon")
+            or _rel_contains(rel, "shortcut")
+            or _rel_contains(rel, "apple-touch-icon")
+        ):
+            result["favicon"] = urljoin(base_url, icon.get("href")) if base_url else icon.get("href")
+            break
 
     # Hreflang
     for link in soup.find_all("link", rel="alternate"):
@@ -90,11 +193,28 @@ def parse_html(html: str, base_url: Optional[str] = None) -> dict:
         if hreflang:
             result["hreflang"].append({
                 "lang": hreflang,
-                "href": link.get("href"),
+                "href": urljoin(base_url, link.get("href", "")) if base_url else link.get("href"),
             })
 
+    for rel_name in ("prev", "next"):
+        page_link = soup.find("link", rel=rel_name)
+        if page_link and page_link.get("href"):
+            href = page_link.get("href")
+            result["pagination"][rel_name] = urljoin(base_url, href) if base_url else href
+
+    for rel_name in result["resource_hints"]:
+        for link in soup.find_all("link", rel=rel_name):
+            href = link.get("href")
+            if href:
+                result["resource_hints"][rel_name].append({
+                    "href": urljoin(base_url, href) if base_url else href,
+                    "as": link.get("as"),
+                    "type": link.get("type"),
+                    "crossorigin": link.get("crossorigin"),
+                })
+
     # Headings
-    for tag in ["h1", "h2", "h3"]:
+    for tag in ["h1", "h2", "h3", "h4", "h5", "h6"]:
         for heading in soup.find_all(tag):
             text = heading.get_text(strip=True)
             if text:
@@ -105,12 +225,14 @@ def parse_html(html: str, base_url: Optional[str] = None) -> dict:
         src = img.get("src", "")
         if base_url and src:
             src = urljoin(base_url, src)
+        is_responsive_fill = _is_responsive_fill_image(img)
 
         result["images"].append({
             "src": src,
             "alt": img.get("alt"),
             "width": img.get("width"),
             "height": img.get("height"),
+            "is_responsive_fill": is_responsive_fill,
             "loading": img.get("loading"),
         })
 
@@ -154,26 +276,38 @@ def parse_html(html: str, base_url: Optional[str] = None) -> dict:
             })
             continue
 
-        schema_type = schema_data.get("@type", "Unknown")
-        status = "active"
-        note = ""
+        items = _schema_items(schema_data)
+        for item in items or [{}]:
+            schema_type = item.get("@type", "Unknown")
+            if isinstance(schema_type, list):
+                schema_types = schema_type
+                primary_type = next((t for t in schema_type if isinstance(t, str)), "Unknown")
+            else:
+                schema_types = [schema_type]
+                primary_type = schema_type
 
-        if schema_type in DEPRECATED_SCHEMA:
-            status = "deprecated"
-            note = f"{schema_type} was deprecated/removed from rich results. Remove or replace."
-        elif schema_type in RESTRICTED_SCHEMA:
-            status = "restricted"
-            note = f"{schema_type} is restricted to government/healthcare authority sites only."
+            status = "active"
+            note = ""
 
-        result["schema"].append({
-            "@type": schema_type,
-            "@context": schema_data.get("@context", ""),
-            "status": status,
-            "note": note,
-            "has_context": bool(schema_data.get("@context")),
-            "has_type": bool(schema_data.get("@type")),
-            "raw": schema_data,
-        })
+            if primary_type in DEPRECATED_SCHEMA:
+                status = "deprecated"
+                note = f"{primary_type} was deprecated/removed from rich results. Remove or replace."
+            elif primary_type in RESTRICTED_SCHEMA:
+                status = "restricted"
+                note = f"{primary_type} is restricted to government/healthcare authority sites only."
+
+            result["schema"].append({
+                "@type": primary_type,
+                "@types": schema_types,
+                "@id": item.get("@id"),
+                "@context": item.get("@context", schema_data.get("@context", "") if isinstance(schema_data, dict) else ""),
+                "status": status,
+                "note": note,
+                "has_context": bool(item.get("@context") or (isinstance(schema_data, dict) and schema_data.get("@context"))),
+                "has_type": bool(item.get("@type")),
+                "from_graph": item is not schema_data,
+                "raw": item,
+            })
 
     # Word count (visible text only)
     for element in soup(["script", "style", "nav", "footer", "header"]):
@@ -190,11 +324,28 @@ def main():
     parser = argparse.ArgumentParser(description="Parse HTML for SEO analysis")
     parser.add_argument("file", nargs="?", help="HTML file to parse")
     parser.add_argument("--url", "-u", help="Base URL for resolving links")
+    parser.add_argument("--fetch", help="Fetch and parse a URL directly")
+    parser.add_argument("--timeout", "-t", type=int, default=20, help="Fetch timeout in seconds")
     parser.add_argument("--json", "-j", action="store_true", help="Output as JSON")
 
     args = parser.parse_args()
 
-    if args.file:
+    headers = {}
+    final_url = args.url
+
+    if args.fetch:
+        try:
+            fetched = _fetch_url(args.fetch, timeout=args.timeout)
+        except Exception as exc:
+            print(f"Error fetching {args.fetch}: {exc}", file=sys.stderr)
+            sys.exit(1)
+        if fetched.get("error"):
+            print(f"Error fetching {args.fetch}: {fetched['error']}", file=sys.stderr)
+            sys.exit(1)
+        html = fetched.get("content") or ""
+        headers = fetched.get("headers") or {}
+        final_url = args.url or fetched.get("url") or args.fetch
+    elif args.file:
         real_path = os.path.realpath(args.file)
         if not os.path.isfile(real_path):
             print(f"Error: File not found: {args.file}", file=sys.stderr)
@@ -204,7 +355,7 @@ def main():
     else:
         html = sys.stdin.read()
 
-    result = parse_html(html, args.url)
+    result = parse_html(html, final_url, headers=headers)
 
     if args.json:
         print(json.dumps(result, indent=2))

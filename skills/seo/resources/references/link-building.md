@@ -1,3 +1,5 @@
+<!-- Updated: 2026-05-14 -->
+
 # Link Building Guidelines
 
 > Reference for `seo-links` skill. Apply post-March 2024 link spam update requirements.

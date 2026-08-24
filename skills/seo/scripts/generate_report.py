@@ -22,9 +22,62 @@ import time
 from datetime import datetime
 from urllib.parse import urlparse
 
-import urllib.request
-
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+ROOT_DIR = os.path.dirname(SCRIPT_DIR)
+SCORING_CONFIG_PATH = os.path.join(ROOT_DIR, "resources", "config", "scoring.json")
+
+try:
+    from lib.safe_http import safe_get
+except ImportError:
+    from scripts.lib.safe_http import safe_get
+
+DEFAULT_SCORING_CONFIG = {
+    "version": 1,
+    "overall": {"method": "weighted_average", "score_floor": 0, "score_ceiling": 100},
+    "categories": {
+        "security": {"weight": 8, "label": "Security Headers"},
+        "social": {"weight": 5, "label": "Social Meta"},
+        "robots": {"weight": 8, "label": "Robots and Crawlers"},
+        "broken_links": {"weight": 10, "label": "Broken Links"},
+        "internal_links": {"weight": 8, "label": "Internal Links"},
+        "redirects": {"weight": 3, "label": "Redirects"},
+        "llms_txt": {"weight": 5, "label": "AI Search"},
+        "pagespeed": {"weight": 13, "label": "Performance and Core Web Vitals"},
+        "onpage": {"weight": 10, "label": "On-Page SEO"},
+        "readability": {"weight": 8, "label": "Readability"},
+        "entity": {"weight": 5, "label": "Entity SEO"},
+        "link_profile": {"weight": 7, "label": "Link Profile"},
+        "hreflang": {"weight": 5, "label": "Hreflang"},
+        "duplicate_content": {"weight": 5, "label": "Content Uniqueness"},
+    },
+}
+
+
+def load_scoring_config(path: str = SCORING_CONFIG_PATH) -> dict:
+    """Load report scoring weights from resources/config/scoring.json."""
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            config = json.load(f)
+    except (OSError, json.JSONDecodeError):
+        return DEFAULT_SCORING_CONFIG
+
+    categories = config.get("categories")
+    if not isinstance(categories, dict):
+        return DEFAULT_SCORING_CONFIG
+    for details in categories.values():
+        if not isinstance(details, dict) or not isinstance(details.get("weight"), (int, float)):
+            return DEFAULT_SCORING_CONFIG
+    return config
+
+
+def get_scoring_weights(config: dict | None = None) -> dict:
+    """Return category weights from the scoring config."""
+    config = config or load_scoring_config()
+    return {
+        key: details["weight"]
+        for key, details in config.get("categories", {}).items()
+        if isinstance(details, dict) and isinstance(details.get("weight"), (int, float))
+    }
 
 
 def run_script(script_name: str, args: list, timeout: int = 120) -> dict:
@@ -51,9 +104,7 @@ def run_script(script_name: str, args: list, timeout: int = 120) -> dict:
 def fetch_page(url: str) -> str:
     """Fetch page HTML to a temp file, return path."""
     try:
-        req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0 (compatible; SEOBot/1.0)"})
-        with urllib.request.urlopen(req, timeout=15) as resp:
-            html = resp.read().decode("utf-8", errors="replace")
+        html = safe_get(url, timeout=15).text
         tmp = tempfile.NamedTemporaryFile(suffix=".html", delete=False, mode="w", encoding="utf-8")
         tmp.write(html)
         tmp.close()
@@ -277,7 +328,7 @@ def build_environment_fixes(data: dict) -> list:
             "info",
             "Performance measurement incomplete",
             "PageSpeed API returned an error, so CWV recommendations are less reliable.",
-            "Rerun `pagespeed.py` with `--api-key` and then prioritize LCP/INP/CLS fixes from that output.",
+            "Set `PAGESPEED_API_KEY` in your environment or `.env` file (see `.env.example`), then rerun. The CLI also accepts `--api-key`. Prioritize LCP/INP/CLS fixes from that output.",
         )
 
     if rd.get("flesch_reading_ease", 100) < 40 or rd.get("avg_sentence_length", 0) > 25:
@@ -384,25 +435,11 @@ def collect_data(url: str) -> dict:
     return data
 
 
-def calculate_overall_score(data: dict) -> dict:
+def calculate_overall_score(data: dict, scoring_config: dict | None = None) -> dict:
     """Calculate overall SEO score from all analyses."""
     scores = {}
-    weights = {
-        "security": 8,
-        "social": 5,
-        "robots": 8,
-        "broken_links": 10,
-        "internal_links": 8,
-        "redirects": 3,
-        "llms_txt": 5,
-        "pagespeed": 13,
-        "onpage": 10,
-        "readability": 8,
-        "entity": 5,
-        "link_profile": 7,
-        "hreflang": 5,
-        "duplicate_content": 5,
-    }
+    scoring_config = scoring_config or load_scoring_config()
+    weights = get_scoring_weights(scoring_config)
 
     # Security score
     sec = data["sections"].get("security", {})
@@ -562,6 +599,7 @@ def calculate_overall_score(data: dict) -> dict:
         "overall": overall,
         "categories": scores,
         "weights": weights,
+        "scoring_version": scoring_config.get("version"),
     }
 
 
@@ -683,6 +721,190 @@ def render_all_recommendations(data: dict) -> str:
             for item in items[:10]:
                 html += f'<div class="issue-item info"><span class="issue-badge">FIX</span> {item}</div>'
     return html if html else '<p style="color:var(--green)">✅ No recommendations — everything looks good!</p>'
+
+
+def _markdown_cell(value) -> str:
+    """Escape a value for use in a compact Markdown table cell."""
+    text = str(value or "").replace("\n", " ").replace("|", "\\|").strip()
+    return re.sub(r"\s+", " ", text)
+
+
+def _severity_rank(severity: str) -> int:
+    return {"critical": 0, "high": 0, "warning": 1, "medium": 1, "info": 2, "low": 2, "pass": 3}.get(
+        (severity or "info").lower(), 2
+    )
+
+
+def _severity_label(severity: str) -> str:
+    normalized = (severity or "info").lower()
+    if normalized in ("critical", "high"):
+        return "Critical"
+    if normalized in ("warning", "medium"):
+        return "Warning"
+    if normalized in ("pass",):
+        return "Pass"
+    return "Info"
+
+
+def collect_report_findings(data: dict) -> list[dict]:
+    """Collect findings from section outputs, script errors, and environment fixes."""
+    findings: list[dict] = []
+
+    for section_name, section_data in data.get("sections", {}).items():
+        if not isinstance(section_data, dict):
+            continue
+
+        if section_data.get("error"):
+            findings.append({
+                "severity": "info",
+                "area": section_name,
+                "finding": f"{section_name} measurement incomplete",
+                "evidence": section_data.get("error"),
+                "fix": "Rerun this check after resolving the environment/API/network limitation.",
+            })
+
+        for issue in section_data.get("issues", []) or []:
+            if isinstance(issue, dict):
+                findings.append({
+                    "severity": _severity_label(issue.get("severity", "info")),
+                    "area": issue.get("area") or section_name,
+                    "finding": issue.get("finding") or issue.get("title") or str(issue),
+                    "evidence": issue.get("evidence") or issue.get("reason") or "",
+                    "fix": issue.get("fix") or issue.get("recommendation") or "",
+                })
+            elif isinstance(issue, str):
+                severity = "critical" if "🔴" in issue else "warning" if "⚠️" in issue else "info"
+                findings.append({
+                    "severity": _severity_label(severity),
+                    "area": section_name,
+                    "finding": issue,
+                    "evidence": "",
+                    "fix": "",
+                })
+
+    for item in data.get("environment_fixes", []) or []:
+        findings.append({
+            "severity": _severity_label(item.get("severity", "info")),
+            "area": "environment",
+            "finding": item.get("title", ""),
+            "evidence": item.get("reason", ""),
+            "fix": item.get("fix", ""),
+        })
+
+    return sorted(findings, key=lambda item: (_severity_rank(item.get("severity", "info")), item.get("area", "")))
+
+
+def render_markdown_report(data: dict, scores: dict, scoring_config: dict | None = None) -> str:
+    """Render the required detailed Markdown audit artifact."""
+    scoring_config = scoring_config or load_scoring_config()
+    labels = {
+        key: details.get("label", key.replace("_", " ").title())
+        for key, details in scoring_config.get("categories", {}).items()
+        if isinstance(details, dict)
+    }
+    findings = collect_report_findings(data)
+    error_count = sum(1 for section in data.get("sections", {}).values() if isinstance(section, dict) and section.get("error"))
+    score_confidence = "Low" if error_count >= 4 else "Medium" if error_count else "High"
+
+    lines = [
+        "# Full Audit Report",
+        "",
+        f"- URL: `{data.get('url', '')}`",
+        f"- Generated: `{data.get('timestamp', '')}`",
+        f"- Overall score: `{scores.get('overall', 0)}/100`",
+        f"- Score confidence: `{score_confidence}`",
+        f"- Scoring version: `{scores.get('scoring_version', scoring_config.get('version', 'unknown'))}`",
+        "",
+        "## Score Card",
+        "",
+        "| Category | Weight | Score |",
+        "| --- | ---: | ---: |",
+    ]
+
+    weights = scores.get("weights", {})
+    for key, weight in weights.items():
+        label = labels.get(key, key.replace("_", " ").title())
+        score = scores.get("categories", {}).get(key, 0)
+        lines.append(f"| {_markdown_cell(label)} | {weight} | {score} |")
+
+    lines.extend(["", "## Findings", ""])
+    if findings:
+        lines.extend(["| Severity | Area | Finding | Evidence | Fix |", "| --- | --- | --- | --- | --- |"])
+        for item in findings[:50]:
+            lines.append(
+                "| {severity} | {area} | {finding} | {evidence} | {fix} |".format(
+                    severity=_markdown_cell(item.get("severity")),
+                    area=_markdown_cell(item.get("area")),
+                    finding=_markdown_cell(item.get("finding")),
+                    evidence=_markdown_cell(item.get("evidence")),
+                    fix=_markdown_cell(item.get("fix")),
+                )
+            )
+    else:
+        lines.append("No confirmed findings were produced by the completed checks.")
+
+    lines.extend(["", "## Measurement Notes", ""])
+    if error_count:
+        lines.append(f"{error_count} checks returned errors or incomplete measurements; treat affected scores as directional.")
+    else:
+        lines.append("All configured checks completed without script-level errors.")
+
+    return "\n".join(lines) + "\n"
+
+
+def render_action_plan(data: dict, scores: dict) -> str:
+    """Render the required prioritized Markdown action-plan artifact."""
+    findings = collect_report_findings(data)
+    actionable = [
+        item for item in findings
+        if item.get("fix") and item.get("severity") in ("Critical", "Warning", "Info")
+    ]
+    pagespeed = data.get("sections", {}).get("pagespeed", {})
+    for opp in pagespeed.get("opportunities", []) if isinstance(pagespeed, dict) else []:
+        actionable.append({
+            "severity": "Warning",
+            "area": "pagespeed",
+            "finding": opp.get("title", "PageSpeed opportunity"),
+            "evidence": f"Estimated savings: {opp.get('savings_ms', 0)}ms",
+            "fix": opp.get("description") or "Apply the PageSpeed recommendation and rerun the audit.",
+        })
+
+    actionable = sorted(actionable, key=lambda item: (_severity_rank(item.get("severity")), item.get("area", "")))
+
+    lines = [
+        "# Action Plan",
+        "",
+        f"- URL: `{data.get('url', '')}`",
+        f"- Overall score: `{scores.get('overall', 0)}/100`",
+        "",
+        "## Priority Fixes",
+        "",
+    ]
+
+    if not actionable:
+        lines.append("No prioritized fixes were produced by the completed checks.")
+        return "\n".join(lines) + "\n"
+
+    for idx, item in enumerate(actionable[:20], start=1):
+        lines.extend([
+            f"{idx}. **{_markdown_cell(item.get('finding'))}**",
+            f"   - Priority: `{_markdown_cell(item.get('severity'))}`",
+            f"   - Area: `{_markdown_cell(item.get('area'))}`",
+            f"   - Evidence: {_markdown_cell(item.get('evidence')) or 'See audit output.'}",
+            f"   - Fix: {_markdown_cell(item.get('fix'))}",
+        ])
+
+    return "\n".join(lines) + "\n"
+
+
+def write_text_output(path: str, content: str) -> str:
+    """Write a text artifact and return its absolute path."""
+    output_dir = os.path.dirname(path)
+    if output_dir:
+        os.makedirs(output_dir, exist_ok=True)
+    with open(path, "w", encoding="utf-8") as f:
+        f.write(content)
+    return os.path.abspath(path)
 
 
 def generate_html(data: dict, scores: dict) -> str:
@@ -1291,7 +1513,7 @@ tr:hover td {{ background: rgba(99,102,241,0.03); }}
                 <div class="summary-item"><div class="val">{psi.get("field_data", psi.get("lab_data", {})).get("INP", psi.get("field_data", psi.get("lab_data", {})).get("TBT", "?"))}</div><div class="lbl">INP/TBT</div></div>
                 <div class="summary-item"><div class="val">{psi.get("field_data", psi.get("lab_data", {})).get("CLS", "?")}</div><div class="lbl">CLS</div></div>
             </div>
-            {'<div class="issue-item warning"><span class="issue-badge">NOTE</span> <div><strong>PageSpeed API returned an error or was rate-limited.</strong><br><span style="color:var(--text-muted)">Try running <code>python3 scripts/pagespeed.py URL --api-key YOUR_KEY</code> manually, or rerun the report later. The LLM can still analyze Core Web Vitals by reading the page directly.</span></div></div>' if psi.get('error') or psi.get('performance_score', 0) == 0 else ''}
+            {'<div class="issue-item warning"><span class="issue-badge">NOTE</span> <div><strong>PageSpeed API returned an error or was rate-limited.</strong><br><span style="color:var(--text-muted)">Set <code>PAGESPEED_API_KEY</code> in a <code>.env</code> file (see <code>.env.example</code>) or export it in your shell, then rerun. The CLI also accepts <code>--api-key</code>. The LLM can still analyze Core Web Vitals by reading the page directly.</span></div></div>' if psi.get('error') or psi.get('performance_score', 0) == 0 else ''}
             {render_recommendations(psi)}
         </div>
     </div>
@@ -1494,35 +1716,50 @@ def main():
     parser = argparse.ArgumentParser(description="Generate interactive SEO HTML report")
     parser.add_argument("url", help="Website URL to analyze")
     parser.add_argument("--output", "-o", help="Output filename (default: seo-report-<domain>.html)")
+    parser.add_argument("--html", dest="html_output", help="HTML output filename (alias for --output)")
+    parser.add_argument("--markdown", default="FULL-AUDIT-REPORT.md",
+                        help="Markdown audit output path (default: FULL-AUDIT-REPORT.md)")
+    parser.add_argument("--action-plan", default="ACTION-PLAN.md",
+                        help="Markdown action-plan output path (default: ACTION-PLAN.md)")
+    parser.add_argument("--no-html", action="store_true", help="Do not write the HTML dashboard")
+    parser.add_argument("--no-markdown", action="store_true", help="Do not write markdown/action-plan artifacts")
 
     args = parser.parse_args()
+    scoring_config = load_scoring_config()
 
     # Collect all data
     data = collect_data(args.url)
 
     # Calculate scores
-    scores = calculate_overall_score(data)
+    scores = calculate_overall_score(data, scoring_config=scoring_config)
 
-    # Generate HTML
-    html = generate_html(data, scores)
+    written = []
 
-    # Determine output path
-    if args.output:
-        output_path = args.output
-    else:
-        domain = urlparse(args.url).netloc.replace(".", "_")
-        output_path = f"seo-report-{domain}.html"
+    if not args.no_html:
+        # Generate HTML
+        html = generate_html(data, scores)
 
-    output_dir = os.path.dirname(output_path)
-    if output_dir:
-        os.makedirs(output_dir, exist_ok=True)
+        # Determine output path
+        if args.html_output or args.output:
+            output_path = args.html_output or args.output
+        else:
+            domain = urlparse(args.url).netloc.replace(".", "_")
+            output_path = f"seo-report-{domain}.html"
 
-    with open(output_path, "w", encoding="utf-8") as f:
-        f.write(html)
+        written.append(("HTML report", write_text_output(output_path, html)))
 
-    print(f"\n✅ Report saved to: {os.path.abspath(output_path)}")
+    if not args.no_markdown:
+        markdown = render_markdown_report(data, scores, scoring_config=scoring_config)
+        action_plan = render_action_plan(data, scores)
+        written.append(("Full audit report", write_text_output(args.markdown, markdown)))
+        written.append(("Action plan", write_text_output(args.action_plan, action_plan)))
+
+    print("\nReport artifacts:")
+    for label, path in written:
+        print(f"   {label}: {path}")
     print(f"   Overall Score: {scores['overall']}/100")
-    print(f"   Open in browser to view the interactive report")
+    if not args.no_html:
+        print(f"   Open the HTML report in a browser to view the interactive dashboard")
 
 
 if __name__ == "__main__":

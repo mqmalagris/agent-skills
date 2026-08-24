@@ -20,7 +20,6 @@ import json
 import re
 import sys
 import time
-import urllib.request
 from collections import Counter, defaultdict
 from urllib.parse import urlparse, urljoin
 
@@ -31,8 +30,10 @@ except ImportError:
           file=sys.stderr)
     sys.exit(1)
 
-
-USER_AGENT = "Mozilla/5.0 (compatible; SEOSkill-LinkProfile/1.0)"
+try:
+    from lib.safe_http import safe_get
+except ImportError:
+    from scripts.lib.safe_http import safe_get
 
 
 # ---------------------------------------------------------------------------
@@ -42,9 +43,8 @@ USER_AGENT = "Mozilla/5.0 (compatible; SEOSkill-LinkProfile/1.0)"
 def fetch_page(url: str, timeout: int = 10) -> tuple:
     """Return (final_url, html) or (url, '')."""
     try:
-        req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
-        with urllib.request.urlopen(req, timeout=timeout) as resp:
-            return resp.url, resp.read().decode("utf-8", errors="ignore")
+        resp = safe_get(url, timeout=timeout)
+        return resp.url, resp.text
     except Exception:
         return url, ""
 
@@ -297,9 +297,12 @@ def main():
     parser.add_argument("--max-pages", type=int, default=50,
                         help="Max pages to crawl (default: 50)")
     parser.add_argument("--gsc-credentials", default="",
-                        help="Path to GSC service account credentials (optional)")
+                        help="Path to GSC service account credentials (optional). Falls back to GSC_CREDENTIALS_PATH env var or .env file.")
     parser.add_argument("--json", action="store_true", help="Output as JSON")
     args = parser.parse_args()
+
+    from env_loader import get_env
+    gsc_credentials = args.gsc_credentials or get_env("GSC_CREDENTIALS_PATH")
 
     print(f"Crawling {args.url}...", file=sys.stderr)
     graph, crawled, base_domain = crawl_site(args.url, max_pages=args.max_pages)
@@ -309,9 +312,9 @@ def main():
     report["site_url"] = args.url
 
     # Optional GSC backlinks
-    if args.gsc_credentials:
+    if gsc_credentials:
         print("Fetching GSC backlinks...", file=sys.stderr)
-        report["gsc_backlinks"] = get_gsc_backlinks(args.gsc_credentials, args.url)
+        report["gsc_backlinks"] = get_gsc_backlinks(gsc_credentials, args.url)
 
     if args.json:
         print(json.dumps(report, indent=2, default=str))

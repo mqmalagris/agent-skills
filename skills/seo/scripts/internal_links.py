@@ -29,8 +29,13 @@ except ImportError:
     print("Error: beautifulsoup4 required. Install with: pip install beautifulsoup4")
     sys.exit(1)
 
+try:
+    from lib.safe_http import default_headers, safe_get
+except ImportError:
+    from scripts.lib.safe_http import default_headers, safe_get
 
-HEADERS = {"User-Agent": "Mozilla/5.0 (compatible; SEOSkill/1.0)"}
+
+HEADERS = default_headers()
 
 
 def extract_internal_links(html: str, page_url: str, domain: str) -> list:
@@ -117,7 +122,7 @@ def crawl_site(start_url: str, max_depth: int = 2, max_pages: int = 50,
 
     def fetch_page(url):
         try:
-            resp = requests.get(url, timeout=timeout, headers=HEADERS, allow_redirects=True)
+            resp = safe_get(url, timeout=timeout, headers=HEADERS, allow_redirects=True)
             if resp.status_code == 200 and "text/html" in resp.headers.get("content-type", ""):
                 return resp.text, resp.url
         except requests.exceptions.RequestException:

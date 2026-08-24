@@ -21,8 +21,13 @@ except ImportError:
     print("Error: requests library required. Install with: pip install requests")
     sys.exit(1)
 
+try:
+    from lib.safe_http import default_headers, safe_head
+except ImportError:
+    from scripts.lib.safe_http import default_headers, safe_head
 
-HEADERS = {"User-Agent": "Mozilla/5.0 (compatible; SEOSkill/1.0)"}
+
+HEADERS = default_headers()
 
 
 def check_redirects(url: str, max_redirects: int = 10, timeout: int = 10) -> dict:
@@ -64,8 +69,8 @@ def check_redirects(url: str, max_redirects: int = 10, timeout: int = 10) -> dic
                 break
             seen.add(current)
 
-            resp = requests.head(current, timeout=timeout, headers=HEADERS,
-                                 allow_redirects=False)
+            resp = safe_head(current, timeout=timeout, headers=HEADERS,
+                             allow_redirects=False)
 
             hop = {
                 "step": i + 1,

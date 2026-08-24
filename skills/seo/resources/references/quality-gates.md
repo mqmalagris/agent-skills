@@ -1,3 +1,5 @@
+<!-- Updated: 2026-05-14 -->
+
 # Content Quality Gates
 
 ## Minimum Word Counts by Page Type

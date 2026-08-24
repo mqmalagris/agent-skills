@@ -17,7 +17,6 @@ import json
 import re
 import sys
 import time
-import urllib.request
 from collections import Counter, defaultdict
 from urllib.parse import urlparse, urljoin
 
@@ -27,8 +26,10 @@ except ImportError:
     print("Error: beautifulsoup4 required. Install with: pip install beautifulsoup4")
     sys.exit(1)
 
-
-USER_AGENT = "Mozilla/5.0 (compatible; SEOSkill-GapAnalysis/1.0)"
+try:
+    from lib.safe_http import safe_get
+except ImportError:
+    from scripts.lib.safe_http import safe_get
 
 STOP_WORDS = {
     "the", "a", "an", "and", "or", "but", "in", "on", "at", "to", "for",
@@ -49,9 +50,7 @@ STOP_WORDS = {
 
 def fetch_page(url: str, timeout: int = 10) -> str:
     try:
-        req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
-        with urllib.request.urlopen(req, timeout=timeout) as resp:
-            return resp.read().decode("utf-8", errors="ignore")
+        return safe_get(url, timeout=timeout).text
     except Exception:
         return ""
 

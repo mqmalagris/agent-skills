@@ -27,8 +27,13 @@ except ImportError:
     print("Error: beautifulsoup4 required. Install with: pip install beautifulsoup4")
     sys.exit(1)
 
+try:
+    from lib.safe_http import default_headers, safe_get
+except ImportError:
+    from scripts.lib.safe_http import default_headers, safe_get
 
-HEADERS = {"User-Agent": "Mozilla/5.0 (compatible; SEOSkill/1.0)"}
+
+HEADERS = default_headers()
 
 # Required and recommended OG tags
 OG_REQUIREMENTS = {
@@ -84,7 +89,7 @@ def check_social_meta(url: str, timeout: int = 15) -> dict:
     }
 
     try:
-        resp = requests.get(url, timeout=timeout, headers=HEADERS)
+        resp = safe_get(url, timeout=timeout, headers=HEADERS)
         if resp.status_code != 200:
             result["error"] = f"HTTP {resp.status_code}"
             return result
