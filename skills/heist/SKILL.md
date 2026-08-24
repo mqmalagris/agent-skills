@@ -65,6 +65,18 @@ Acceptance criteria. Bullet list. Each item testable.
 - [ ] <criterion>
 - [ ] <criterion>
 
+## The Blind Spots
+Edge cases swept before coding. One row per case. Decision is `handle` (build now), `defer` (out of scope, say why), or `won't` (deliberately unsupported).
+
+| Case | Decision | Covered by |
+|------|----------|-----------|
+| empty result set | handle | Phase 1 task 2 + integration test |
+| two tabs submitting at once | defer | single-seat feature, revisit at multi-seat |
+
+Walk these categories, skip one only with a stated reason: empty / nil / zero, boundary (first, last, exactly one, max), invalid or malformed input, error and failure paths, idempotency (called twice), order sensitivity, concurrency, partial failure (one of N succeeded), wrong actor / insufficient permission, and the reverse of every state transition. Carry over anything `grill-me` already raised verbatim — don't re-derive it.
+
+This table is the input to `implementation-review` Check 3, which reconciles the shipped diff against it. A case that never lands here gets rediscovered at review time, or not at all.
+
 ## The Getaway
 Rollback + risk plan.
 
@@ -91,6 +103,7 @@ Unresolved items blocking start. If empty, delete section.
 - **Tasks are checkboxes.** Update `- [ ]` → `- [x]` as work progresses. Bump phase Status field too.
 - **Crew table is exhaustive for known files.** Add `?` next to speculative ones.
 - **Acceptance criteria are testable.** "Works well" is not. "Login completes in <2s p95" is.
+- **Blind Spots are decisions, not a wish list.** Every row carries `handle` / `defer` / `won't`. A case you can't decide yet is an Open Question, not a Blind Spot row.
 - **No code in plan.** Pseudocode rare; only when sequencing isn't clear without it.
 - **Honor stack conventions** in this priority: (1) ADR-declared stack/paradigm, (2) existing code patterns in the repo, (3) user override. If they conflict, surface the conflict — don't silently pick.
 - **Don't write code after planning.** Hand back to user. They run plan or invoke implementation separately.

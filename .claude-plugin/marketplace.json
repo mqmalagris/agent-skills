@@ -164,22 +164,6 @@
       ]
     },
     {
-      "name": "heist",
-      "source": "./skills/heist",
-      "description": "Turn a settled feature scope into an implementation plan at docs/plans/NNNN-<slug>.md. Crew, sequence (with parallel phases), getaway, payoff. Consumes PRDs + ADRs.",
-      "version": "0.2.0",
-      "author": {
-        "name": "Matheus Malagris"
-      },
-      "category": "engineering-workflow",
-      "keywords": [
-        "planning",
-        "implementation-plan",
-        "prd",
-        "adr"
-      ]
-    },
-    {
       "name": "compass",
       "source": "./skills/compass",
       "description": "Multi-mode software engineering coach: architect, advisor, reviewer, refactor, legacy, and explainer workflows. Auto-writes ADRs to docs/adr/.",
@@ -400,6 +384,22 @@
         "pre-prd",
         "interview",
         "ubiquitous-language"
+      ]
+    },
+    {
+      "name": "heist",
+      "source": "./skills/heist",
+      "description": "Turn a settled feature scope into an implementation plan at docs/plans/NNNN-<slug>.md. Crew, sequence (with parallel phases), getaway, payoff. Consumes PRDs + ADRs.",
+      "version": "0.3.0",
+      "author": {
+        "name": "Matheus Malagris"
+      },
+      "category": "engineering-workflow",
+      "keywords": [
+        "planning",
+        "implementation-plan",
+        "prd",
+        "adr"
       ]
     }
   ]
