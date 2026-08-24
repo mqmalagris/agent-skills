@@ -128,23 +128,6 @@
       ]
     },
     {
-      "name": "brag-doc",
-      "source": "./skills/brag-doc",
-      "description": "Maintain a monthly brag document and roll it up into a promo packet, self-review, or CV material. Lucas Faria's 4-field template + Julia Evans' impact-first categories. Feeds cv-craft.",
-      "version": "0.1.1",
-      "author": {
-        "name": "Matheus Malagris"
-      },
-      "category": "career",
-      "keywords": [
-        "brag-document",
-        "career",
-        "self-review",
-        "promotion",
-        "cv-source"
-      ]
-    },
-    {
       "name": "code-craft",
       "source": "./skills/code-craft",
       "description": "Language- and framework-specific best practices and idioms. Reader and reviewer modes. Ships 7 languages + 12 frameworks (TS, Rust, CSS, Tailwind, Dart, Go, Python, React, Next, RN+Expo, Hono, Workers, Astro, Svelte, Drizzle, Supabase, Lambda, Terraform, Flutter).",
@@ -418,6 +401,23 @@
         "svpg",
         "continuous-discovery",
         "product-trio"
+      ]
+    },
+    {
+      "name": "brag-doc",
+      "source": "./skills/brag-doc",
+      "description": "Maintain a monthly brag document and roll it up into a promo packet, self-review, or CV material. Lucas Faria's 4-field template + Julia Evans' impact-first categories. Feeds cv-craft.",
+      "version": "0.2.0",
+      "author": {
+        "name": "Matheus Malagris"
+      },
+      "category": "career",
+      "keywords": [
+        "brag-document",
+        "career",
+        "self-review",
+        "promotion",
+        "cv-source"
       ]
     }
   ]
