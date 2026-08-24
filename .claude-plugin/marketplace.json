@@ -401,6 +401,24 @@
         "ats",
         "job-search"
       ]
+    },
+    {
+      "name": "aso-craft",
+      "source": "./skills/aso-craft",
+      "description": "App Store Optimization for iOS and Android from one per-locale Markdown source.",
+      "version": "0.1.0",
+      "author": {
+        "name": "Matheus Malagris"
+      },
+      "category": "marketing",
+      "keywords": [
+        "aso",
+        "app-store",
+        "google-play",
+        "keyword-research",
+        "store-listing",
+        "localization"
+      ]
     }
   ]
 }
