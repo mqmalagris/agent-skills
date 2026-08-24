@@ -3,6 +3,7 @@
 All notable changes to this collection are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); the collection follows [SemVer](https://semver.org). See [VERSIONING.md](VERSIONING.md) for the per-skill vs collection model.
 
 ## [Unreleased]
+- new skill: cross-store ASO from one per-locale Markdown source, free live-store keyword probing, listing linter
 - sync mode gains standalone-rewrite sub-flow, DOCX export, three-tier metric markers and data-integrity rules; example persona genericized (no real PII or client names)
 - scripts 33 -> 88 (crawl audit, schema tooling, a11y, LCP subparts, repo SEO, log analysis) + reference and sub-skill updates
 - Check 3 now reconciles the shipped diff against the plan Blind Spots ledger
