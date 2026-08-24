@@ -1,6 +1,6 @@
 {
   "name": "cagan-check",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Apply Marty Cagan (SVPG) + Teresa Torres Continuous Discovery to a dev's workflow: feature kickoff, planning/estimation, discovery calls, PR review. Flags feature-factory smells; green/yellow/red per dimension.",
   "author": {
     "name": "Matheus Malagris",

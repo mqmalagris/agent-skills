@@ -1,7 +1,7 @@
 ---
 name: cagan-check
 description: >-
-  Apply Marty Cagan product principles (Inspired, Empowered, Transformed) plus Teresa Torres' Continuous Discovery to a software dev's workflow from the Product Trio's engineering seat. Runs structured reviews for feature kickoff, sprint planning/estimation, client discovery calls, and pull requests — checking problem framing, outcome metrics, the five big risks (value/usability/feasibility/viability/ethical), feature-factory smells (incl. Cutler 2025 updates: high WIP, Team Tetris, success theater), prototyping fit, instrumentation, customer touchpoint cadence. Outputs green/yellow/red flags per dimension with concrete next actions. Use when user says /cagan-check, "starting a feature", "vou começar feature", "kickoff", "planning", "estimativa", "estimation", "discovery", "review this PR" with feature context, or asks to apply Cagan/SVPG/Torres/product-trio thinking. User context: full-stack dev at agency (Arctic Leaf) — adapt to agency-client reality. Output language: mirror the language of the user's current turn (detect per invocation — pt-BR if user wrote in Portuguese, EN if in English, etc).
+  Apply Marty Cagan product principles (Inspired, Empowered, Transformed) plus Teresa Torres' Continuous Discovery to a software dev's workflow from the Product Trio's engineering seat. Runs structured reviews for feature kickoff, sprint planning/estimation, client discovery calls, and pull requests — checking problem framing, outcome metrics, the five big risks (value/usability/feasibility/viability/ethical), feature-factory smells (incl. Cutler 2025 updates: high WIP, Team Tetris, success theater), prototyping fit, instrumentation, customer touchpoint cadence. Outputs green/yellow/red flags per dimension with concrete next actions. Use when user says /cagan-check, "starting a feature", "vou começar feature", "kickoff", "planning", "estimativa", "estimation", "discovery", "review this PR" with feature context, or asks to apply Cagan/SVPG/Torres/product-trio thinking. Adapts to the reader's employment context — in-house product team, or client-services work (agency, consultancy, contractor) where a paying stakeholder sits between the team and the end user. Output language: mirror the language of the user's current turn (detect per invocation — pt-BR if user wrote in Portuguese, EN if in English, etc).
 ---
 
 # cagan-check
@@ -63,9 +63,9 @@ Per Cagan/SVPG: **Tech Lead is the formal owner of feasibility risk and co-accou
 
 Details in [CHECKLISTS.md](CHECKLISTS.md).
 
-## Agency context (Arctic Leaf)
+## Client-services context
 
-Adapt when relevant:
+Applies when a paying stakeholder sits between the team and the end user — agency, consultancy, contractor, or an internal team serving another business unit. Skip if you build for your own end users. Adapt when relevant:
 - Client pays for delivery ≠ client pays for outcome. Try to align around the **end user's outcome**, not just the contracting stakeholder's.
 - Fixed contract scope makes discovery hard. Propose a **discovery sprint** before the delivery sprint when possible.
 - The client's roadmap may itself be a feature factory. Don't copy blindly — challenge with Cagan-style questions.
