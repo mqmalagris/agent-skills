@@ -1,16 +1,16 @@
 ---
 name: brag-doc
 description: >-
-  Maintain a monthly brag document (accomplishment log) and roll it up into a promo packet, self-review, or CV material. Blends Lucas Faria's 4-field monthly template with Julia Evans' impact-first categories. Use when the user wants to log what they shipped, prep for a performance or promotion cycle, write a self-review, remember work from months ago, feed achievements to cv-craft, or runs /brag-doc. Modes: draft, example, review, compile. Targets: al (Arctic Leaf employment), side (public / side-project work).
+  Maintain a monthly brag document (accomplishment log) and roll it up into a promo packet, self-review, or CV material. Blends Lucas Faria's 4-field monthly template with Julia Evans' impact-first categories. Use when the user wants to log what they shipped, prep for a performance or promotion cycle, write a self-review, remember work from months ago, feed achievements to cv-craft, or runs /brag-doc. Modes: draft, example, review, compile. Targets: work (employment, any employer), side (public / side-project work).
 ---
 
 # Brag Doc
 
 Two living docs the user maintains:
-- `projects/side/brag/arctic-leaf.md` — employment (Arctic Leaf, agency). For perf/promo cycles; shared with the manager.
+- `projects/side/brag/<employer>.md` — employment, one file per employer (e.g. `acme.md`). For perf/promo cycles; shared with the manager.
 - `projects/side/brag/side-projects.md` — public work (OSS, content, shipped apps). Feeds the 2026 job search and cv-craft.
 
-Invocation: `/brag-doc <mode> [target]`. `target` is `al` or `side` — ask if the mode needs one and it's unclear. (Personal skills take space-separated args, so `/brag-doc draft al`, not `:draft`.)
+Invocation: `/brag-doc <mode> [target]`. `target` is `work` or `side` — ask if the mode needs one and it's unclear. For `work`, resolve to the employer file in `projects/side/brag/`; ask which if more than one exists. (Personal skills take space-separated args, so `/brag-doc draft work`, not `:draft`.)
 
 ## Modes
 
@@ -37,7 +37,7 @@ Roll N monthly entries into one output. Ask which and the date range, then produ
 - **Julia Evans** — impact over tasks, the category taxonomy, "make it sound exactly as good as it is", and that a running doc beats memory six months later. Original: https://jvns.ca/blog/brag-documents/
 
 ## Cadence
-Monthly. For `al`, share with the manager after each entry. For `side`, the log is CV/portfolio source — keep it publishable.
+Monthly. For `work`, share with the manager after each entry. For `side`, the log is CV/portfolio source — keep it publishable.
 
 ## Humanize the written prose (if available)
 
