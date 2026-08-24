@@ -29,8 +29,13 @@ except ImportError:
     print("Error: beautifulsoup4 library required. Install with: pip install beautifulsoup4")
     sys.exit(1)
 
+try:
+    from lib.safe_http import default_headers, safe_get, safe_head
+except ImportError:
+    from scripts.lib.safe_http import default_headers, safe_get, safe_head
 
-HEADERS = {"User-Agent": "Mozilla/5.0 (compatible; SEOSkill/1.0)"}
+
+HEADERS = default_headers()
 
 
 def extract_links(html: str, base_url: str) -> list:
@@ -67,13 +72,12 @@ def check_link(link: dict, timeout: int = 10) -> dict:
     result = {**link, "status": None, "error": None, "redirect": None, "response_time_ms": None}
 
     try:
-        resp = requests.head(url, timeout=timeout, headers=HEADERS,
-                             allow_redirects=True, verify=False)
+        resp = safe_head(url, timeout=timeout, headers=HEADERS, allow_redirects=True)
 
         # Some servers reject HEAD, fall back to GET
         if resp.status_code == 405:
-            resp = requests.get(url, timeout=timeout, headers=HEADERS,
-                                allow_redirects=True, verify=False, stream=True)
+            resp = safe_get(url, timeout=timeout, headers=HEADERS,
+                            allow_redirects=True, stream=True)
 
         result["status"] = resp.status_code
         result["response_time_ms"] = round(resp.elapsed.total_seconds() * 1000)
@@ -128,7 +132,7 @@ def check_broken_links(url: str, internal_only: bool = False,
 
     # Fetch page
     try:
-        resp = requests.get(url, timeout=15, headers=HEADERS)
+        resp = safe_get(url, timeout=15, headers=HEADERS)
         if resp.status_code != 200:
             result["error"] = f"Failed to fetch page: HTTP {resp.status_code}"
             return result

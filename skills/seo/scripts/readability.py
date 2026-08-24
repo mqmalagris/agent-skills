@@ -16,13 +16,20 @@ import argparse
 import json
 import re
 import sys
-import urllib.request
 
 try:
     from bs4 import BeautifulSoup
     HAS_BS4 = True
 except ImportError:
     HAS_BS4 = False
+
+try:
+    from lib.safe_http import safe_get
+except ImportError:
+    from scripts.lib.safe_http import safe_get
+
+
+PARAGRAPH_BLOCK_TAGS = ("p", "li", "blockquote")
 
 
 def count_syllables(word: str) -> int:
@@ -56,7 +63,20 @@ def extract_text(html: str) -> str:
         soup = BeautifulSoup(html, "html.parser")
         for tag in soup(["script", "style", "nav", "header", "footer", "aside"]):
             tag.decompose()
-        return soup.get_text(separator="\n", strip=True)
+        paragraph_blocks = []
+        for tag in soup.find_all(PARAGRAPH_BLOCK_TAGS):
+            if tag.find_parent(PARAGRAPH_BLOCK_TAGS):
+                continue
+            block_text = tag.get_text(separator=" ", strip=True)
+            if block_text:
+                paragraph_blocks.append(block_text)
+        if paragraph_blocks:
+            return "\n\n".join(paragraph_blocks)
+        text = soup.get_text(separator="\n", strip=True)
+        text = re.sub(r"\n[ \t]*\n(?:[ \t]*\n)+", "\n\n", text)
+        text = re.sub(r"[ \t]+\n", "\n", text)
+        text = re.sub(r"\n[ \t]+", "\n", text)
+        return text.strip()
     else:
         # Basic fallback: strip tags
         text = re.sub(r'<(script|style)[^>]*>.*?</\1>', '', html, flags=re.DOTALL | re.IGNORECASE)
@@ -330,12 +350,7 @@ def main():
         text = args.text
     elif args.url:
         try:
-            req = urllib.request.Request(
-                args.url,
-                headers={"User-Agent": "Mozilla/5.0 (compatible; SEOBot/1.0)"},
-            )
-            with urllib.request.urlopen(req, timeout=20) as resp:
-                content = resp.read().decode("utf-8", errors="ignore")
+            content = safe_get(args.url, timeout=20).text
             if "<html" in content.lower() or "<body" in content.lower():
                 text = extract_text(content)
             else:

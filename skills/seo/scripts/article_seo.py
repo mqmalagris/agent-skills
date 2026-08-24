@@ -24,7 +24,6 @@ import re
 import sys
 import math
 import time
-import urllib.request
 import urllib.parse
 from collections import Counter
 
@@ -34,16 +33,15 @@ except ImportError:
     print("Error: beautifulsoup4 required. Install with: pip install beautifulsoup4")
     sys.exit(1)
 
+try:
+    from lib.safe_http import safe_get
+except ImportError:
+    from scripts.lib.safe_http import safe_get
+
 
 # ---------------------------------------------------------------------------
 # Constants
 # ---------------------------------------------------------------------------
-
-USER_AGENT = (
-    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-    "AppleWebKit/537.36 (KHTML, like Gecko) "
-    "Chrome/122.0.0.0 Safari/537.36"
-)
 
 STOP_WORDS = {
     "the", "a", "an", "and", "or", "but", "in", "on", "at", "to", "for",
@@ -71,11 +69,9 @@ RESTRICTED_SCHEMA = {"FAQPage"}  # government / healthcare only
 # ---------------------------------------------------------------------------
 
 def fetch_html(url: str) -> str:
-    """Fetch raw HTML from a URL with a realistic browser user-agent."""
+    """Fetch raw HTML from a URL."""
     try:
-        req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
-        with urllib.request.urlopen(req, timeout=15) as resp:
-            return resp.read().decode("utf-8", errors="ignore")
+        return safe_get(url, timeout=15).text
     except Exception as exc:
         print(f"Error fetching {url}: {exc}", file=sys.stderr)
         return ""
@@ -420,11 +416,9 @@ def get_google_autocomplete(query: str) -> list:
             "https://suggestqueries.google.com/complete/search"
             f"?client=chrome&q={urllib.parse.quote(query)}"
         )
-        req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
-        with urllib.request.urlopen(req, timeout=6) as resp:
-            data = json.loads(resp.read().decode("utf-8"))
-            if len(data) >= 2 and isinstance(data[1], list):
-                return data[1]
+        data = safe_get(url, timeout=6).json()
+        if len(data) >= 2 and isinstance(data[1], list):
+            return data[1]
     except Exception:
         pass
     return []

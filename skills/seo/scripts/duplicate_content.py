@@ -16,7 +16,6 @@ import json
 import re
 import sys
 import time
-import urllib.request
 from collections import defaultdict
 from urllib.parse import urljoin, urlparse
 
@@ -26,8 +25,10 @@ except ImportError:
     print("Error: beautifulsoup4 required. Install with: pip install beautifulsoup4")
     sys.exit(1)
 
-
-USER_AGENT = "Mozilla/5.0 (compatible; SEOSkill-DupCheck/1.0)"
+try:
+    from lib.safe_http import safe_get
+except ImportError:
+    from scripts.lib.safe_http import safe_get
 
 # Quality gates from resources/references/quality-gates.md
 THIN_CONTENT_THRESHOLDS = {
@@ -45,12 +46,11 @@ THIN_CONTENT_THRESHOLDS = {
 
 def fetch_page(url: str, timeout: int = 12) -> str:
     try:
-        req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
-        with urllib.request.urlopen(req, timeout=timeout) as resp:
-            ct = resp.headers.get("Content-Type", "")
-            if "text/html" not in ct:
-                return ""
-            return resp.read().decode("utf-8", errors="ignore")
+        resp = safe_get(url, timeout=timeout)
+        ct = resp.headers.get("Content-Type", "")
+        if "text/html" not in ct:
+            return ""
+        return resp.text
     except Exception:
         return ""
 
@@ -124,6 +124,49 @@ def exact_hash(text: str) -> str:
     return hashlib.sha256(normalized.encode()).hexdigest()
 
 
+def _robots_directives(value: str | None) -> set[str]:
+    """Normalize a robots directive string into lowercase tokens."""
+    if not value:
+        return set()
+    return {token.strip().lower() for token in re.split(r"[\s,;]+", value) if token.strip()}
+
+
+def _robots_content_has_noindex(content: str | None) -> bool:
+    directives = _robots_directives(content)
+    return "noindex" in directives or "none" in directives
+
+
+def html_has_noindex(html: str) -> bool:
+    """Return True when retained HTML contains a robots noindex directive."""
+    if not html:
+        return False
+
+    soup = BeautifulSoup(html, "html.parser")
+    for meta in soup.find_all("meta"):
+        name = (meta.get("name") or "").strip().lower()
+        http_equiv = (meta.get("http-equiv") or "").strip().lower()
+        content = meta.get("content")
+
+        if name in {"robots", "googlebot", "bingbot"} and _robots_content_has_noindex(content):
+            return True
+        if http_equiv == "x-robots-tag" and _robots_content_has_noindex(content):
+            return True
+
+    return False
+
+
+def page_is_noindex(data: dict) -> bool:
+    """Detect noindex from explicit fields first, then retained HTML."""
+    if data.get("noindex") is True:
+        return True
+
+    for key in ("meta_robots", "robots", "x_robots_tag", "x-robots-tag"):
+        if _robots_content_has_noindex(data.get(key)):
+            return True
+
+    return html_has_noindex(data.get("html") or "")
+
+
 # ---------------------------------------------------------------------------
 # Crawl
 # ---------------------------------------------------------------------------
@@ -151,6 +194,8 @@ def crawl_site(start_url: str, max_pages: int = 50, depth: int = 2) -> dict:
         visited[url] = {
             "text": text,
             "word_count": word_count,
+            "html": html,
+            "noindex": html_has_noindex(html),
         }
 
         if d < depth:
@@ -190,13 +235,27 @@ def detect_duplicates(pages: dict, similarity_threshold: float = 0.85) -> dict:
     exact_dupes = []
     for h, urls in hash_groups.items():
         if len(urls) > 1:
-            exact_dupes.append({
-                "type": "exact_duplicate",
-                "severity": "Critical",
-                "urls": urls,
-                "finding": f"{len(urls)} pages have identical content.",
-                "fix": "Consolidate into a single canonical page and redirect duplicates with 301.",
-            })
+            indexable_urls = [url for url in urls if not page_is_noindex(pages[url])]
+            noindex_urls = [url for url in urls if page_is_noindex(pages[url])]
+
+            if len(indexable_urls) > 1:
+                exact_dupes.append({
+                    "type": "exact_duplicate",
+                    "severity": "Critical",
+                    "urls": indexable_urls,
+                    "finding": f"{len(indexable_urls)} indexable pages have identical content.",
+                    "fix": "Consolidate into a single canonical page and redirect duplicates with 301.",
+                })
+
+            if noindex_urls:
+                exact_dupes.append({
+                    "type": "exact_duplicate",
+                    "severity": "Info",
+                    "urls": urls,
+                    "noindex_urls": noindex_urls,
+                    "finding": "Identical content includes at least one noindex page.",
+                    "fix": "No action required for duplicate-content risk while noindex is intentional.",
+                })
 
     # Step 2: Near-duplicates (MinHash Jaccard)
     near_dupes = []
@@ -215,21 +274,33 @@ def detect_duplicates(pages: dict, similarity_threshold: float = 0.85) -> dict:
                 # Skip if already in exact dupes
                 if any(urls[i] in ed["urls"] and urls[j] in ed["urls"] for ed in exact_dupes):
                     continue
+                noindex_in_pair = page_is_noindex(pages[urls[i]]) or page_is_noindex(pages[urls[j]])
                 near_dupes.append({
                     "type": "near_duplicate",
-                    "severity": "Warning",
+                    "severity": "Info" if noindex_in_pair else "Warning",
                     "similarity": round(sim, 3),
                     "url_a": urls[i],
                     "url_b": urls[j],
                     "word_count_a": pages[urls[i]]["word_count"],
                     "word_count_b": pages[urls[j]]["word_count"],
-                    "finding": f"Pages are {sim:.0%} similar — likely near-duplicate content.",
-                    "fix": "Differentiate content significantly, or set one as canonical and noindex the other.",
+                    "noindex_in_pair": noindex_in_pair,
+                    "finding": (
+                        f"Pages are {sim:.0%} similar, but at least one page is noindex."
+                        if noindex_in_pair
+                        else f"Pages are {sim:.0%} similar — likely near-duplicate content."
+                    ),
+                    "fix": (
+                        "No action required for duplicate-content risk while noindex is intentional."
+                        if noindex_in_pair
+                        else "Differentiate content significantly, or set one as canonical and noindex the other."
+                    ),
                 })
 
     # Step 3: Thin content
     thin_pages = []
     for url, data in pages.items():
+        if page_is_noindex(data):
+            continue
         wc = data["word_count"]
         threshold = THIN_CONTENT_THRESHOLDS["default"]
         if wc < threshold:

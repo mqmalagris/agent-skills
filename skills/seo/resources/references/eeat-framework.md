@@ -1,3 +1,5 @@
+<!-- Updated: 2026-05-14 -->
+
 # E-E-A-T Evaluation Framework
 ## Updated per Google Quality Rater Guidelines — September 11, 2025
 ## Plus December 2025 Core Update Implications

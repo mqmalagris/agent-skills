@@ -8,11 +8,7 @@ Usage:
 """
 
 import argparse
-import ipaddress
-import socket
 import sys
-from typing import Optional
-from urllib.parse import urlparse
 
 try:
     import requests
@@ -20,14 +16,10 @@ except ImportError:
     print("Error: requests library required. Install with: pip install requests")
     sys.exit(1)
 
-
-DEFAULT_HEADERS = {
-    "User-Agent": "Mozilla/5.0 (compatible; ClaudeSEO/1.0; +https://github.com/AgriciDaniel/claude-seo)",
-    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-    "Accept-Language": "en-US,en;q=0.5",
-    "Accept-Encoding": "gzip, deflate",
-    "Connection": "keep-alive",
-}
+try:
+    from lib.safe_http import DEFAULT_HEADERS, normalize_url, safe_get
+except ImportError:
+    from scripts.lib.safe_http import DEFAULT_HEADERS, normalize_url, safe_get
 
 
 def fetch_page(
@@ -63,35 +55,15 @@ def fetch_page(
         "error": None,
     }
 
-    # Validate URL
-    parsed = urlparse(url)
-    if not parsed.scheme:
-        url = f"https://{url}"
-        parsed = urlparse(url)
-
-    if parsed.scheme not in ("http", "https"):
-        result["error"] = f"Invalid URL scheme: {parsed.scheme}"
-        return result
-
-    # SSRF prevention: block private/internal IPs
     try:
-        resolved_ip = socket.gethostbyname(parsed.hostname)
-        ip = ipaddress.ip_address(resolved_ip)
-        if ip.is_private or ip.is_loopback or ip.is_reserved:
-            result["error"] = f"Blocked: URL resolves to private/internal IP ({resolved_ip})"
-            return result
-    except (socket.gaierror, ValueError):
-        pass  # DNS resolution failure handled by requests below
+        url = normalize_url(url)
 
-    try:
-        session = requests.Session()
-        session.max_redirects = max_redirects
-
-        response = session.get(
+        response = safe_get(
             url,
             headers=DEFAULT_HEADERS,
             timeout=timeout,
             allow_redirects=follow_redirects,
+            max_redirects=max_redirects,
         )
 
         result["url"] = response.url

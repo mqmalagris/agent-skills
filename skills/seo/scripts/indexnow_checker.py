@@ -24,8 +24,6 @@ import json
 import os
 import sys
 import time
-import urllib.request
-import urllib.parse
 from urllib.parse import urlparse
 
 try:
@@ -33,8 +31,10 @@ try:
 except ImportError:
     BeautifulSoup = None
 
-
-USER_AGENT = "Mozilla/5.0 (compatible; SEOSkill-IndexNow/1.0)"
+try:
+    from lib.safe_http import safe_get, safe_post
+except ImportError:
+    from scripts.lib.safe_http import safe_get, safe_post
 
 INDEXNOW_ENDPOINTS = {
     "bing": "https://www.bing.com/indexnow",
@@ -51,11 +51,8 @@ INDEXNOW_ENDPOINTS = {
 def fetch_url(url: str, timeout: int = 8) -> tuple:
     """Return (status_code, body) or (None, error_msg)."""
     try:
-        req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
-        with urllib.request.urlopen(req, timeout=timeout) as resp:
-            return resp.status, resp.read().decode("utf-8", errors="ignore")
-    except urllib.error.HTTPError as e:
-        return e.code, ""
+        resp = safe_get(url, timeout=timeout)
+        return resp.status_code, resp.text
     except Exception as exc:
         return None, str(exc)
 
@@ -147,29 +144,20 @@ def ping_indexnow(site_url: str, key: str, urls: list, engine: str = "bing") -> 
     }).encode("utf-8")
 
     try:
-        req = urllib.request.Request(
+        resp = safe_post(
             endpoint,
             data=payload,
             headers={
                 "Content-Type": "application/json",
-                "User-Agent": USER_AGENT,
             },
-            method="POST",
+            timeout=10,
         )
-        with urllib.request.urlopen(req, timeout=10) as resp:
-            return {
-                "success": resp.status in (200, 202),
-                "status_code": resp.status,
-                "engine": engine,
-                "urls_submitted": len(urls),
-                "endpoint": endpoint,
-            }
-    except urllib.error.HTTPError as e:
         return {
-            "success": False,
-            "status_code": e.code,
+            "success": resp.status_code in (200, 202),
+            "status_code": resp.status_code,
             "engine": engine,
-            "error": f"HTTP {e.code}: {e.reason}",
+            "urls_submitted": len(urls),
+            "endpoint": endpoint,
         }
     except Exception as exc:
         return {

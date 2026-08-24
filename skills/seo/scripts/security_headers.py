@@ -21,6 +21,11 @@ except ImportError:
     print("Error: requests library required. Install with: pip install requests")
     sys.exit(1)
 
+try:
+    from lib.safe_http import default_headers, safe_get
+except ImportError:
+    from scripts.lib.safe_http import default_headers, safe_get
+
 
 SECURITY_HEADERS = {
     "strict-transport-security": {
@@ -91,9 +96,7 @@ def check_security_headers(url: str, timeout: int = 15) -> dict:
     }
 
     try:
-        resp = requests.get(url, timeout=timeout, headers={
-            "User-Agent": "Mozilla/5.0 (compatible; SEOSkill/1.0)"
-        }, allow_redirects=True)
+        resp = safe_get(url, timeout=timeout, headers=default_headers(), allow_redirects=True)
 
         # Check HTTPS
         if resp.url.startswith("https://"):

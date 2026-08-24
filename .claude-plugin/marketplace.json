@@ -57,25 +57,6 @@
       ]
     },
     {
-      "name": "seo",
-      "source": "./skills/seo",
-      "description": "Deterministic LLM-first SEO audits for websites, blog posts, and GitHub repos. 16 sub-skills, 10 specialist agents, 33 evidence scripts. Adapted from Bhanunamikaze/Agentic-SEO-Skill (originally AgriciDaniel/claude-seo).",
-      "version": "0.1.0",
-      "author": {
-        "name": "Matheus Malagris"
-      },
-      "category": "marketing",
-      "keywords": [
-        "seo",
-        "audit",
-        "schema",
-        "core-web-vitals",
-        "e-e-a-t",
-        "geo",
-        "aeo"
-      ]
-    },
-    {
       "name": "wstg-security-testing",
       "source": "./skills/wstg-security-testing",
       "description": "Web application security testing via the OWASP Web Security Testing Guide (WSTG) \u2014 12 categories, ~109 test cases. Four modes: guide a pentest, self-review your app, build/score a coverage checklist, review a diff against WSTG. Methodology from OWASP/wstg. Authorized/defensive use only.",
@@ -400,6 +381,25 @@
         "solid",
         "security",
         "multi-agent"
+      ]
+    },
+    {
+      "name": "seo",
+      "source": "./skills/seo",
+      "description": "Deterministic LLM-first SEO audits for websites, blog posts, and GitHub repos. 16 sub-skills, 10 specialist agents, 88 evidence scripts. Adapted from Bhanunamikaze/Agentic-SEO-Skill (originally AgriciDaniel/claude-seo).",
+      "version": "0.2.0",
+      "author": {
+        "name": "Matheus Malagris"
+      },
+      "category": "marketing",
+      "keywords": [
+        "seo",
+        "audit",
+        "schema",
+        "core-web-vitals",
+        "e-e-a-t",
+        "geo",
+        "aeo"
       ]
     }
   ]

@@ -248,14 +248,18 @@ def main():
         description="Google Search Console Data Checker — pulls GSC data for LLM analysis"
     )
     parser.add_argument("site_url", help="GSC property URL (e.g., https://example.com)")
-    parser.add_argument("--credentials", required=True, help="Path to service account JSON credentials file")
+    parser.add_argument("--credentials", default="", help="Path to service account JSON credentials file. Falls back to GSC_CREDENTIALS_PATH env var or .env file.")
     parser.add_argument("--days", type=int, default=28, help="Performance data lookback period (default: 28)")
     parser.add_argument("--query", default="", help="Filter by query keyword")
     parser.add_argument("--inspect", default="", help="URL to inspect for indexing status")
     parser.add_argument("--json", action="store_true", help="Output as JSON")
     args = parser.parse_args()
 
-    service = build_service(args.credentials)
+    from env_loader import get_env
+    credentials_path = args.credentials or get_env("GSC_CREDENTIALS_PATH")
+    if not credentials_path:
+        parser.error("GSC credentials required. Pass --credentials <path> or set GSC_CREDENTIALS_PATH in your environment / .env file.")
+    service = build_service(credentials_path)
 
     report = {
         "site_url": args.site_url,

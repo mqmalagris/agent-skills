@@ -25,8 +25,6 @@ import json
 import re
 import sys
 import time
-import urllib.request
-import urllib.parse
 from urllib.parse import urlparse, urljoin
 
 try:
@@ -34,6 +32,11 @@ try:
 except ImportError:
     print("Error: beautifulsoup4 required. Install with: pip install beautifulsoup4")
     sys.exit(1)
+
+try:
+    from lib.safe_http import safe_get, safe_head
+except ImportError:
+    from scripts.lib.safe_http import safe_get, safe_head
 
 
 # ---------------------------------------------------------------------------
@@ -94,9 +97,6 @@ COMMON_REGION_MISTAKES = {
     "EU": None,   # European Union is not a country
 }
 
-USER_AGENT = "Mozilla/5.0 (compatible; SEOSkill-hreflang/1.0)"
-
-
 # ---------------------------------------------------------------------------
 # Fetch helpers
 # ---------------------------------------------------------------------------
@@ -104,9 +104,8 @@ USER_AGENT = "Mozilla/5.0 (compatible; SEOSkill-hreflang/1.0)"
 def fetch_html(url: str, timeout: int = 10) -> tuple[str, str]:
     """Return (html, final_url) after fetching. Returns ('', url) on error."""
     try:
-        req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
-        with urllib.request.urlopen(req, timeout=timeout) as resp:
-            return resp.read().decode("utf-8", errors="ignore"), resp.url
+        resp = safe_get(url, timeout=timeout)
+        return resp.text, resp.url
     except Exception as exc:
         return "", url
 
@@ -148,25 +147,24 @@ def extract_hreflang_from_http_headers(url: str) -> list[dict]:
     """Check HTTP Link headers for hreflang (used for non-HTML files)."""
     tags = []
     try:
-        req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT}, method="HEAD")
-        with urllib.request.urlopen(req, timeout=8) as resp:
-            link_header = resp.headers.get("Link", "")
-            if not link_header:
-                return []
-            # Parse: <url>; rel="alternate"; hreflang="lang"
-            for part in link_header.split(","):
-                part = part.strip()
-                url_match = re.search(r'<([^>]+)>', part)
-                hreflang_match = re.search(r'hreflang="([^"]+)"', part)
-                rel_match = re.search(r'rel="([^"]+)"', part)
-                if url_match and hreflang_match and rel_match and "alternate" in rel_match.group(1):
-                    tags.append({
-                        "lang": hreflang_match.group(1).lower(),
-                        "raw_lang": hreflang_match.group(1),
-                        "url": url_match.group(1),
-                        "raw_url": url_match.group(1),
-                        "source": "http_header",
-                    })
+        resp = safe_head(url, timeout=8)
+        link_header = resp.headers.get("Link", "")
+        if not link_header:
+            return []
+        # Parse: <url>; rel="alternate"; hreflang="lang"
+        for part in link_header.split(","):
+            part = part.strip()
+            url_match = re.search(r'<([^>]+)>', part)
+            hreflang_match = re.search(r'hreflang="([^"]+)"', part)
+            rel_match = re.search(r'rel="([^"]+)"', part)
+            if url_match and hreflang_match and rel_match and "alternate" in rel_match.group(1):
+                tags.append({
+                    "lang": hreflang_match.group(1).lower(),
+                    "raw_lang": hreflang_match.group(1),
+                    "url": url_match.group(1),
+                    "raw_url": url_match.group(1),
+                    "source": "http_header",
+                })
     except Exception:
         pass
     return tags
@@ -199,50 +197,94 @@ def check_sitemap_hreflang(base_url: str) -> dict:
 
 def validate_lang_code(lang_tag: str) -> dict:
     """
-    Validate a single hreflang value (e.g., 'en-US', 'fr', 'x-default').
-    Returns {valid, lang, region, issues}.
+    Validate a single hreflang value with a pragmatic BCP 47 parser.
+
+    Supported shape:
+      language[-script][-region][-variant...]
+
+    Examples: en, en-US, zh-Hans, zh-Hant-TW, sr-Cyrl-RS.
+    Returns {valid, lang, script, region, variants, issues}.
     """
-    if lang_tag == "x-default":
-        return {"valid": True, "lang": "x-default", "region": None, "issues": []}
+    raw_tag = (lang_tag or "").strip()
+    if raw_tag.lower() == "x-default":
+        return {
+            "valid": True,
+            "lang": "x-default",
+            "script": None,
+            "region": None,
+            "variants": [],
+            "issues": [],
+        }
 
     issues = []
-    parts = lang_tag.split("-", 1)
-    lang = parts[0].lower()
-    region = parts[1].upper() if len(parts) > 1 else None
+    if "_" in raw_tag:
+        issues.append("Use hyphens, not underscores, in hreflang values.")
 
-    # Check for 3-letter ISO 639-2 codes (invalid for hreflang)
-    if len(lang) == 3:
-        correction = COMMON_LANG_MISTAKES.get(lang)
-        issue = f"3-letter language code '{lang}' is not valid for hreflang (ISO 639-1 required)."
-        if correction:
-            issue += f" Use '{correction}' instead."
-        issues.append(issue)
-    elif lang not in VALID_LANG_CODES:
+    mistake = COMMON_LANG_MISTAKES.get(raw_tag.lower())
+    if mistake:
+        issues.append(f"'{raw_tag}' is a common invalid hreflang value. Use '{mistake}' instead.")
+
+    parts = raw_tag.replace("_", "-").split("-")
+    lang = parts[0].lower() if parts and parts[0] else ""
+    script = None
+    region = None
+    variants = []
+    index = 1
+
+    if not re.fullmatch(r"[A-Za-z]{2,3}", lang or ""):
+        issues.append(
+            f"Invalid primary language subtag '{parts[0] if parts else ''}'. "
+            "Use a 2-3 letter BCP 47 language subtag."
+        )
+    elif len(lang) == 2 and lang not in VALID_LANG_CODES:
         correction = COMMON_LANG_MISTAKES.get(lang)
         issue = f"Unknown language code '{lang}'."
         if correction:
             issue += f" Did you mean '{correction}'?"
         issues.append(issue)
 
-    # Check for ambiguous zh without script qualifier
-    if lang == "zh" and region is None:
-        issues.append("'zh' is ambiguous — use 'zh-Hans' (Simplified) or 'zh-Hant' (Traditional).")
+    if index < len(parts) and re.fullmatch(r"[A-Za-z]{4}", parts[index]):
+        script = parts[index].title()
+        index += 1
 
-    # Validate region code
+    if index < len(parts) and (
+        re.fullmatch(r"[A-Za-z]{2}", parts[index])
+        or re.fullmatch(r"\d{3}", parts[index])
+    ):
+        region = parts[index].upper()
+        index += 1
+
+    while index < len(parts):
+        part = parts[index]
+        if re.fullmatch(r"[A-Za-z0-9]{5,8}", part) or re.fullmatch(r"\d[A-Za-z0-9]{3}", part):
+            variants.append(part)
+            index += 1
+            continue
+        if re.fullmatch(r"[A-WY-Za-wy-z0-9]", part):
+            issues.append("Extension subtags are valid BCP 47 but are not supported for hreflang targeting.")
+            break
+        issues.append(f"Invalid or out-of-order BCP 47 subtag '{part}'.")
+        index += 1
+
+    if lang == "zh" and not script and region not in {"CN", "SG", "TW", "HK", "MO"}:
+        issues.append("'zh' is ambiguous — use 'zh-Hans' or 'zh-Hant' when no clear region is present.")
+
     if region:
         if region in COMMON_REGION_MISTAKES:
             fix = COMMON_REGION_MISTAKES[region]
             if fix:
                 issues.append(f"Region '{region}' is not a valid ISO 3166-1 code. Use '{fix}'.")
             else:
-                issues.append(f"'{region}' is not a valid ISO 3166-1 country code (supranational regions not supported).")
-        elif region not in VALID_REGION_CODES:
+                issues.append(f"'{region}' is not a valid ISO 3166-1 country code for hreflang.")
+        elif re.fullmatch(r"[A-Z]{2}", region) and region not in VALID_REGION_CODES:
             issues.append(f"Unknown region code '{region}' — verify against ISO 3166-1 Alpha-2.")
 
     return {
         "valid": len(issues) == 0,
         "lang": lang,
+        "script": script,
         "region": region,
+        "variants": variants,
         "issues": issues,
     }
 

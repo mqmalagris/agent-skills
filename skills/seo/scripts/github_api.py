@@ -9,8 +9,11 @@ import re
 import subprocess
 import time
 import urllib.parse
-import urllib.request
-from urllib.error import HTTPError, URLError
+
+try:
+    from lib.safe_http import default_headers, safe_request
+except ImportError:
+    from scripts.lib.safe_http import default_headers, safe_request
 
 
 API_BASE = "https://api.github.com"
@@ -27,9 +30,14 @@ class GitHubAPIError(RuntimeError):
 
 
 def get_token(cli_token: str = None) -> str:
-    """Resolve token from CLI override or standard environment variables."""
+    """Resolve token from CLI override, env vars, or .env file."""
     if cli_token:
         return cli_token.strip()
+    try:
+        from env_loader import load_env
+        load_env()
+    except Exception:
+        pass
     for env_key in ("GITHUB_TOKEN", "GH_TOKEN"):
         value = os.environ.get(env_key, "").strip()
         if value:
@@ -166,11 +174,10 @@ def parse_repo_slug(repo: str) -> tuple:
 
 
 def _headers(token: str = "", accept: str = "", content_type: str = "application/json") -> dict:
-    headers = {
-        "User-Agent": "SEOSkill-GitHubAPI/1.0",
+    headers = default_headers({
         "Accept": accept or "application/vnd.github+json",
         "X-GitHub-Api-Version": "2022-11-28",
-    }
+    })
     if content_type:
         headers["Content-Type"] = content_type
     if token:
@@ -209,35 +216,36 @@ def rest_json(
 
     attempt = 0
     while attempt <= retries:
-        request = urllib.request.Request(
-            url,
-            data=payload,
-            headers=_headers(token=token, accept=accept),
-            method=method.upper(),
-        )
         try:
-            with urllib.request.urlopen(request, timeout=timeout) as resp:
-                raw = resp.read().decode("utf-8", errors="replace").strip()
+            resp = safe_request(
+                method.upper(),
+                url,
+                data=payload,
+                headers=_headers(token=token, accept=accept),
+                timeout=timeout,
+            )
+            raw = resp.text.strip()
+            if resp.status_code < 400:
                 data = json.loads(raw) if raw else {}
                 return {
                     "data": data,
-                    "status": getattr(resp, "status", 200),
+                    "status": resp.status_code,
                     "rate_limit": {
                         "limit": resp.headers.get("X-RateLimit-Limit"),
                         "remaining": resp.headers.get("X-RateLimit-Remaining"),
                         "reset": resp.headers.get("X-RateLimit-Reset"),
                     },
                 }
-        except HTTPError as exc:
-            response_text = exc.read().decode("utf-8", errors="replace").strip()
+
+            response_text = raw
             try:
                 payload_json = json.loads(response_text) if response_text else {}
             except Exception:
                 payload_json = {"raw": response_text}
 
-            status = exc.code
-            remaining = exc.headers.get("X-RateLimit-Remaining")
-            reset = exc.headers.get("X-RateLimit-Reset")
+            status = resp.status_code
+            remaining = resp.headers.get("X-RateLimit-Remaining")
+            reset = resp.headers.get("X-RateLimit-Reset")
 
             can_retry = attempt < retries
             if can_retry and status in (429, 500, 502, 503, 504):
@@ -258,7 +266,9 @@ def rest_json(
 
             message = payload_json.get("message", f"GitHub API error: HTTP {status}")
             raise GitHubAPIError(message=message, status=status, details=payload_json)
-        except URLError as exc:
+        except Exception as exc:
+            if isinstance(exc, GitHubAPIError):
+                raise
             if attempt < retries:
                 time.sleep(max(1, 2 ** attempt))
                 attempt += 1

@@ -18,6 +18,11 @@ except ImportError:
     print("Error: requests library required. Install with: pip install requests")
     sys.exit(1)
 
+try:
+    from lib.safe_http import default_headers, safe_get
+except ImportError:
+    from scripts.lib.safe_http import default_headers, safe_get
+
 
 # AI crawlers to check for explicit management
 AI_CRAWLERS = [
@@ -66,9 +71,7 @@ def fetch_robots_txt(url: str, timeout: int = 15) -> dict:
     }
 
     try:
-        resp = requests.get(robots_url, timeout=timeout, headers={
-            "User-Agent": "Mozilla/5.0 (compatible; SEOSkill/1.0)"
-        })
+        resp = safe_get(robots_url, timeout=timeout, headers=default_headers())
         result["status"] = resp.status_code
 
         if resp.status_code == 404:
