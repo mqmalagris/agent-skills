@@ -3,6 +3,7 @@
 All notable changes to this collection are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); the collection follows [SemVer](https://semver.org). See [VERSIONING.md](VERSIONING.md) for the per-skill vs collection model.
 
 ## [Unreleased]
+- Check 3 now reconciles the shipped diff against the plan Blind Spots ledger
 - new "## The Blind Spots" section: pre-code edge-case ledger with a decision per case
 - new "## Edge cases" output block: lens 6-7 findings survive the session with a handle/defer/wont decision
 - edge-case ledger now flows grill-me -> heist -> implementation-review

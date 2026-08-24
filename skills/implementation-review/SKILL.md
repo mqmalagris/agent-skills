@@ -59,9 +59,17 @@ Different from Check 1: use cases can be implicit in the product scope even if t
 
 ### Check 3: Missing test scenarios
 
-**Inputs:** full `git diff --staged`, full content of changed test files. Apply `/testing-philosophy`.
+**Inputs:** full `git diff --staged`, full content of changed test files, the plan's `## The Blind Spots` table if present. Apply `/testing-philosophy`.
 
-For every behavior introduced or changed, work the scenario checklist:
+**First, reconcile against the ledger.** If the plan carries a Blind Spots table, every row is a claim to check:
+
+- `handle` → is the case actually implemented, and is there a test that fails without it? Implemented-but-untested is a finding. Neither is a ✗.
+- `defer` / `won't` → is it still absent? Silently implemented is fine but note it. Silently *half*-implemented is a ✗ — a partial path is worse than none.
+- Anything the diff introduced that no row covers → new blind spot, flag it and name the row that should have existed.
+
+No Blind Spots table (bug tier, or the plan predates it) → say so and derive from scratch below.
+
+Then, for every behavior introduced or changed, work the scenario checklist:
 
 | Scenario | Question |
 |---|---|
@@ -141,6 +149,7 @@ Check 2 · Use-case coverage
   ✓ All use cases covered  |  ✗ [use case], no test / no implementation
 Check 3 · Missing test scenarios
   ✓ Scenarios complete  |  ⚠ [behavior]: missing [scenario type]
+  Ledger: [N handled / N deferred / N drifted]  |  ✗ [case]: planned [decision], shipped [reality]
 Check 4 · Test philosophy
   ✓ Tests pass  |  ✗ [test name]: [violation]
 Check 5 · SOLID
