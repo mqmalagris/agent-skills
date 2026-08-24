@@ -27,7 +27,7 @@ Detect from the task. When in doubt, pick the lower-ceremony tier and let the us
 | **bug** | obvious cause, single-file, spike, throwaway | code → verify → pr-craft |
 | **feature** | multi-file, some design surface, user-visible | grill-me → to-prd → heist → code → verify → code-review → implementation-review → pr-craft |
 | **architecture** | new subsystem, public API, hard-to-reverse decision, schema, "how should I structure X" | adhd → grill-me → to-prd → compass → heist → code → verify → code-review → implementation-review → pr-craft |
-| **client** (Arctic Leaf) | agency client work, delivery for a stakeholder | wrap the feature/architecture chain in cagan-check: kickoff (before) + review (before PR) |
+| **client** | client-services work, delivery for a paying stakeholder | wrap the feature/architecture chain in cagan-check: kickoff (before) + review (before PR) |
 
 ### Stage gates (only RUN when the gate is true)
 
