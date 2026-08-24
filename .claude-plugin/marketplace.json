@@ -387,23 +387,6 @@
       ]
     },
     {
-      "name": "dev-flow",
-      "source": "./skills/dev-flow",
-      "description": "Conductor for the dev pipeline: detects a task's tier (bug / feature / architecture / client), prints the exact chain of sub-skills it will run and skip with reasons, confirms, then drives them in order. Matches ceremony to stakes.",
-      "version": "0.4.3",
-      "author": {
-        "name": "Matheus Malagris"
-      },
-      "category": "engineering-workflow",
-      "keywords": [
-        "workflow-orchestration",
-        "dev-chain",
-        "task-routing",
-        "worktree",
-        "skill-conductor"
-      ]
-    },
-    {
       "name": "llm-wiki",
       "source": "./skills/llm-wiki",
       "description": "Build and maintain an LLM-maintained wiki \u2014 a persistent, interlinked Markdown knowledge base distilled from curated raw sources (Karpathy's LLM Wiki pattern).",
@@ -452,6 +435,23 @@
         "quality-gate",
         "pre-commit",
         "orchestrator"
+      ]
+    },
+    {
+      "name": "dev-flow",
+      "source": "./skills/dev-flow",
+      "description": "Conductor for the dev pipeline: detects a task's tier (bug / feature / architecture / client), prints the exact chain of sub-skills it will run and skip with reasons, confirms, then drives them in order. Matches ceremony to stakes.",
+      "version": "0.5.0",
+      "author": {
+        "name": "Matheus Malagris"
+      },
+      "category": "engineering-workflow",
+      "keywords": [
+        "workflow-orchestration",
+        "dev-chain",
+        "task-routing",
+        "worktree",
+        "skill-conductor"
       ]
     }
   ]
