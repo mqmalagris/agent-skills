@@ -7,7 +7,7 @@ description: "Publish one of the user's own skills from ~/.claude/skills to the 
 
 Publishes a locally-authored skill (`~/.claude/skills/<name>/`) to **mqmalagris/agent-skills** (a dual-format Claude-marketplace + `bunx skills` repo). The script does all mechanical work idempotently; you supply the two editorial bits it can't guess: **category** and **keywords**.
 
-Do not use this for third-party skills — those belong in the repo's `THIRD_PARTY.md`, not vendored. `al-cli` stays out entirely (Arctic Leaf internal).
+Do not use this for third-party skills — those belong in the repo's `THIRD_PARTY.md`, not vendored. `al-cli` stays out entirely (employer-internal tooling).
 
 ## Steps
 
