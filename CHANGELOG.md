@@ -3,6 +3,7 @@
 All notable changes to this collection are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); the collection follows [SemVer](https://semver.org). See [VERSIONING.md](VERSIONING.md) for the per-skill vs collection model.
 
 ## [Unreleased]
+- adds quick depth (verify + code-review only) and an orchestrator-driven mode that skips the confirm step; now the single owner of the review gate policy
 - stdout/stderr forced to UTF-8: publishing a NEW skill whose description contains an arrow or dash no longer dies with UnicodeEncodeError on a cp1252 console
 - new skill: review-only entry point over verify -> code-review -> implementation-review, merged into one go/no-go verdict
 - new skill: LLM-maintained interlinked Markdown wiki with ingest / query / lint operations
