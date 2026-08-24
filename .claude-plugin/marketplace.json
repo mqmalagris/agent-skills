@@ -145,23 +145,6 @@
       ]
     },
     {
-      "name": "cagan-check",
-      "source": "./skills/cagan-check",
-      "description": "Apply Marty Cagan (SVPG) + Teresa Torres Continuous Discovery to a dev's workflow: feature kickoff, planning/estimation, discovery calls, PR review. Flags feature-factory smells; green/yellow/red per dimension.",
-      "version": "0.1.1",
-      "author": {
-        "name": "Matheus Malagris"
-      },
-      "category": "product",
-      "keywords": [
-        "product",
-        "cagan",
-        "svpg",
-        "continuous-discovery",
-        "product-trio"
-      ]
-    },
-    {
       "name": "code-craft",
       "source": "./skills/code-craft",
       "description": "Language- and framework-specific best practices and idioms. Reader and reviewer modes. Ships 7 languages + 12 frameworks (TS, Rust, CSS, Tailwind, Dart, Go, Python, React, Next, RN+Expo, Hono, Workers, Astro, Svelte, Drizzle, Supabase, Lambda, Terraform, Flutter).",
@@ -418,6 +401,23 @@
         "marketplace",
         "bunx-skills",
         "git"
+      ]
+    },
+    {
+      "name": "cagan-check",
+      "source": "./skills/cagan-check",
+      "description": "Apply Marty Cagan (SVPG) + Teresa Torres Continuous Discovery to a dev's workflow: feature kickoff, planning/estimation, discovery calls, PR review. Flags feature-factory smells; green/yellow/red per dimension.",
+      "version": "0.2.0",
+      "author": {
+        "name": "Matheus Malagris"
+      },
+      "category": "product",
+      "keywords": [
+        "product",
+        "cagan",
+        "svpg",
+        "continuous-discovery",
+        "product-trio"
       ]
     }
   ]

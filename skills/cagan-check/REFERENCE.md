@@ -36,7 +36,7 @@ Validation: stakeholder review early, not at the end.
 
 Signs it's NOT validated: LGPD/GDPR not checked, infra cost not calculated, support not trained, client contract doesn't cover it, marketing doesn't know how to sell.
 
-**In agency settings**: the client contract IS viability. A feature outside scope = high risk even if the client wants it.
+**In client-services settings**: the client contract IS viability. A feature outside scope = high risk even if the client wants it.
 
 ### 5. Ethical risk (Torres)
 **Question**: Should we build it? Who gets harmed?
@@ -109,7 +109,7 @@ When assessing the product maturity of a company/client, separate it into 3:
 
 **Diagnostic shortcut**: a company that has only evolved #1 is still a feature factory. Real transformation requires all 3.
 
-**In agency settings (Arctic Leaf)**: the client usually pays for #1 (delivery). Pushing toward #2 (discovery sprint) and #3 (problem before feature) is the commercial challenge. Use this lens to propose different scopes in proposals.
+**In client-services settings**: the client usually pays for #1 (delivery). Pushing toward #2 (discovery sprint) and #3 (problem before feature) is the commercial challenge. Use this lens to propose different scopes in proposals.
 
 ---
 
@@ -143,7 +143,7 @@ Adapted from John Cutler ("12 Signs You're Working in a Feature Factory") + Caga
 - 🔴 Prototype = "nice screen for approval", not validation
 - 🟡 Discovery exists but is "design done before dev"
 
-### Agency symptoms (Arctic Leaf)
+### Client-services symptoms
 - 🟡 Client hands over a finished backlog, team only executes
 - 🟡 Project success = client signs off, not end user adoption
 - 🟡 No access to the client's product metrics
@@ -152,7 +152,7 @@ Adapted from John Cutler ("12 Signs You're Working in a Feature Factory") + Caga
 - **Trust + psychological safety** — not a consequence, a **prerequisite**. Without psychological safety, the team won't surface problems, won't experiment, won't kill bad features. A leader who punishes error kills empowered teams before they're born.
 - **Collaborative decision reviews** — not adversarial, not used to rank teams
 - **Shared language of value** — without it nobody agrees on what matters
-- **12–18 months of practice** — transformation is gradual. "Chipping away" works better than all-or-nothing. In agency settings, start with one pilot project.
+- **12–18 months of practice** — transformation is gradual. "Chipping away" works better than all-or-nothing. In client-services settings, start with one pilot project.
 
 ---
 

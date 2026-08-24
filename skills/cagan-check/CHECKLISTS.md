@@ -90,7 +90,7 @@ Use the checklist for the detected mode. Each item becomes a 🟢/🟡/🔴 flag
 - [ ] Room to observe the real flow, not just hear a retelling?
 - [ ] Weekly cadence? (Torres' keystone habit — without this, discovery is theater)
 
-### Agency context (Arctic Leaf)
+### Client-services context
 - [ ] Is the client the stakeholder or the end user?
 - [ ] If the client is the stakeholder, can we get access to the end user?
 - [ ] Is the outcome for the client's client clear?
