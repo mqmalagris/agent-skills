@@ -198,22 +198,6 @@
       ]
     },
     {
-      "name": "grill-me",
-      "source": "./skills/grill-me",
-      "description": "Stress-test a plan or design via relentless interview. Resolves each branch of the decision tree, captures domain vocabulary, emits Design Notes + Glossary block for /to-prd. Adapted from mattpocock/skills.",
-      "version": "0.2.0",
-      "author": {
-        "name": "Matheus Malagris"
-      },
-      "category": "engineering-workflow",
-      "keywords": [
-        "design-review",
-        "pre-prd",
-        "interview",
-        "ubiquitous-language"
-      ]
-    },
-    {
       "name": "brag-doc",
       "source": "./skills/brag-doc",
       "description": "Maintain a monthly brag document and roll it up into a promo packet, self-review, or CV material. Lucas Faria's 4-field template + Julia Evans' impact-first categories. Feeds cv-craft.",
@@ -400,6 +384,22 @@
         "task-routing",
         "worktree",
         "skill-conductor"
+      ]
+    },
+    {
+      "name": "grill-me",
+      "source": "./skills/grill-me",
+      "description": "Stress-test a plan or design via relentless interview. Resolves each branch of the decision tree, captures domain vocabulary, emits Design Notes + Glossary block for /to-prd. Adapted from mattpocock/skills.",
+      "version": "0.3.0",
+      "author": {
+        "name": "Matheus Malagris"
+      },
+      "category": "engineering-workflow",
+      "keywords": [
+        "design-review",
+        "pre-prd",
+        "interview",
+        "ubiquitous-language"
       ]
     }
   ]
