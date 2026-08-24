@@ -13,6 +13,13 @@ Collection releases are cut separately with scripts/release.py in the repo.
 import argparse, json, re, shutil, subprocess, sys
 from pathlib import Path
 
+# Skill descriptions carry arrows and dashes; a cp1252 console (Windows default)
+# raises UnicodeEncodeError when we echo them back. Only NEW skills hit this --
+# updates reuse the already-stored description -- so it fails rarely and late.
+for _stream in (sys.stdout, sys.stderr):
+    if hasattr(_stream, "reconfigure"):
+        _stream.reconfigure(encoding="utf-8", errors="replace")
+
 REPO = "https://github.com/mqmalagris/agent-skills"
 OWNER_NAME = "mqmalagris/agent-skills"
 AUTHOR = {"name": "Matheus Malagris", "url": "https://github.com/mqmalagris"}

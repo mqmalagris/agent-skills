@@ -404,23 +404,6 @@
       ]
     },
     {
-      "name": "publish-skill",
-      "source": "./skills/publish-skill",
-      "description": "Publish one of your own skills from ~/.claude/skills to this repo: copy it under skills/<name>/, mint its plugin.json, upsert marketplace.json, bump SemVer, and open a PR (CI-gated). Idempotent.",
-      "version": "0.1.4",
-      "author": {
-        "name": "Matheus Malagris"
-      },
-      "category": "meta",
-      "keywords": [
-        "publish",
-        "skill-authoring",
-        "marketplace",
-        "bunx-skills",
-        "git"
-      ]
-    },
-    {
       "name": "llm-wiki",
       "source": "./skills/llm-wiki",
       "description": "Build and maintain an LLM-maintained wiki \u2014 a persistent, interlinked Markdown knowledge base distilled from curated raw sources (Karpathy's LLM Wiki pattern).",
@@ -452,6 +435,23 @@
         "quality-gate",
         "pre-commit",
         "orchestrator"
+      ]
+    },
+    {
+      "name": "publish-skill",
+      "source": "./skills/publish-skill",
+      "description": "Publish one of your own skills from ~/.claude/skills to this repo: copy it under skills/<name>/, mint its plugin.json, upsert marketplace.json, bump SemVer, and open a PR (CI-gated). Idempotent.",
+      "version": "0.1.5",
+      "author": {
+        "name": "Matheus Malagris"
+      },
+      "category": "meta",
+      "keywords": [
+        "publish",
+        "skill-authoring",
+        "marketplace",
+        "bunx-skills",
+        "git"
       ]
     }
   ]
