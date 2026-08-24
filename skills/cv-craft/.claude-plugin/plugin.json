@@ -1,7 +1,7 @@
 {
   "name": "cv-craft",
-  "version": "0.1.0",
-  "description": "Maintain a canonical master CV in Markdown and produce tailored, ATS-friendly resumes and recruiter-screen prep packs from job descriptions. Four modes: bootstrap, sync (import existing resume), tailor (match JD), screen-prep (recruiter call answers).",
+  "version": "0.2.0",
+  "description": "Maintain a canonical master CV in Markdown and produce tailored, ATS-friendly resumes and recruiter-screen prep packs from job descriptions.",
   "author": {
     "name": "Matheus Malagris",
     "url": "https://github.com/mqmalagris"
@@ -14,7 +14,6 @@
     "resume",
     "ats",
     "job-search",
-    "career",
-    "recruiter"
+    "career"
   ]
 }

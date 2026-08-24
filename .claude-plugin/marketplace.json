@@ -26,22 +26,6 @@
       ]
     },
     {
-      "name": "cv-craft",
-      "source": "./skills/cv-craft",
-      "description": "Maintain a canonical master CV in Markdown and produce tailored, ATS-friendly resumes and recruiter-screen prep packs from job descriptions.",
-      "version": "0.1.0",
-      "author": {
-        "name": "Matheus Malagris"
-      },
-      "category": "career",
-      "keywords": [
-        "cv",
-        "resume",
-        "ats",
-        "job-search"
-      ]
-    },
-    {
       "name": "write-a-skill",
       "source": "./skills/write-a-skill",
       "description": "Meta-skill: create new Claude Code skills with proper structure, progressive disclosure, and bundled resources.",
@@ -400,6 +384,22 @@
         "e-e-a-t",
         "geo",
         "aeo"
+      ]
+    },
+    {
+      "name": "cv-craft",
+      "source": "./skills/cv-craft",
+      "description": "Maintain a canonical master CV in Markdown and produce tailored, ATS-friendly resumes and recruiter-screen prep packs from job descriptions.",
+      "version": "0.2.0",
+      "author": {
+        "name": "Matheus Malagris"
+      },
+      "category": "career",
+      "keywords": [
+        "cv",
+        "resume",
+        "ats",
+        "job-search"
       ]
     }
   ]

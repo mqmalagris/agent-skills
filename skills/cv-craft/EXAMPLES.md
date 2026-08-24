@@ -11,31 +11,35 @@ Concrete reference output for `tailor` and `screen-prep` modes. Loaded only when
 **Tailored output (single page):**
 
 ```markdown
-# Matheus Malagris
+# Alex Ribeiro
 
 Senior Full-stack Engineer
 
 **Location:** Rio de Janeiro, Brazil — Remote
-**Email:** malagrismatheus@gmail.com
-**LinkedIn:** linkedin.com/in/matheus-malagris
-**GitHub:** github.com/mqmalagris
+**Email:** alex.ribeiro@example.com
+**LinkedIn:** linkedin.com/in/alex-ribeiro
+**GitHub:** github.com/alexribeiro
 
 ## Summary
 
-Full-stack engineer with 8+ years of programming and 5 years building production web apps on Next.js, Node.js, and AWS. Track record shipping Stripe-integrated commerce middleware and scalable Lambda-driven backends. Comfortable owning a feature end-to-end from API design through deployment.
+Full-stack engineer with 8+ years building production web apps on Next.js, Node.js, and AWS for B2B commerce. Architected Lambda + EventBridge middleware integrating Shopify, Stripe, and Recharge across a 12-store multi-tenant retailer. Cut checkout p95 latency from 800ms to 180ms by replacing N+1 Stripe calls with batched payment intents.
 
-## Skills
+## Technical Skills
 
-**Proficient:** TypeScript, Next.js, Node.js, AWS (Lambda, S3, CloudFormation, RDS/Aurora, SQS, SES, EventBridge), Stripe, Shopify Admin GraphQL, MongoDB, SQL
+**Languages:** TypeScript, JavaScript, SQL
 
-**Intermediate:** React, Angular, Cloudflare Workers, Astro
+**Frameworks:** Next.js, Node.js, React
 
-**Beginner:** Svelte, Remix, Flutter
+**Databases:** MongoDB, Aurora, PostgreSQL
+
+**Cloud / DevOps:** AWS (Lambda, S3, CloudFormation, RDS/Aurora, SQS, SES, EventBridge), Cloudflare Workers
+
+**Tools:** Stripe, Shopify Admin GraphQL, Recharge, Aftership
 
 ## Experience
 
 ### Full-stack Developer
-**Arctic Leaf**, Meridian, US — Remote
+**Northwind Commerce**, Austin, US — Remote
 01/2022 – Present
 
 - Architected Lambda + EventBridge middleware integrating Shopify, Stripe, Recharge, and Aftership for a multi-store commerce client.
@@ -48,10 +52,10 @@ Full-stack engineer with 8+ years of programming and 5 years building production
 **Notes on the diff from master to tailored:**
 
 - Headline `Full-stack Developer` → `Senior Full-stack Engineer` (matches JD's role title and seniority).
-- Skills section reordered: TypeScript / Next.js / AWS / Stripe pulled to the front of `Proficient`.
-- Older Daydream / Kosher GPS role dropped — Angular/Ionic not aligned with JD; master keeps it.
+- Skills consolidated into single grouped section; ratings removed. TypeScript / Next.js / AWS / Stripe pulled to the front of their categories.
+- Older Loopgate / FleetTrack role dropped — Angular/Ionic not aligned with JD; master keeps it.
 - Bachelor of Electrical Engineering omitted on the one-page version; reinstate if the JD weights education.
-- Summary rewritten — same facts, ordered around JD priorities.
+- Summary rewritten — same facts, ordered around JD priorities and the three-layer structure (Identity / Scale / Complexity).
 
 ## XYZ bullet rewrites (before / after)
 
@@ -105,7 +109,7 @@ A `[FAIL]` example (score < 80) lists every category below threshold and blocks 
 
 ## 30-second intro pitch
 
-"I'm a full-stack engineer based in Rio with eight years of programming experience, the last five focused on Next.js, Node, and AWS. At Arctic Leaf I've architected Lambda-based commerce middleware integrating Shopify, Stripe, and Recharge for multi-store retailers. I'm looking for a senior role where I can own scalable backend integrations end-to-end."
+"I'm a full-stack engineer based in Rio with eight years of programming experience, the last five focused on Next.js, Node, and AWS. At Northwind Commerce I've architected Lambda-based commerce middleware integrating Shopify, Stripe, and Recharge for multi-store retailers. I'm looking for a senior role where I can own scalable backend integrations end-to-end."
 
 ## Why Acme
 
@@ -120,10 +124,10 @@ A `[FAIL]` example (score < 80) lists every category below threshold and blocks 
 ## Top 8 likely first-call questions
 
 1. **Walk me through your background.** *(use the 30-second pitch above)*
-2. **Tell me about a project you owned end-to-end.** *(Lambda + EventBridge middleware, Arctic Leaf — name the integrations and the outcome)*
+2. **Tell me about a project you owned end-to-end.** *(Lambda + EventBridge middleware, Northwind Commerce — name the integrations and the outcome)*
 3. **How do you approach scaling Lambda-based integrations?** *(idempotency, SQS dead-letter handling, EventBridge for fan-out, observability via CloudWatch)*
 4. **Tell me about a time you debugged a hard production issue.** *(pick a real incident from master's bullets — name the symptom, the root cause, the fix, the prevention)*
-5. **Why are you looking to leave Arctic Leaf?** *(growth-framed, not negative — "I am ready for senior-IC scope, and the projects I want to own are not on my current team's roadmap")*
+5. **Why are you looking to leave Northwind Commerce?** *(growth-framed, not negative — "I am ready for senior-IC scope, and the projects I want to own are not on my current team's roadmap")*
 6. **What is your experience with Stripe specifically?** *(billing flows, webhooks, idempotency keys, Recharge subscription orchestration)*
 7. **How do you balance shipping speed and code quality?** *(test pyramid, what you skip on a prototype vs production, when you take on tech debt deliberately)*
 8. **What questions do you have for us?** *(see below)*
@@ -141,6 +145,49 @@ Each answer ≤ 120 words.
 2. How does the team measure success six months in?
 3. What is the on-call rotation, and how often does it page?
 4. What is the biggest engineering challenge the team is working through right now?
+```
+
+## Sample standalone rewrite — post-CV section (PT-BR)
+
+Rendered after `sync` (b) or `tailor` final write, separated from the CV body by `---`. Brazilian Portuguese.
+
+```markdown
+---
+
+## A. Perfil inferido
+
+- **Cargo mais provável:** Senior Full-stack Engineer
+- **Senioridade:** Senior
+- **Especialização:** e-commerce integrations / Stripe + Shopify middleware
+- **Tipo de empresa-alvo:** scale-up B2B SaaS, remote-first
+
+**Por quê:** 8+ anos de experiência, últimos 4 focados em arquitetura serverless AWS para comércio multi-store; bullets demonstram ownership end-to-end de integrações de pagamento; stack alinha com produtos B2B remote-friendly. Sinais como liderança de migração TypeScript e mentoria sugerem escopo Senior IC, não Staff ainda.
+
+Se discordar, corrija e faça um novo upload.
+
+## B. Mudanças principais
+
+1. **Reduzido de 7 para 2 páginas** — mercado internacional rejeita CVs longos. Cortei detalhes técnicos repetidos entre cargos.
+2. **Seção de Side Projects removida** — projetos pequenos foram agrupados sob a experiência da empresa onde foram construídos. Mantido apenas link do GitHub no header.
+3. **Skills consolidadas em uma seção com categorias** — removidas as classificações Proficient/Intermediate/Beginner. Tecnologias sem evidência em nenhum bullet foram removidas (Svelte, Remix, Flutter).
+4. **Summary reescrito** — antes era genérico ("passionate full-stack developer"). Agora segue estrutura Identidade / Escala / Complexidade.
+5. **Empresa "Northwind Commerce" recebeu linha de contexto** — adicionado "Shopify Plus dev partner, multi-store e-commerce middleware" para recrutadores internacionais.
+
+## C. Lista de revisão obrigatória antes do próximo upload
+
+### Northwind Commerce
+- [ ] `[ESTIMADO]` na linha "12 stores, 40k SKUs" — confirme se o número exato bate.
+- [ ] `[DADO AUSENTE: qual era X?]` no bullet de migração GraphQL — quantos endpoints exatos? Qual a redução média de response time?
+- [ ] `[DADO AUSENTE: métricas sobre Northwind Commerce]` — número de clientes, ARR, funding, clientes conhecidos para reforçar contexto.
+
+### Loopgate
+- [ ] `[DADO AUSENTE: qual era X?]` em "improved app performance" — qual era o p95 antes/depois?
+
+## D. Próximos passos além do CV
+
+1. **Contribuição open source em SDK de pagamentos** — o repositório `stripe/stripe-node` ou `Shopify/shopify-api-js` aceitam PRs externos. Uma issue resolvida ali demonstra exatamente o perfil do CV.
+2. **Side project de observabilidade serverless** — uma ferramenta pequena que detecta cold-starts ou DLQ-replay em Lambdas. Demonstra a skill de "Stripe webhook reconciliation" sem precisar do contexto da Northwind Commerce.
+3. **Outreach direto a hiring managers de scale-ups B2B remote-first** — Linear, Vercel, Cal.com, Resend. Procure no LinkedIn por "Engineering Manager" + stack do CV. Mensagem curta com link do GitHub + uma frase sobre o sistema descrito no Summary.
 ```
 
 ## When to deviate from these examples
