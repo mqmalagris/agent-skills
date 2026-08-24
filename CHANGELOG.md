@@ -3,6 +3,7 @@
 All notable changes to this collection are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); the collection follows [SemVer](https://semver.org). See [VERSIONING.md](VERSIONING.md) for the per-skill vs collection model.
 
 ## [Unreleased]
+- new skill: review-only entry point over verify -> code-review -> implementation-review, merged into one go/no-go verdict
 - new skill: LLM-maintained interlinked Markdown wiki with ingest / query / lint operations
 - employer-internal exclusion note is employer-agnostic
 - client tier is employer-agnostic (no employer name)
