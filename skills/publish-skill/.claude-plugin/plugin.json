@@ -1,6 +1,6 @@
 {
   "name": "publish-skill",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Publish one of your own skills from ~/.claude/skills to this repo: copy it under skills/<name>/, mint its plugin.json, upsert marketplace.json, bump SemVer, and open a PR (CI-gated). Idempotent.",
   "author": {
     "name": "Matheus Malagris",
