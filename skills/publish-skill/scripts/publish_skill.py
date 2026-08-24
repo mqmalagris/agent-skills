@@ -140,7 +140,9 @@ def main():
     dst = args.repo_dir / "skills" / name
     if dst.exists():
         shutil.rmtree(dst)
-    shutil.copytree(src, dst)
+    # never vendor build/editor droppings into the public repo
+    shutil.copytree(src, dst, ignore=shutil.ignore_patterns(
+        "__pycache__", "*.pyc", "*.pyo", ".DS_Store", ".pytest_cache", "*.egg-info"))
 
     plugin = {
         "name": name, "version": version, "description": desc,
