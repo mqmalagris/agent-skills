@@ -249,23 +249,6 @@
       ]
     },
     {
-      "name": "dev-flow",
-      "source": "./skills/dev-flow",
-      "description": "Conductor for the dev pipeline: detects a task's tier (bug / feature / architecture / client), prints the exact chain of sub-skills it will run and skip with reasons, confirms, then drives them in order. Matches ceremony to stakes.",
-      "version": "0.4.2",
-      "author": {
-        "name": "Matheus Malagris"
-      },
-      "category": "engineering-workflow",
-      "keywords": [
-        "workflow-orchestration",
-        "dev-chain",
-        "task-routing",
-        "worktree",
-        "skill-conductor"
-      ]
-    },
-    {
       "name": "grill-me",
       "source": "./skills/grill-me",
       "description": "Stress-test a plan or design via relentless interview. Resolves each branch of the decision tree, captures domain vocabulary, emits Design Notes + Glossary block for /to-prd. Adapted from mattpocock/skills.",
@@ -418,6 +401,23 @@
         "self-review",
         "promotion",
         "cv-source"
+      ]
+    },
+    {
+      "name": "dev-flow",
+      "source": "./skills/dev-flow",
+      "description": "Conductor for the dev pipeline: detects a task's tier (bug / feature / architecture / client), prints the exact chain of sub-skills it will run and skip with reasons, confirms, then drives them in order. Matches ceremony to stakes.",
+      "version": "0.4.3",
+      "author": {
+        "name": "Matheus Malagris"
+      },
+      "category": "engineering-workflow",
+      "keywords": [
+        "workflow-orchestration",
+        "dev-chain",
+        "task-routing",
+        "worktree",
+        "skill-conductor"
       ]
     }
   ]

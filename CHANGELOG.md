@@ -3,6 +3,7 @@
 All notable changes to this collection are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); the collection follows [SemVer](https://semver.org). See [VERSIONING.md](VERSIONING.md) for the per-skill vs collection model.
 
 ## [Unreleased]
+- client tier is employer-agnostic (no employer name)
 - employer-agnostic: target `al` renamed to `work`, employment doc path generalized to <employer>.md with multi-employer resolution
 - employer-agnostic: agency-specific sections reframed as client-services context (applies whenever a paying stakeholder sits between team and end user); employer name removed
 - copytree now ignores __pycache__, *.pyc, .DS_Store, .pytest_cache and *.egg-info so build droppings are never vendored into the public repo
