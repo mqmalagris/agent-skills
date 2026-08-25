@@ -3,6 +3,7 @@
 All notable changes to this collection are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); the collection follows [SemVer](https://semver.org). See [VERSIONING.md](VERSIONING.md) for the per-skill vs collection model.
 
 ## [Unreleased]
+- drop third-party ponytail attribution; the rule keeps the idea as its own stated floor
 - review tail delegated to review-pass as one stage (was verify + code-review + implementation-review restated inline); removes the duplicated gate specs that had drifted, and the chain now ends in one merged go/no-go verdict
 - adds quick depth (verify + code-review only) and an orchestrator-driven mode that skips the confirm step; now the single owner of the review gate policy
 - stdout/stderr forced to UTF-8: publishing a NEW skill whose description contains an arrow or dash no longer dies with UnicodeEncodeError on a cp1252 console
