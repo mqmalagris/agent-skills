@@ -4,7 +4,7 @@
 
 Sources: [docs.flutter.dev](https://docs.flutter.dev/), [Flutter 3.27 release notes](https://docs.flutter.dev/release/release-notes/release-notes-3.27.0), [Material 3 + Flutter](https://m3.material.io/develop/flutter), [Riverpod docs](https://riverpod.dev/), [flutter_bloc docs](https://bloclibrary.dev/), [go_router](https://pub.dev/packages/go_router), Andrea Bizzotto's *Code With Andrea*, Filip Hracek videos, Remi Rousselet (Riverpod author) talks (2024–2025), Flutter team blog.
 
-Loaded by `code-craft` when the user asks about Flutter or pastes Flutter code. Audio/Riverpod/desktop scope: SynthChord-style apps (SF2 SoundFont synth, MIDI, FFI) are in scope.
+Loaded by `code-craft` when the user asks about Flutter or pastes Flutter code. Audio/Riverpod/desktop scope: real-time audio apps (SF2 SoundFont synth, MIDI, FFI) are in scope.
 
 ---
 
@@ -298,7 +298,7 @@ final renderBlock = dylib.lookupFunction<Void Function(Pointer<Float>, Int32), v
 
 ### B13. Audio callback work off the UI isolate
 **Rule.** Real-time audio render callbacks must not run on the Flutter UI isolate; expose them through native code via FFI/method channels and surface only state (levels, meters) to Dart.
-**Reason.** The UI isolate is stop-the-world during build/layout/paint; any audio work there guarantees dropouts. SynthChord-style apps render in C/C++ and report back via a `Stream` of frames.
+**Reason.** The UI isolate is stop-the-world during build/layout/paint; any audio work there guarantees dropouts. Real-time audio apps render in C/C++ and report back via a `Stream` of frames.
 ```dart
 // right: Dart only orchestrates; native renders
 final levels = ref.watch(meterStreamProvider);
@@ -666,7 +666,7 @@ state = [...state, x];
 - [freezed](https://pub.dev/packages/freezed), [json_serializable](https://pub.dev/packages/json_serializable)
 - [drift](https://pub.dev/packages/drift) — preferred SQL layer in 2025 over uncertain Hive/Isar maintenance
 - [pigeon](https://pub.dev/packages/pigeon) — typed platform channels
-- [dart:ffi docs](https://dart.dev/guides/libraries/c-interop) — for audio/MIDI native interop (SynthChord-style)
+- [dart:ffi docs](https://dart.dev/guides/libraries/c-interop) — for audio/MIDI native interop
 - Andrea Bizzotto, *Code With Andrea* (2024–2025) — Riverpod, go_router, testing
 - Filip Hracek talks — Flutter performance and architecture
 - `package:flutter_lints` — recommended lint set

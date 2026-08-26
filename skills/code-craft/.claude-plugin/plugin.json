@@ -1,6 +1,6 @@
 {
   "name": "code-craft",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Language- and framework-specific best practices and idioms. Reader and reviewer modes. Ships 7 languages + 12 frameworks (TS, Rust, CSS, Tailwind, Dart, Go, Python, React, Next, RN+Expo, Hono, Workers, Astro, Svelte, Drizzle, Supabase, Lambda, Terraform, Flutter).",
   "author": {
     "name": "Matheus Malagris",
