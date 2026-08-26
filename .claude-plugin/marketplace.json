@@ -149,21 +149,6 @@
       ]
     },
     {
-      "name": "portfolio-sync",
-      "source": "./skills/portfolio-sync",
-      "description": "Sync the current project into a central project-portfolio Markdown archive. Source data for cv-craft.",
-      "version": "0.1.1",
-      "author": {
-        "name": "Matheus Malagris"
-      },
-      "category": "career",
-      "keywords": [
-        "portfolio",
-        "project-archive",
-        "cv-source"
-      ]
-    },
-    {
       "name": "semver",
       "source": "./skills/semver",
       "description": "Decide the correct Semantic Version bump for a change (major/minor/patch) by analyzing the diff against the project's public surface and running the ecosystem's breaking-change detector, then apply it (bump the manifest + changelog).",
@@ -469,6 +454,21 @@
         "work-report",
         "status-update",
         "conventional-commits"
+      ]
+    },
+    {
+      "name": "portfolio-sync",
+      "source": "./skills/portfolio-sync",
+      "description": "Sync the current project into a central project-portfolio Markdown archive. Source data for cv-craft.",
+      "version": "0.1.2",
+      "author": {
+        "name": "Matheus Malagris"
+      },
+      "category": "career",
+      "keywords": [
+        "portfolio",
+        "project-archive",
+        "cv-source"
       ]
     }
   ]
