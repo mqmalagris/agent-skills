@@ -60,7 +60,7 @@ Skip `node_modules`, `target`, `dist`, `.next`, `build`, `vendor`, `__pycache__`
 
 ### 3. Match against the portfolio
 
-Read the resolved portfolio file in full. Match by folder name against existing entries (e.g. folder `v0-smartbrokr` → entry `**v0-SmartBrokr**`; folder `gravida-app` → `### mami.care (Gravida App)`). Expect renames: match on loose similarity, confirm with user before treating as the same entry.
+Read the resolved portfolio file in full. Match by folder name against existing entries (e.g. folder `v0-acme-portal` → entry `**v0-AcmePortal**`, casing only; folder `bluebird-app` → `### skylark.io (Bluebird App)`, where the product was renamed after the repo was). Expect renames: match on loose similarity, confirm with user before treating as the same entry.
 
 Three outcomes:
 
