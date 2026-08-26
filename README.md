@@ -74,7 +74,7 @@ The loop I use to take a feature from vague hunch to merged code without writing
 | [`periscope`](skills/periscope/) | Role-play a senior / staff / principal engineer and sweep the surfaces you declare for tech, product and org opportunities. At most 5 ranked openings, each with a concrete first move and a draft. Read-only until you approve one specific message. Feeds `brag-doc`. |
 | [`cv-craft`](skills/cv-craft/) | Maintain a canonical master CV and produce tailored, ATS-friendly resumes + recruiter-screen prep from job descriptions. |
 | [`portfolio-sync`](skills/portfolio-sync/) | Sync the current project into a central project-portfolio archive. `cv-craft` reads it as source of truth. |
-| [`brag-doc`](skills/brag-doc/) | Maintain a monthly brag document and roll it up into a promo packet, self-review, or CV material. Feeds `cv-craft`. |
+| [`brag-doc`](skills/brag-doc/) | Maintain a monthly brag document and roll it up into a promo packet, self-review, or CV material. Reads `periscope`'s contribution log so influence work with no commit behind it still counts. Feeds `cv-craft`. |
 
 ### Product (1)
 
