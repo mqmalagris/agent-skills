@@ -370,23 +370,6 @@
       ]
     },
     {
-      "name": "brag-doc",
-      "source": "./skills/brag-doc",
-      "description": "Maintain a monthly brag document and roll it up into a promo packet, self-review, or CV material. Lucas Faria's 4-field template + Julia Evans' impact-first categories. Feeds cv-craft.",
-      "version": "0.2.0",
-      "author": {
-        "name": "Matheus Malagris"
-      },
-      "category": "career",
-      "keywords": [
-        "brag-document",
-        "career",
-        "self-review",
-        "promotion",
-        "cv-source"
-      ]
-    },
-    {
       "name": "llm-wiki",
       "source": "./skills/llm-wiki",
       "description": "Build and maintain an LLM-maintained wiki \u2014 a persistent, interlinked Markdown knowledge base distilled from curated raw sources (Karpathy's LLM Wiki pattern).",
@@ -469,6 +452,23 @@
         "career-growth",
         "influence",
         "opportunity-scan"
+      ]
+    },
+    {
+      "name": "brag-doc",
+      "source": "./skills/brag-doc",
+      "description": "Maintain a monthly brag document and roll it up into a promo packet, self-review, or CV material. Lucas Faria's 4-field template + Julia Evans' impact-first categories. Feeds cv-craft.",
+      "version": "0.3.0",
+      "author": {
+        "name": "Matheus Malagris"
+      },
+      "category": "career",
+      "keywords": [
+        "brag-document",
+        "career",
+        "self-review",
+        "promotion",
+        "cv-source"
       ]
     }
   ]
