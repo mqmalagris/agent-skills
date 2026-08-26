@@ -6,7 +6,7 @@
   },
   "metadata": {
     "description": "Curated, dual-format skill collection: installable as a Claude Code plugin marketplace or via `bunx skills`. A full dev pipeline (grill-me -> to-prd -> compass -> heist -> maestro), a review stage that merges four checks into one verdict (review-pass over implementation-review + testing-philosophy + security-audit + wstg), language idioms, plus career tools (CV, brag doc, portfolio, opportunity scanning), product, reporting, SEO and ASO.",
-    "version": "0.10.2"
+    "version": "0.10.3"
   },
   "plugins": [
     {
