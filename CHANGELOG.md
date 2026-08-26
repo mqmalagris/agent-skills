@@ -3,6 +3,9 @@
 All notable changes to this collection are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); the collection follows [SemVer](https://semver.org). See [VERSIONING.md](VERSIONING.md) for the per-skill vs collection model.
 
 ## [Unreleased]
+
+## [0.10.4] - 2026-08-26
+
 - exclusion rule states the principle (employer- and client-owned skills stay out) instead of naming one private skill
 
 ## [0.10.3] - 2026-08-26
