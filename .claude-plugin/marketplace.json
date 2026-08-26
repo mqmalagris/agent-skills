@@ -128,27 +128,6 @@
       ]
     },
     {
-      "name": "code-craft",
-      "source": "./skills/code-craft",
-      "description": "Language- and framework-specific best practices and idioms. Reader and reviewer modes. Ships 7 languages + 12 frameworks (TS, Rust, CSS, Tailwind, Dart, Go, Python, React, Next, RN+Expo, Hono, Workers, Astro, Svelte, Drizzle, Supabase, Lambda, Terraform, Flutter).",
-      "version": "0.2.1",
-      "author": {
-        "name": "Matheus Malagris"
-      },
-      "category": "development",
-      "keywords": [
-        "code-review",
-        "idioms",
-        "typescript",
-        "rust",
-        "react",
-        "nextjs",
-        "go",
-        "python",
-        "flutter"
-      ]
-    },
-    {
       "name": "semver",
       "source": "./skills/semver",
       "description": "Decide the correct Semantic Version bump for a change (major/minor/patch) by analyzing the diff against the project's public surface and running the ecosystem's breaking-change detector, then apply it (bump the manifest + changelog).",
@@ -469,6 +448,27 @@
         "portfolio",
         "project-archive",
         "cv-source"
+      ]
+    },
+    {
+      "name": "code-craft",
+      "source": "./skills/code-craft",
+      "description": "Language- and framework-specific best practices and idioms. Reader and reviewer modes. Ships 7 languages + 12 frameworks (TS, Rust, CSS, Tailwind, Dart, Go, Python, React, Next, RN+Expo, Hono, Workers, Astro, Svelte, Drizzle, Supabase, Lambda, Terraform, Flutter).",
+      "version": "0.2.2",
+      "author": {
+        "name": "Matheus Malagris"
+      },
+      "category": "development",
+      "keywords": [
+        "code-review",
+        "idioms",
+        "typescript",
+        "rust",
+        "react",
+        "nextjs",
+        "go",
+        "python",
+        "flutter"
       ]
     }
   ]
