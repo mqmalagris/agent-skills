@@ -62,7 +62,7 @@ Rules for the block: outcome-focused, never a changelog. No SHAs, no file paths,
 - Default path: `standups/YYYY-MM-DD.md` (relative to cwd). Create the `standups/` dir if it doesn't exist. Override per-run with `--doc <path>`, or set `docDir` in config.
 - `YYYY-MM-DD` = the window's end date (today), from a real timestamp (`git log -1 --date=short` or system date) — never invented.
 - After writing, print the file path AND the channel block (so the user can both paste and hand off).
-- <!-- ponytail: doc path is a default, not a law — one config key or one flag overrides it. Deliberately no chat/Slack/email auto-send; a paste-ready block + a file cover "send it" without any external auth. Add a real integration only if the user asks. -->
+- <!-- scope note: doc path is a default, not a law — one config key or one flag overrides it. Deliberately no chat/Slack/email auto-send; a paste-ready block + a file cover "send it" without any external auth. Add a real integration only if the user asks. -->
 
 ## First-run config (standup only)
 
