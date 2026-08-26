@@ -5,7 +5,7 @@
     "url": "https://github.com/mqmalagris"
   },
   "metadata": {
-    "description": "Curated, dual-format skill collection: installable as a Claude Code plugin marketplace or via `bunx skills`. A full dev pipeline (grill-me -> to-prd -> compass -> heist -> maestro -> parallel-worktrees), a pre-commit quality gate (implementation-review + testing-philosophy + security-audit + wstg), language idioms, plus career/product/reporting/SEO tools.",
+    "description": "Curated, dual-format skill collection: installable as a Claude Code plugin marketplace or via `bunx skills`. A full dev pipeline (grill-me -> to-prd -> compass -> heist -> maestro), a review stage that merges four checks into one verdict (review-pass over implementation-review + testing-philosophy + security-audit + wstg), language idioms, plus career tools (CV, brag doc, portfolio, opportunity scanning), product, reporting, SEO and ASO.",
     "version": "0.9.0"
   },
   "plugins": [
