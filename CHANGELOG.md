@@ -3,6 +3,9 @@
 All notable changes to this collection are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); the collection follows [SemVer](https://semver.org). See [VERSIONING.md](VERSIONING.md) for the per-skill vs collection model.
 
 ## [Unreleased]
+
+## [0.10.0] - 2026-08-26
+
 - new skill: role-driven opportunity scan across tech / product / org lenses, kind-based surfaces with a hard tool allowlist, per-lens credibility, evidence trail for brag-doc
 - drop third-party ponytail attribution; the rule keeps the idea as its own stated floor
 - review tail delegated to review-pass as one stage (was verify + code-review + implementation-review restated inline); removes the duplicated gate specs that had drifted, and the chain now ends in one merged go/no-go verdict
