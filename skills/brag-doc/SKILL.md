@@ -17,6 +17,7 @@ Invocation: `/brag-doc <mode> [target]`. `target` is `work` or `side` — ask if
 ### draft
 Add this month's entry to the target doc. **Pull real signal first — never invent accomplishments.**
 1. Gather evidence: `git log --author=<user> --since="1 month ago"`, recent PRs/tickets, this conversation, and for `side` the career plan at `projects/side/career-plan-90d.md`.
+   **Also read `~/.claude/state/periscope/contributions.log.md` when it exists.** One line per approved contribution: `- <date> | <lens> | <link> | <what changed> | mandate: <behavior>`. These are *influence* entries — weighing in on someone else's PR, unblocking a stalled decision, proposing a convention across teams. **They have no commit behind them by design**, so `git log` cannot see them. Do not try to reconcile them against git history: nothing will match, and dropping them removes the highest-leverage work in the month. The approval gate that wrote each line already vetted it, so take it at face value and convert it to impact like any other item.
 2. Fill the monthly template (see [TEMPLATE.md](TEMPLATE.md)) — four fields: shipped+impact, challenges, "would be much better if", next-month focus.
 3. **Impact rule (Julia):** state it *exactly as good as it is* — no inflation, no hedging. Every "shipped" line names an outcome (who uses it, metric, $, time saved), not a task. For fuzzy work: goal → actions taken → observable effect. Mark any unverified number `[ESTIMADO]`.
 4. Prepend the entry under a `## <Month Year>` header. Never overwrite past months.
@@ -29,7 +30,7 @@ Sharpen an existing entry the user points at. Line by line: task or impact? vagu
 
 ### compile
 Roll N monthly entries into one output. Ask which and the date range, then produce:
-- `promo` → promo packet / self-review organized by Julia's full categories (projects & impact, collaboration & mentorship, design & docs, company building, what I learned, outside of work).
+- `promo` → promo packet / self-review organized by Julia's full categories (projects & impact, collaboration & mentorship, design & docs, company building, what I learned, outside of work). Pull the `periscope` contribution log for this range too. Influence entries land mostly under **collaboration & mentorship** and **company building** — the two categories a packet built only from commits leaves conspicuously empty, which is the gap that sinks a promo case.
 - `cv` → hand the impact bullets to **cv-craft** as achievement source material.
 
 ## Method & sources

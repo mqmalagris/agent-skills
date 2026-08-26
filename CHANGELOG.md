@@ -3,6 +3,7 @@
 All notable changes to this collection are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); the collection follows [SemVer](https://semver.org). See [VERSIONING.md](VERSIONING.md) for the per-skill vs collection model.
 
 ## [Unreleased]
+- reads the periscope contribution log as a first-class evidence source in draft and compile, so influence work with no commit behind it reaches the promo packet
 
 ## [0.10.0] - 2026-08-26
 
