@@ -41,24 +41,6 @@
       ]
     },
     {
-      "name": "security-audit",
-      "source": "./skills/security-audit",
-      "description": "High-confidence security review of a diff, layered on wstg-security-testing. Confidence gate, false-positive precedents, WSTG-ID mapping, and a dependency audit. Reports only concretely exploitable findings.",
-      "version": "0.1.0",
-      "author": {
-        "name": "Matheus Malagris"
-      },
-      "category": "security",
-      "keywords": [
-        "security",
-        "appsec",
-        "vulnerability",
-        "wstg",
-        "dependency-audit",
-        "code-review"
-      ]
-    },
-    {
       "name": "compass",
       "source": "./skills/compass",
       "description": "Multi-mode software engineering coach: architect, advisor, reviewer, refactor, legacy, and explainer workflows. Auto-writes ADRs to docs/adr/.",
@@ -503,6 +485,24 @@
         "charts",
         "github-issues",
         "reporting"
+      ]
+    },
+    {
+      "name": "security-audit",
+      "source": "./skills/security-audit",
+      "description": "High-confidence security review of a diff, layered on wstg-security-testing. Confidence gate, false-positive precedents, WSTG-ID mapping, and a dependency audit. Reports only concretely exploitable findings.",
+      "version": "0.2.0",
+      "author": {
+        "name": "Matheus Malagris"
+      },
+      "category": "security",
+      "keywords": [
+        "security",
+        "appsec",
+        "vulnerability",
+        "wstg",
+        "dependency-audit",
+        "code-review"
       ]
     }
   ]
