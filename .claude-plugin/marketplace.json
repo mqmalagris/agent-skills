@@ -337,23 +337,6 @@
       ]
     },
     {
-      "name": "commit-report",
-      "source": "./skills/commit-report",
-      "description": "Work report in two modes \u2014 quick (git-only: prose + bullets from the current repo) and standup (multi-source: GitHub PRs/reviews/comments, git across repos, deploys) \u2014 tunable to audience (dev / pm / client), delivered as a copy-ready channel block or a doc file.",
-      "version": "0.1.4",
-      "author": {
-        "name": "Matheus Malagris"
-      },
-      "category": "reporting",
-      "keywords": [
-        "standup",
-        "git-log",
-        "work-report",
-        "status-update",
-        "conventional-commits"
-      ]
-    },
-    {
       "name": "portfolio-sync",
       "source": "./skills/portfolio-sync",
       "description": "Sync the current project into a central project-portfolio Markdown archive. Source data for cv-craft.",
@@ -486,6 +469,23 @@
         "prd",
         "feature-spec",
         "github-issues"
+      ]
+    },
+    {
+      "name": "commit-report",
+      "source": "./skills/commit-report",
+      "description": "Work report in two modes \u2014 quick (git-only: prose + bullets from the current repo) and standup (multi-source: GitHub PRs/reviews/comments, git across repos, deploys) \u2014 tunable to audience (dev / pm / client), delivered as a copy-ready channel block or a doc file.",
+      "version": "0.2.0",
+      "author": {
+        "name": "Matheus Malagris"
+      },
+      "category": "reporting",
+      "keywords": [
+        "standup",
+        "git-log",
+        "work-report",
+        "status-update",
+        "conventional-commits"
       ]
     }
   ]
