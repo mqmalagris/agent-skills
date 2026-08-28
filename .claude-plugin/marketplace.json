@@ -470,6 +470,23 @@
         "bunx-skills",
         "git"
       ]
+    },
+    {
+      "name": "sentinel",
+      "source": "./skills/sentinel",
+      "description": "Close the loop after ship \u2014 scan a repo (and optionally its live prod signal) for post-release trouble, then file what it finds as docs/intent/NNNN-<slug>.md so it re-enters the dev-flow chain as ordinary work.",
+      "version": "0.1.0",
+      "author": {
+        "name": "Matheus Malagris"
+      },
+      "category": "engineering-workflow",
+      "keywords": [
+        "post-ship-monitoring",
+        "regression-detection",
+        "git-analysis",
+        "maintenance",
+        "observability"
+      ]
     }
   ]
 }

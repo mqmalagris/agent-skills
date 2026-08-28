@@ -3,6 +3,7 @@
 All notable changes to this collection are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); the collection follows [SemVer](https://semver.org). See [VERSIONING.md](VERSIONING.md) for the per-skill vs collection model.
 
 ## [Unreleased]
+- Add sentinel: scheduled post-ship detector that files recurring fix classes, reverts, and prod threshold breaches as docs/intent files
 
 ## [0.10.4] - 2026-08-26
 
