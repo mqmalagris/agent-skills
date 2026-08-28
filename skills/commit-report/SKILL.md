@@ -1,7 +1,7 @@
 ---
 name: commit-report
 description: >-
-  Generate a work report tunable to audience (dev / pm / client) and deliver it as a copy-ready channel block or a written doc. Two modes: `quick` (git-only, zero-config — prose + bullets from the current repo) and `standup` (multi-source — GitHub PRs/reviews/comments + git across repos + deploys + optional tracker, framed as an impact narrative). Use when the user asks for a standup, status update, work summary, "what did I ship today", commit recap, end-of-day report, PM/client update, a report to paste into a channel, or a standup doc — or runs /commit-report. Triggers on "write a report", "summarize commits", "standup", "report for the PM", "update for the client", "send a report", "what did I do today/yesterday". Default delivery is a copy-ready block; `--doc` writes the full report to a file. Quick mode default scope = `--since-mine` (current user's contiguous commit batch at HEAD); standup mode default window = last working day → now. Parses Conventional Commits prefixes and honors Co-Authored-By trailers.
+  Generate a work report tunable to audience (dev / pm / client) and deliver it as a copy-ready channel block or a written doc. Two modes: `quick` (git-only, zero-config — prose + bullets from the current repo) and `standup` (multi-source — GitHub PRs/reviews/comments + git across repos + deploys + optional tracker, framed as an impact narrative). Use when the user asks for a standup, status update, work summary, "what did I ship today", commit recap, end-of-day report, PM/client update, a report to paste into a channel, or a standup doc — or runs /commit-report. Triggers on "write a report", "summarize commits", "standup", "report for the PM", "update for the client", "send a report", "what did I do today/yesterday". Default delivery is a copy-ready block; `--doc` writes the full report to a file; `--metrics` appends flow metrics (human review coverage, rework depth, artifact lag, spec churn, caught-vs-escaped defects, recurring fix classes) derived from git and gh. Quick mode default scope = `--since-mine` (current user's contiguous commit batch at HEAD); standup mode default window = last working day → now. Parses Conventional Commits prefixes and honors Co-Authored-By trailers.
 ---
 
 # commit-report
@@ -31,9 +31,12 @@ Guiding principle (both modes): **name work by what it was, not by its ID.** "Fi
 /commit-report --standup --repos a,b,c  # override local repo roots for this run
 /commit-report pm --standup --doc       # write full report to a doc AND print channel block
 /commit-report pm --standup --doc ~/standups/today.md   # explicit doc path
+
+/commit-report --metrics                # append flow metrics for the window
+/commit-report dev --metrics --last week
 ```
 
-Flag precedence: explicit scope flag > mode default window. `--doc` and audience compose with any mode.
+Flag precedence: explicit scope flag > mode default window. `--doc`, `--metrics`, and audience compose with any mode.
 
 ## Modes
 
@@ -110,7 +113,7 @@ Keep setup to the minimum needed for the flags actually used; don't prompt for a
    - **standup** — run these in parallel (see [Multi-source collection](#multi-source-collection-standup)).
 6. **Parse Conventional Commits prefixes** (`feat:`, `fix:`, `chore:`, `refactor:`, `docs:`, `test:`, `perf:`, `build:`, `ci:`) as the primary bucketing signal: features ship, fixes resolve, refactor/chore/test = "groundwork" for client audience. No prefix → content heuristics. Scope in parens (`feat(auth):`) is a `pm`/`client` framing hint.
 7. **Synthesize** per audience + mode ([Audience map](#audience-map), [Standup format](#standup-format)). Group related work; do not echo subjects 1:1. Name by outcome, not ID.
-8. **Deliver**: render the mode's format, then always the channel block. If `--doc`, write the full report to file and print its path.
+8. **Deliver**: render the mode's format, then always the channel block. If `--metrics`, insert the [flow-metrics](#flow-metrics---metrics) section before the channel block. If `--doc`, write the full report to file and print its path.
 
 ## Multi-source collection (standup)
 
@@ -125,6 +128,58 @@ Query in parallel, then merge and dedupe:
 7. **Today's queue** — carry-overs (open/draft PRs, unpushed branches), pending review requests (`review-requested:{githubLogin}`), assigned tickets by priority. Cap at 5.
 
 Any source that errors or is unconfigured is skipped silently — a partial report beats a failed one. Note in the report which sources were unavailable only if it materially changes the picture.
+
+## Flow metrics (`--metrics`)
+
+Opt-in. Appends a `## Flow metrics` section measuring **how the work moved**, not what shipped. `dev` audience only — these are engineering-process numbers; a PM or client report gets the outcomes, not the pipeline telemetry. If `--metrics` is combined with `pm`/`client`, compute it into the `--doc` body but keep it out of the channel block.
+
+Every figure below is derived from git and `gh` alone — no new tooling, no instrumentation to install. That also means several are **proxies**, and a proxy reported as a fact is worse than no metric. Label them as marked, and when the window is too small for a number to mean anything (fewer than ~5 PRs), print the raw counts and skip the percentage rather than reporting "100% first-pass" off a sample of one.
+
+**Leading** — cheap signals that move before quality does:
+
+| Metric | How to derive | Note |
+|---|---|---|
+| **Review coverage** | Report it **three ways**: PRs with a human review, PRs with a bot review, PRs with neither. Filter on `.user.type=="User"` vs `"Bot"` — see [automated-reviewers](../review-pass/references/automated-reviewers.md) | Compute this **first** — it calibrates everything below |
+| Rework signal | inline review comments per PR (`repos/{owner}/{repo}/pulls/{n}/comments`), median and worst. Where review coverage is high, also count commits pushed after the first review's `submittedAt` | The real "had to redo work" signal |
+| First-pass merge rate | merged PRs with no `CHANGES_REQUESTED` ÷ all merged PRs — **but only report it when review coverage is meaningful and the state is actually in use** | See the trap below |
+
+**The `CHANGES_REQUESTED` trap.** Plenty of teams review thoroughly and never touch that button; they approve and leave inline comments instead. On such a repo this metric reports a flawless 100% that means nothing, and it reports the same 100% for a repo that merges entirely unreviewed. Two opposite realities, one flattering number.
+
+So: if zero PRs in the window carry a `CHANGES_REQUESTED`, do **not** print a first-pass rate. Print `not computable — team does not use the CHANGES_REQUESTED state` and lead with review coverage instead. Before blaming the data, confirm `gh` is returning reviews at all by spot-checking one PR you know was approved (`gh pr view <n> --json reviews`) — an empty array everywhere can mean a broken query rather than an unreviewed repo, and those need opposite responses.
+
+**Never filter bots by login suffix.** Use `.user.type`. GitHub Copilot files its review under `copilot-pull-request-reviewer[bot]` but authors its inline comments as plain `Copilot`, which sails through a suffix check and gets counted as a person. That single mistake turned a real 9/25 human-review figure into a reassuring 21/25 on a repo whose review gap was the finding. `user.type` is `"Bot"` for both identities.
+
+```bash
+gh api "repos/$OWNER/$REPO/pulls/$N/comments" -q '[.[] | select(.user.type=="User")] | length'
+```
+
+Bot review is worth counting — separately, never folded into the human number. A repo where bots review everything and humans review little is a different situation from one with no review at all, and both differ from thorough human review; one figure cannot say which you're looking at. Deploy bots (`vercel[bot]`, `cloudflare-workers-and-pages[bot]`) are not reviewers at all and belong in neither column.
+
+If a configured reviewer is paused, absent, or stale, give it a line. An automated reviewer reporting *"reviews are paused for this user"* on the repo with the highest fix share is a finding, not a footnote.
+| Stage-artifact lag | `git log --diff-filter=A --format=%aI` over `docs/intent/`, `docs/prds/`, `docs/plans/`, then the first code commit citing that slug. Report the gaps | Measures the dev-flow chain itself; only meaningful on repos that use it |
+
+**Lagging** — the ones that actually tell you whether the process is working:
+
+| Metric | How to derive | Note |
+|---|---|---|
+| Spec churn after build | commits touching `docs/prds/NNNN-<slug>.md` dated **after** the first code commit for that slug | Proxy. High churn means to-prd ran on thin context |
+| Caught vs escaped | `fix:` commits on a branch **before** its PR merged (caught) vs `fix:` commits landing after a merge that touch files the merge introduced (escaped) | Proxy, and the softest one — conventional-commit discipline is the only signal available. Say so |
+| Repeat classes | run `sentinel`'s scanner — `py -3 ~/.claude/skills/sentinel/scripts/scan_git_signals.py --repo . --since <window>` — and report its `recurring` bucket | Proxy for "same incident twice". Don't hand-roll this: a raw fix-count ranking is dominated by locale catalogs and same-day iteration, which is why that scanner buckets against the repo's own distribution. A file recurring three windows running is the finding, not the count |
+
+Output shape:
+
+```
+## Flow metrics
+- Review coverage: human 9/25, bot 25/25, unreviewed 0/25
+- Rework: median 3 inline comments/PR, worst #482 at 11
+- First-pass merge: not computable — no PR used CHANGES_REQUESTED this window
+- Artifact lag: intent → PRD 2h, PRD → plan 1d, plan → first commit 3h
+- Spec churn after build: 1 PRD amended post-code (#0012 payments-retry)
+- Caught vs escaped [proxy]: fix share 0.09, 0 reverts
+- Repeat classes [proxy]: `src/api/orders.ts` 8x over 19d (sentinel, recurring)
+```
+
+Rules: never invent a figure to fill a row — drop the row and say which data was unavailable. Never present a proxy without its `[proxy]` tag. Trend beats level; a single window's number is close to meaningless, so when prior `--doc` reports exist in `docDir`, read the last one and show the delta.
 
 ## Time window
 
