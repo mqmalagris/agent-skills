@@ -3,6 +3,7 @@
 All notable changes to this collection are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); the collection follows [SemVer](https://semver.org). See [VERSIONING.md](VERSIONING.md) for the per-skill vs collection model.
 
 ## [Unreleased]
+- grill-me: persist Design Notes, Glossary and edge cases to docs/intent/NNNN-<slug>.md instead of leaving them in conversation
 - review-pass: harvest existing automated review before running its own stages; add the automated-reviewers reference
 - dev-flow: add sentinel as the scheduled Maintain stage, make the on-disk artifact chain explicit, repoint the review tail's live check to /run
 - Add sentinel: scheduled post-ship detector that files recurring fix classes, reverts, and prod threshold breaches as docs/intent files
