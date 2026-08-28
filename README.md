@@ -31,16 +31,16 @@ Each skill is a directory under [`skills/`](skills/) with a `SKILL.md` (plus opt
 
 Each skill is versioned independently (SemVer in its `plugin.json`); the collection is snapshotted with git tags `vX.Y.Z` and [GitHub Releases](https://github.com/mqmalagris/agent-skills/releases). See [`CHANGELOG.md`](CHANGELOG.md) and [`VERSIONING.md`](VERSIONING.md). Manifests are validated in CI on every push and PR.
 
-## What's in here (27 skills)
+## What's in here (28 skills)
 
-### Dev pipeline (9)
+### Dev pipeline (10)
 
 The loop I use to take a feature from vague hunch to merged code without writing fiction at any step. `dev-flow` conducts; the rest are its stages.
 
 | Skill | What it does |
 |-------|--------------|
 | [`dev-flow`](skills/dev-flow/) | Conductor. Detects a task's tier (bug / feature / architecture / client), prints the exact subset of stages it will run and skip with reasons, confirms, then drives them. Matches ceremony to stakes. |
-| [`grill-me`](skills/grill-me/) | Stress-test a plan via relentless interview; captures domain vocabulary, emits a Design Notes + Glossary block. Adapted from [mattpocock/skills](https://github.com/mattpocock/skills). |
+| [`grill-me`](skills/grill-me/) | Stress-test a plan via relentless interview; captures domain vocabulary, emits a Design Notes + Glossary block and persists it to `docs/intent/NNNN-<slug>.md`. Adapted from [mattpocock/skills](https://github.com/mattpocock/skills). |
 | [`to-prd`](skills/to-prd/) | Synthesize the conversation into a PRD at `docs/prds/NNNN-<slug>.md` and publish to GitHub Issues. Adapted from [mattpocock/skills](https://github.com/mattpocock/skills). |
 | [`compass`](skills/compass/) | Multi-mode software-engineering coach (architect, advisor, reviewer, refactor, legacy, explainer). Auto-writes ADRs to `docs/adr/`. |
 | [`heist`](skills/heist/) | Turn a settled scope into an implementation plan at `docs/plans/NNNN-<slug>.md`: crew, sequence, getaway, payoff. Consumes PRDs + ADRs. |
@@ -48,12 +48,13 @@ The loop I use to take a feature from vague hunch to merged code without writing
 | [`parallel-worktrees`](skills/parallel-worktrees/) | Plan-optional counterpart to maestro: go/no-go, file partitioning, isolation mechanism, integration + cleanup for ad-hoc parallel work. |
 | [`pr-craft`](skills/pr-craft/) | Open a PR with a structured body (Problem / Root cause / Fix / Test / Out of scope). Drives branch → commit → push → `gh pr create`, and opens GitHub-native **stacked PRs** (one PR per dependent layer) for large, layered changes. |
 | [`babysit-prs`](skills/babysit-prs/) | Drive a PR through review on its own loop: fetch feedback (human + bots like Copilot/Qodo/CodeRabbit), triage, fix, report per item with the commit SHA, resolve threads, push — repeating until MERGED. Never merges itself. |
+| [`sentinel`](skills/sentinel/) | The Maintain stage the chain otherwise lacks. Runs on a schedule, not in a build: scans shipped work for recurring fix classes, reverts, and (where configured) prod threshold breaches, then files findings as `docs/intent/NNNN-<slug>.md` so they re-enter the chain as ordinary work. Never fixes or commits. |
 
 ### Quality & review (7)
 
 | Skill | What it does |
 |-------|--------------|
-| [`review-pass`](skills/review-pass/) | Review-only entry point for a diff you already have: runs `verify` → `code-review` → `implementation-review` (plus `security-audit` only on trust-boundary changes), then merges every finding into one ranked go/no-go verdict. |
+| [`review-pass`](skills/review-pass/) | Review-only entry point for a diff you already have: harvests any existing automated review, then runs `/run` → `code-review` → `implementation-review` (plus `security-audit` only on trust-boundary changes), then merges every finding into one ranked go/no-go verdict. |
 | [`implementation-review`](skills/implementation-review/) | Pre-commit quality gate: seven parallel-subagent checks (plan gaps, use-case coverage, test scenarios, test philosophy, SOLID, Clean Code, security). Runs after `verify`, before commit. |
 | [`testing-philosophy`](skills/testing-philosophy/) | What a good test is: behavior over implementation, the Testing Trophy, an e2e floor for user-facing features. Stack-agnostic (TS/Rust/Go/Elixir/Python). |
 | [`security-audit`](skills/security-audit/) | High-confidence security review of a diff, layered on `wstg-security-testing`. Confidence gate, false-positive precedents, WSTG-ID mapping, dependency audit. |
