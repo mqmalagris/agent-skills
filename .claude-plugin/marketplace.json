@@ -196,22 +196,6 @@
       ]
     },
     {
-      "name": "grill-me",
-      "source": "./skills/grill-me",
-      "description": "Stress-test a plan or design via relentless interview. Resolves each branch of the decision tree, captures domain vocabulary, emits Design Notes + Glossary block for /to-prd. Adapted from mattpocock/skills.",
-      "version": "0.3.0",
-      "author": {
-        "name": "Matheus Malagris"
-      },
-      "category": "engineering-workflow",
-      "keywords": [
-        "design-review",
-        "pre-prd",
-        "interview",
-        "ubiquitous-language"
-      ]
-    },
-    {
       "name": "heist",
       "source": "./skills/heist",
       "description": "Turn a settled feature scope into an implementation plan at docs/plans/NNNN-<slug>.md. Crew, sequence (with parallel phases), getaway, payoff. Consumes PRDs + ADRs.",
@@ -486,6 +470,22 @@
         "quality-gate",
         "pre-commit",
         "orchestrator"
+      ]
+    },
+    {
+      "name": "grill-me",
+      "source": "./skills/grill-me",
+      "description": "Stress-test a plan or design via relentless interview. Resolves each branch of the decision tree, captures domain vocabulary, emits Design Notes + Glossary block for /to-prd. Adapted from mattpocock/skills.",
+      "version": "0.4.0",
+      "author": {
+        "name": "Matheus Malagris"
+      },
+      "category": "engineering-workflow",
+      "keywords": [
+        "design-review",
+        "pre-prd",
+        "interview",
+        "ubiquitous-language"
       ]
     }
   ]

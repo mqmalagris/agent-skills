@@ -1,6 +1,6 @@
 ---
 name: grill-me
-description: Interview the user relentlessly about a plan or design until reaching shared understanding, resolving each branch of the decision tree and emitting a Design Notes + Glossary block for handoff to /to-prd. Use when user wants to stress-test a plan, get grilled on their design, do a pre-PRD design review, challenge an idea before writing it up, or mentions "grill me" or runs /grill-me.
+description: Interview the user relentlessly about a plan or design until reaching shared understanding, resolving each branch of the decision tree, then emitting a Design Notes + Glossary + edge-case block and persisting it to docs/intent/NNNN-<slug>.md for handoff to /to-prd. Use when user wants to stress-test a plan, get grilled on their design, do a pre-PRD design review, challenge an idea before writing it up, or mentions "grill me" or runs /grill-me.
 ---
 
 Interview me relentlessly about every aspect of this plan until we reach a shared understanding. Walk down each branch of the decision tree, resolving dependencies between decisions one-by-one. For each question, provide your recommended answer (with brief reasoning); skip the recommendation only when the codebase or my prior answers haven't given you enough signal.
@@ -42,10 +42,21 @@ While interviewing, build a **ubiquitous language** for this feature — the sha
 
 ## Output
 
-At end of session (or when I say "wrap it up"), emit a single markdown block:
+At end of session (or when I say "wrap it up"), emit this block **and commit it to disk**:
+
+- **Path**: `bash scripts/next-intent-index.sh <slug>` prints the zero-padded target (`docs/intent/NNNN-<slug>.md`) and creates the directory if missing. `<slug>` = short kebab feature name.
+- **Also print the block in chat**, so the conversation can carry straight into `/to-prd` without a file read.
+
+Writing it down is the point. The Glossary and the edge-case decisions are load-bearing for every stage after this one, and until now they lived only in conversation scrollback — one compaction or one closed session and `to-prd` is synthesizing from thinner context than the interview actually produced, or halting. A numbered file makes the interview an artifact the rest of the chain can read, diff, and review, the same way the PRD, ADR, and plan already are.
+
+Skip the file only for a throwaway session the user says not to keep, and say that you skipped it.
 
 ```markdown
 # Design Notes: <feature title>
+
+- **Status**: draft | settled | superseded
+- **Date**: YYYY-MM-DD
+- **Slug**: <kebab-slug>
 
 ## Resolved decisions
 - <decision>: <chosen option> — <one-line rationale>
@@ -66,7 +77,9 @@ Term — definition. (aliases: <other names if any>)
 ...
 ```
 
-This block is the handoff to `/to-prd`, which synthesizes it into a PRD. Don't write to disk — the user copies the block into the next step or keeps it in conversation.
+This block is the handoff to `/to-prd`, which synthesizes it into a PRD and cites the intent file in its `Sources` line. Report the written path when you finish.
+
+**Updating an existing intent.** If the user reopens a settled design, find the file by slug and amend it rather than minting a new index — a second file for the same feature splits the Glossary, which is exactly what this artifact exists to prevent. Edit-safe: `Status`, `Open questions`, adding resolved decisions or edge cases. Changing a `## Glossary` term after `to-prd` has consumed it needs an explicit OK, because heist and the implementing code are already using that word.
 
 ## When to skip grill-me
 
