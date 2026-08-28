@@ -130,23 +130,6 @@
       ]
     },
     {
-      "name": "babysit-prs",
-      "source": "./skills/babysit-prs",
-      "description": "Babysit a GitHub PR from review all the way to MERGED.",
-      "version": "0.1.0",
-      "author": {
-        "name": "Matheus Malagris"
-      },
-      "category": "engineering-workflow",
-      "keywords": [
-        "pull-request",
-        "code-review",
-        "github",
-        "ci",
-        "automation"
-      ]
-    },
-    {
       "name": "pr-craft",
       "source": "./skills/pr-craft",
       "description": "Create a pull request with a structured description (Problem / Root cause / Fix / Test / Out of scope) derived from the diff and conversation. Drives the branch -> commit -> push -> gh pr create flow.",
@@ -486,6 +469,23 @@
         "work-report",
         "status-update",
         "conventional-commits"
+      ]
+    },
+    {
+      "name": "babysit-prs",
+      "source": "./skills/babysit-prs",
+      "description": "Babysit a GitHub PR from review all the way to MERGED.",
+      "version": "0.2.0",
+      "author": {
+        "name": "Matheus Malagris"
+      },
+      "category": "engineering-workflow",
+      "keywords": [
+        "pull-request",
+        "code-review",
+        "github",
+        "ci",
+        "automation"
       ]
     }
   ]
