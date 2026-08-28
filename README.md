@@ -31,7 +31,7 @@ Each skill is a directory under [`skills/`](skills/) with a `SKILL.md` (plus opt
 
 Each skill is versioned independently (SemVer in its `plugin.json`); the collection is snapshotted with git tags `vX.Y.Z` and [GitHub Releases](https://github.com/mqmalagris/agent-skills/releases). See [`CHANGELOG.md`](CHANGELOG.md) and [`VERSIONING.md`](VERSIONING.md). Manifests are validated in CI on every push and PR.
 
-## What's in here (28 skills)
+## What's in here (29 skills)
 
 ### Dev pipeline (10)
 
@@ -62,10 +62,11 @@ The loop I use to take a feature from vague hunch to merged code without writing
 | [`code-craft`](skills/code-craft/) | Language- and framework-specific idioms; reader and reviewer modes. 7 languages + 12 frameworks. Tactical complement to `compass`. |
 | [`wstg-security-testing`](skills/wstg-security-testing/) | OWASP WSTG web-security testing: 12 categories, ~109 test cases, four modes. Methodology from [OWASP/wstg](https://github.com/OWASP/wstg). Authorized/defensive use only. |
 
-### Reporting (1)
+### Reporting (2)
 
 | Skill | What it does |
 |-------|--------------|
+| [`audit-report`](skills/audit-report/) | Renders audit findings (JSON in) as a designed A4 PDF — cover, severity donut, category bars, colored severity chips, evidence-backed strengths, prioritized recommendations, and copy-ready GitHub issue blocks. English default with a pt-BR pack; self-verifying and leaves a re-runnable generator script beside the report. |
 | [`commit-report`](skills/commit-report/) | Work report in two modes — `quick` (git-only: prose + bullets from the current repo) and `standup` (multi-source: GitHub PRs/reviews/comments, git across repos, deploys) — tunable to audience (dev / pm / client), delivered as a copy-ready channel block or a `--doc` file. |
 
 ### Career (4)

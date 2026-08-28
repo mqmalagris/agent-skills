@@ -487,6 +487,23 @@
         "stacked-prs",
         "gh-cli"
       ]
+    },
+    {
+      "name": "audit-report",
+      "source": "./skills/audit-report",
+      "description": "Render audit findings as a designed, paginated A4 PDF report with a cover page, severity donut and category bar charts, colored severity chips, evidence-backed strengths, prioritized recommendations, and copy-ready GitHub issue blocks.",
+      "version": "0.1.0",
+      "author": {
+        "name": "Matheus Malagris"
+      },
+      "category": "reporting",
+      "keywords": [
+        "pdf-report",
+        "security-audit",
+        "charts",
+        "github-issues",
+        "reporting"
+      ]
     }
   ]
 }

@@ -3,6 +3,7 @@
 All notable changes to this collection are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); the collection follows [SemVer](https://semver.org). See [VERSIONING.md](VERSIONING.md) for the per-skill vs collection model.
 
 ## [Unreleased]
+- Add audit-report: render audit findings as an A4 PDF with severity donut, category bars, severity chips, evidence-backed strengths, and copy-ready GitHub issue blocks. English default, pt-BR label pack, self-verifying render.
 
 ## [0.11.0] - 2026-08-28
 
