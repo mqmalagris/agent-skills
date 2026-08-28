@@ -60,7 +60,7 @@ The loop I use to take a feature from vague hunch to merged code without writing
 | [`security-audit`](skills/security-audit/) | High-confidence security review of a diff, layered on `wstg-security-testing`. Confidence gate, false-positive precedents, WSTG-ID mapping, dependency audit. |
 | [`semver`](skills/semver/) | Decide the SemVer bump for a change (major/minor/patch): analyze the diff against the public surface, run the ecosystem's breaking-change detector, then apply. Stack-agnostic; feeds `publish-skill` / `release.py`. |
 | [`code-craft`](skills/code-craft/) | Language- and framework-specific idioms; reader and reviewer modes. 7 languages + 12 frameworks. Tactical complement to `compass`. |
-| [`wstg-security-testing`](skills/wstg-security-testing/) | OWASP WSTG web-security testing: 12 categories, ~109 test cases, four modes. Methodology from [OWASP/wstg](https://github.com/OWASP/wstg). Authorized/defensive use only. |
+| [`wstg-security-testing`](skills/wstg-security-testing/) | OWASP WSTG web-security testing: 12 categories, ~109 test cases, four modes. Mode 2 is the whole-codebase audit and carries a systematic protocol — stack detection, route-handler enumeration, tenant-isolation and secret sweeps, frontend-gate cross-referencing, evidence-backed strengths. Methodology from [OWASP/wstg](https://github.com/OWASP/wstg). Authorized/defensive use only. |
 
 ### Reporting (2)
 
