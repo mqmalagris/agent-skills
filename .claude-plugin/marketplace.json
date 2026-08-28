@@ -351,23 +351,6 @@
       ]
     },
     {
-      "name": "dev-flow",
-      "source": "./skills/dev-flow",
-      "description": "Conductor for the dev pipeline: detects a task's tier (bug / feature / architecture / client), prints the exact chain of sub-skills it will run and skip with reasons, confirms, then drives them in order. Matches ceremony to stakes.",
-      "version": "0.5.1",
-      "author": {
-        "name": "Matheus Malagris"
-      },
-      "category": "engineering-workflow",
-      "keywords": [
-        "workflow-orchestration",
-        "dev-chain",
-        "task-routing",
-        "worktree",
-        "skill-conductor"
-      ]
-    },
-    {
       "name": "periscope",
       "source": "./skills/periscope",
       "description": "Role-play a senior, staff or principal engineer and sweep the surfaces you declare for tech, product and org opportunities. Returns at most 5 ranked openings, each with a concrete first move and a draft. Read-only until you approve a specific message.",
@@ -486,6 +469,23 @@
         "git-analysis",
         "maintenance",
         "observability"
+      ]
+    },
+    {
+      "name": "dev-flow",
+      "source": "./skills/dev-flow",
+      "description": "Conductor for the dev pipeline: detects a task's tier (bug / feature / architecture / client), prints the exact chain of sub-skills it will run and skip with reasons, confirms, then drives them in order. Matches ceremony to stakes.",
+      "version": "0.6.0",
+      "author": {
+        "name": "Matheus Malagris"
+      },
+      "category": "engineering-workflow",
+      "keywords": [
+        "workflow-orchestration",
+        "dev-chain",
+        "task-routing",
+        "worktree",
+        "skill-conductor"
       ]
     }
   ]
