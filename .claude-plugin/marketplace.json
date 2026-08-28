@@ -334,23 +334,6 @@
       ]
     },
     {
-      "name": "review-pass",
-      "source": "./skills/review-pass",
-      "description": "Single review-only entry point for an existing diff \u2014 runs verify \u2192 code-review \u2192 implementation-review (and security-audit only when the change touches a trust boundary), then consolidates every finding into one go/no-go verdict.",
-      "version": "0.2.0",
-      "author": {
-        "name": "Matheus Malagris"
-      },
-      "category": "engineering-workflow",
-      "keywords": [
-        "code-review",
-        "diff-review",
-        "quality-gate",
-        "pre-commit",
-        "orchestrator"
-      ]
-    },
-    {
       "name": "periscope",
       "source": "./skills/periscope",
       "description": "Role-play a senior, staff or principal engineer and sweep the surfaces you declare for tech, product and org opportunities. Returns at most 5 ranked openings, each with a concrete first move and a draft. Read-only until you approve a specific message.",
@@ -486,6 +469,23 @@
         "task-routing",
         "worktree",
         "skill-conductor"
+      ]
+    },
+    {
+      "name": "review-pass",
+      "source": "./skills/review-pass",
+      "description": "Single review-only entry point for an existing diff \u2014 runs verify \u2192 code-review \u2192 implementation-review (and security-audit only when the change touches a trust boundary), then consolidates every finding into one go/no-go verdict.",
+      "version": "0.3.0",
+      "author": {
+        "name": "Matheus Malagris"
+      },
+      "category": "engineering-workflow",
+      "keywords": [
+        "code-review",
+        "diff-review",
+        "quality-gate",
+        "pre-commit",
+        "orchestrator"
       ]
     }
   ]
