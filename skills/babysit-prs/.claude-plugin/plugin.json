@@ -1,6 +1,6 @@
 {
   "name": "babysit-prs",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Babysit a GitHub PR from review all the way to MERGED.",
   "author": {
     "name": "Matheus Malagris",

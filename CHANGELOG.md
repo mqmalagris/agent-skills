@@ -3,6 +3,7 @@
 All notable changes to this collection are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); the collection follows [SemVer](https://semver.org). See [VERSIONING.md](VERSIONING.md) for the per-skill vs collection model.
 
 ## [Unreleased]
+- babysit-prs: add PROVENANCE-FLAG triage row and bot identification by user.type; flag silent or paused automated reviewers
 - commit-report: add --metrics (review coverage, rework depth, artifact lag, spec churn, recurring fix classes)
 - to-prd: read docs/intent as a Glossary source when the conversation does not carry the grill-me block
 - grill-me: persist Design Notes, Glossary and edge cases to docs/intent/NNNN-<slug>.md instead of leaving them in conversation
