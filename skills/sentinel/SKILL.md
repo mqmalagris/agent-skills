@@ -1,6 +1,13 @@
 ---
 name: sentinel
-description: Close the loop after ship — scan a repo (and optionally its live prod signal) for post-release trouble, then file what it finds as docs/intent/NNNN-<slug>.md so it re-enters the dev-flow chain as ordinary work. Detects recurring fix classes, reverts, and threshold breaches on the outcome metric a feature named at plan time. Read-only on code: it never fixes, commits, or opens a PR. Use when the user says "sentinel", "what's rotting", "post-ship check", "did anything regress", "watch this repo", "maintain scan", or runs /sentinel — and as the scheduled Maintain stage that dev-flow's chain ends without.
+description: >-
+  Close the loop after ship — scan a repo (and optionally its live prod signal) for post-release
+  trouble, then file what it finds as docs/intent/NNNN-<slug>.md so it re-enters the dev-flow chain
+  as ordinary work. Detects recurring fix classes, reverts, and threshold breaches on the outcome
+  metric a feature named at plan time. Read-only on code — it never fixes, commits, or opens a PR.
+  Use when the user says "sentinel", "what's rotting", "post-ship check", "did anything regress",
+  "watch this repo", "maintain scan", or runs /sentinel — and as the scheduled Maintain stage that
+  dev-flow's chain ends without.
 ---
 
 # sentinel
