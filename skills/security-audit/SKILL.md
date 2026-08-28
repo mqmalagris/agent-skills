@@ -1,6 +1,6 @@
 ---
 name: security-audit
-description: "Focused security review of a change, layered on the wstg-security-testing skill. Finds HIGH-CONFIDENCE, concretely exploitable vulnerabilities in a diff (injection, broken authn/authz, secrets and data exposure, unsafe deserialization, crypto misuse, SSRF) and audits dependencies when a lockfile moved, using the repo's own package manager. Runs as Check 7 of /implementation-review, and standalone when the user says 'security review', 'security audit', 'check this for vulnerabilities', 'is this safe', 'any security holes', 'threat check', or before shipping anything that touches auth, user input, secrets, or untrusted data. Maps findings to WSTG IDs via /wstg, then reports only findings with a concrete exploit path, never theoretical noise."
+description: "Focused security review of a CHANGE (a diff, a branch, a PR), layered on the wstg-security-testing skill. Finds HIGH-CONFIDENCE, concretely exploitable vulnerabilities the change newly introduces (injection, broken authn/authz, secrets and data exposure, unsafe deserialization, crypto misuse, SSRF) and audits dependencies when a lockfile moved, using the repo's own package manager. Runs as Check 7 of /implementation-review, and standalone when the user says 'review this diff for security', 'is this change safe', 'security-check my PR', 'threat check this branch', or before shipping something that touches auth, user input, secrets, or untrusted data. NOT for whole-codebase or posture audits ('audit this repo', 'is my app secure', 'find every IDOR', 'auditoria de seguranca') — this skill is diff-scoped and its precedents suppress absence-shaped findings, so on a codebase-wide ask it can report clean on a vulnerable repo; route those to /wstg mode 2. Maps findings to WSTG IDs via /wstg, then reports only findings with a concrete exploit path, never theoretical noise."
 ---
 
 # Security Audit
@@ -15,6 +15,22 @@ It runs two ways:
 
 - **As Check 7 of `/implementation-review`**, a parallel subagent whose brief pulls in this skill's content. Diff-scoped, fast.
 - **Standalone** (`/security-audit`), a deliberate pass on demand.
+
+---
+
+## When this is the wrong skill
+
+**This skill reviews a change. It does not audit a codebase.** If the ask is repo-wide ("audit this project", "is my app secure", "find every IDOR", "auditoria de segurança"), stop and run **`/wstg` mode 2** instead, which carries the systematic protocol in `reference/CODEBASE-AUDIT.md`.
+
+The distinction is not cosmetic, three things here actively break on a codebase-wide ask:
+
+| This skill | Why it fails a posture audit |
+|---|---|
+| Scope resolves to a diff | No diff to resolve, so it reviews nothing and reports clean on a vulnerable repo |
+| "Not pre-existing issues the diff merely sits near" | Every finding in an audit is pre-existing, that is the point |
+| Precedent 9, "not the absence of defense-in-depth" | Missing RLS, a missing tenant filter, and an unvalidated secret default are all absences |
+
+Those rules are correct **for change review**, where noise trains the reader to skip the report. They are wrong for a posture audit, where absence is the finding. `CODEBASE-AUDIT.md` states its own overrides explicitly; do not carry this file's precedents into it.
 
 ---
 
