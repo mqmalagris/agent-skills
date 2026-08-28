@@ -1,11 +1,11 @@
 ---
 name: implementation-review
-description: "Pre-commit quality gate. Invoke before every git commit, after /verify. Seven checks run as parallel subagents: plan gaps, use-case coverage gaps, missing test scenarios, test-philosophy violations (Kent Dodds Testing Trophy), SOLID violations, Clean Code violations, and security vulnerabilities (via /security-audit, which layers on /wstg). Surfaces findings before they land in history. Also invoke when the user says 'review this', 'am I done', 'did I miss anything', or 'check the quality'."
+description: "Pre-commit quality gate. Invoke before every git commit, after the live-run check (/run). Seven checks run as parallel subagents: plan gaps, use-case coverage gaps, missing test scenarios, test-philosophy violations (Kent Dodds Testing Trophy), SOLID violations, Clean Code violations, and security vulnerabilities (via /security-audit, which layers on /wstg). Surfaces findings before they land in history. Also invoke when the user says 'review this', 'am I done', 'did I miss anything', or 'check the quality'."
 ---
 
 # Implementation Review
 
-Run this before every commit, after `/verify`. The goal: **what was planned is implemented, what is implemented is tested, and what is tested is correct**.
+Run this before every commit, after the live-run check (`/run` — drive the actual app and see the change work). The goal: **what was planned is implemented, what is implemented is tested, and what is tested is correct**.
 
 Each of the seven checks is run by a dedicated subagent. Spawn all seven in parallel, collect their reports, then synthesise into the output format below. Never run the checks sequentially in the main agent, spawn then collect then synthesise.
 
@@ -21,7 +21,7 @@ Before spawning subagents, collect:
 - `git diff --staged --name-only`, file list.
 - The **active plan**, look in this order:
   1. Session context: did a planning skill (`/heist`, `/to-prd`, `/grill-me`) run earlier in this conversation? Use that output.
-  2. `docs/plans/*.md` or `docs/prds/*.md`, the most recently modified file.
+  2. `docs/plans/*.md` or `docs/prds/*.md`, the most recently modified file. Falling back further, `docs/intent/*.md` carries the grill-me design notes and edge-case decisions — thinner than a plan, but enough for Checks 1-3 to have something to reconcile against.
   3. The decision log: `docs/adr/`, `docs/prds/`, `docs/development/`. The foundational decision anchors mission and scope.
   4. README or CLAUDE.md scope notes.
 - Full content of test files touched or related to the staged changes.
@@ -171,7 +171,7 @@ Summary: [N findings, fix before committing / Clean, proceed]
 ```
 [code changes complete]
      ↓
-/verify                    ← does the change actually work end-to-end
+/run                       ← does the change actually work end-to-end
      ↓
 /implementation-review     ← THIS SKILL, seven parallel subagents
      ↓

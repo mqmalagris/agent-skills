@@ -180,25 +180,6 @@
       ]
     },
     {
-      "name": "implementation-review",
-      "source": "./skills/implementation-review",
-      "description": "Pre-commit quality gate: seven parallel-subagent checks (plan gaps, use-case coverage, test scenarios, test philosophy, SOLID, Clean Code, security). Runs after /verify, before commit.",
-      "version": "0.2.0",
-      "author": {
-        "name": "Matheus Malagris"
-      },
-      "category": "engineering-workflow",
-      "keywords": [
-        "code-review",
-        "pre-commit",
-        "quality-gate",
-        "testing",
-        "solid",
-        "security",
-        "multi-agent"
-      ]
-    },
-    {
       "name": "seo",
       "source": "./skills/seo",
       "description": "Deterministic LLM-first SEO audits for websites, blog posts, and GitHub repos. 16 sub-skills, 10 specialist agents, 88 evidence scripts. Adapted from Bhanunamikaze/Agentic-SEO-Skill (originally AgriciDaniel/claude-seo).",
@@ -486,6 +467,25 @@
         "github",
         "ci",
         "automation"
+      ]
+    },
+    {
+      "name": "implementation-review",
+      "source": "./skills/implementation-review",
+      "description": "Pre-commit quality gate: seven parallel-subagent checks (plan gaps, use-case coverage, test scenarios, test philosophy, SOLID, Clean Code, security). Runs after /verify, before commit.",
+      "version": "0.2.1",
+      "author": {
+        "name": "Matheus Malagris"
+      },
+      "category": "engineering-workflow",
+      "keywords": [
+        "code-review",
+        "pre-commit",
+        "quality-gate",
+        "testing",
+        "solid",
+        "security",
+        "multi-agent"
       ]
     }
   ]
