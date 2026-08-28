@@ -13,8 +13,11 @@ This skill takes the current conversation context and codebase understanding and
 
 3. **Pick the Glossary source** (in priority order):
    1. Glossary block emitted by a prior `/grill-me` session in the conversation.
-   2. Domain terms already used in the codebase — search for prominent nouns/verbs in module names, types, and route names.
-   3. Terms surfaced in the conversation context.
+   2. `docs/intent/NNNN-<slug>.md` — the same block, written to disk by grill-me. Check here whenever the conversation doesn't carry one: the interview may have happened in an earlier session, or its output may have been compacted away. Match by slug, or take the most recently modified file when the feature is obvious. Cite it in `Sources`.
+   3. Domain terms already used in the codebase — search for prominent nouns/verbs in module names, types, and route names.
+   4. Terms surfaced in the conversation context.
+
+   Sources 1–2 are the same artifact and carry the edge-case decisions too — fold those into the PRD rather than re-deriving them, so `heist` inherits a ledger instead of starting one.
 
 4. **Sketch the major modules** to build or modify. Actively look for opportunities to extract deep modules — ones that encapsulate substantial functionality behind a simple, testable, slow-to-change interface (Ousterhout). Do not interview; synthesize from context. If module shape is unclear, halt and route back to `/grill-me`.
 
@@ -41,7 +44,7 @@ This skill takes the current conversation context and codebase understanding and
 
 `grill-me → to-prd → compass → heist → maestro → code`
 
-- **grill-me** extracts scope, design-tree decisions, and Glossary via interview.
+- **grill-me** extracts scope, design-tree decisions, edge cases, and Glossary via interview, and writes them to `docs/intent/NNNN-<slug>.md`.
 - **to-prd** (this skill) synthesizes the above into a PRD on disk + tracker.
 - **compass** locks architectural decisions in ADRs (auto-written to `docs/adr/`).
 - **heist** consumes PRD + ADRs, produces implementation plan at `docs/plans/NNNN-<slug>.md`.

@@ -95,21 +95,6 @@
       ]
     },
     {
-      "name": "to-prd",
-      "source": "./skills/to-prd",
-      "description": "Synthesize conversation context into a PRD. Writes docs/prds/NNNN-<slug>.md + publishes to GitHub Issues. Includes Glossary section. Adapted from mattpocock/skills.",
-      "version": "0.2.0",
-      "author": {
-        "name": "Matheus Malagris"
-      },
-      "category": "engineering-workflow",
-      "keywords": [
-        "prd",
-        "feature-spec",
-        "github-issues"
-      ]
-    },
-    {
       "name": "compass",
       "source": "./skills/compass",
       "description": "Multi-mode software engineering coach: architect, advisor, reviewer, refactor, legacy, and explainer workflows. Auto-writes ADRs to docs/adr/.",
@@ -486,6 +471,21 @@
         "pre-prd",
         "interview",
         "ubiquitous-language"
+      ]
+    },
+    {
+      "name": "to-prd",
+      "source": "./skills/to-prd",
+      "description": "Synthesize conversation context into a PRD. Writes docs/prds/NNNN-<slug>.md + publishes to GitHub Issues. Includes Glossary section. Adapted from mattpocock/skills.",
+      "version": "0.3.0",
+      "author": {
+        "name": "Matheus Malagris"
+      },
+      "category": "engineering-workflow",
+      "keywords": [
+        "prd",
+        "feature-spec",
+        "github-issues"
       ]
     }
   ]

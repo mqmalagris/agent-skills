@@ -1,6 +1,6 @@
 {
   "name": "to-prd",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Synthesize conversation context into a PRD. Writes docs/prds/NNNN-<slug>.md + publishes to GitHub Issues. Includes Glossary section. Adapted from mattpocock/skills.",
   "author": {
     "name": "Matheus Malagris",
