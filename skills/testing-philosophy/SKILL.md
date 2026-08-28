@@ -1,6 +1,6 @@
 ---
 name: testing-philosophy
-description: "Defines what a good test is: behavior over implementation details, and the Testing Trophy with a hard floor on end-to-end coverage for user-facing features. Stack-agnostic, any language (TS/JS, Rust, Go, Elixir, Python, ...) and any layer (frontend, backend, CLI, library). REQUIRED BACKGROUND for skills that plan or review tests (implementation-review, heist, verify). Use when proposing, writing, or reviewing automated tests, or when the user asks whether tests are good, what to test, why a test is brittle, or whether e2e is needed."
+description: "Defines what a good test is: behavior over implementation details, and the Testing Trophy with a hard floor on end-to-end coverage for user-facing features. Stack-agnostic, any language (TS/JS, Rust, Go, Elixir, Python, ...) and any layer (frontend, backend, CLI, library). REQUIRED BACKGROUND for skills that plan or review tests (implementation-review, heist, review-pass). Use when proposing, writing, or reviewing automated tests, or when the user asks whether tests are good, what to test, why a test is brittle, or whether e2e is needed."
 ---
 
 # Testing philosophy

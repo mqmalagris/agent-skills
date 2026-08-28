@@ -3,6 +3,7 @@
 All notable changes to this collection are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); the collection follows [SemVer](https://semver.org). See [VERSIONING.md](VERSIONING.md) for the per-skill vs collection model.
 
 ## [Unreleased]
+- testing-philosophy: correct the sibling-skill list in the description (/verify no longer exists)
 - implementation-review: repoint the pre-commit live check from the removed /verify to /run; fall back to docs/intent for plan-gap checks
 - babysit-prs: add PROVENANCE-FLAG triage row and bot identification by user.type; flag silent or paused automated reviewers
 - commit-report: add --metrics (review coverage, rework depth, artifact lag, spec churn, recurring fix classes)

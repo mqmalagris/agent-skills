@@ -1,6 +1,6 @@
 {
   "name": "testing-philosophy",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Defines what a good test is: behavior over implementation, the Testing Trophy, and an e2e floor for user-facing features. Stack-agnostic (TS/Rust/Go/Elixir/Python). Kent Dodds, generalized.",
   "author": {
     "name": "Matheus Malagris",
