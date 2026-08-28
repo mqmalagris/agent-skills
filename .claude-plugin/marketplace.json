@@ -78,23 +78,6 @@
       ]
     },
     {
-      "name": "testing-philosophy",
-      "source": "./skills/testing-philosophy",
-      "description": "Defines what a good test is: behavior over implementation, the Testing Trophy, and an e2e floor for user-facing features. Stack-agnostic (TS/Rust/Go/Elixir/Python). Kent Dodds, generalized.",
-      "version": "0.1.0",
-      "author": {
-        "name": "Matheus Malagris"
-      },
-      "category": "engineering-workflow",
-      "keywords": [
-        "testing",
-        "testing-trophy",
-        "integration-tests",
-        "e2e",
-        "kent-dodds"
-      ]
-    },
-    {
       "name": "compass",
       "source": "./skills/compass",
       "description": "Multi-mode software engineering coach: architect, advisor, reviewer, refactor, legacy, and explainer workflows. Auto-writes ADRs to docs/adr/.",
@@ -486,6 +469,23 @@
         "solid",
         "security",
         "multi-agent"
+      ]
+    },
+    {
+      "name": "testing-philosophy",
+      "source": "./skills/testing-philosophy",
+      "description": "Defines what a good test is: behavior over implementation, the Testing Trophy, and an e2e floor for user-facing features. Stack-agnostic (TS/Rust/Go/Elixir/Python). Kent Dodds, generalized.",
+      "version": "0.1.1",
+      "author": {
+        "name": "Matheus Malagris"
+      },
+      "category": "engineering-workflow",
+      "keywords": [
+        "testing",
+        "testing-trophy",
+        "integration-tests",
+        "e2e",
+        "kent-dodds"
       ]
     }
   ]
