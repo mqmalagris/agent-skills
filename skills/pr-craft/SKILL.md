@@ -15,7 +15,7 @@ Drive a clean PR end to end: branch, stage only the relevant files, conventional
 4. **Commit.** Conventional Commits subject (`type(scope): summary`, ≤72 chars). Body explains *why* + bullet the changes. End with `Refs task <id>` / `Refs <ticket>` when known. Obey the repo's CLAUDE.md (e.g. no `Co-Authored-By` trailer if it says so).
 5. **Push.** `git push -u origin <branch>`.
 6. **Open PR.** `gh pr create --base <base> --head <branch> --title "<same as commit subject>" --body "$(cat <<'EOF' … EOF)"`. Base = the branch the user named, else the repo default (`staging` here, often `main` elsewhere — check `git remote show origin` or repo CLAUDE.md if unsure).
-7. **Report** the PR URL. Offer follow-ups (log time, comment the link on the task).
+7. **Report** the PR URL. Name which automated reviewers this repo runs, so the user knows what will (and won't) look at the diff — one discovery command, in [review-pass/references/automated-reviewers.md](../review-pass/references/automated-reviewers.md). If the repo has none configured, or the one it has is paused, that's worth a sentence: a PR nobody and nothing reviews should be a deliberate choice, not a surprise. Then offer follow-ups (log time, comment the link on the task).
 
 ## PR body structure
 
