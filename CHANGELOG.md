@@ -3,6 +3,7 @@
 All notable changes to this collection are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); the collection follows [SemVer](https://semver.org). See [VERSIONING.md](VERSIONING.md) for the per-skill vs collection model.
 
 ## [Unreleased]
+- commit-report: enforce a formal, agentless voice (no grammatical person in any of the three) across report prose, bullets and the channel block. Add a Discretion section so a fix states present behavior instead of narrating the prior defect, with client rules against before/after contrast, defect duration and scope, and jokes about a failure, plus a one-neutral-clause allowance at pm. Run the humanizer pass on every report rather than only on `--doc` bodies, leashed to both voice rules. Retire the `voice` config key; any persisted value, legacy `"first"` included, is read and ignored.
 
 ## [0.12.0] - 2026-08-31
 

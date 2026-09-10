@@ -365,23 +365,6 @@
       ]
     },
     {
-      "name": "commit-report",
-      "source": "./skills/commit-report",
-      "description": "Work report in two modes \u2014 quick (git-only: prose + bullets from the current repo) and standup (multi-source: GitHub PRs/reviews/comments, git across repos, deploys) \u2014 tunable to audience (dev / pm / client), delivered as a copy-ready channel block or a doc file.",
-      "version": "0.2.0",
-      "author": {
-        "name": "Matheus Malagris"
-      },
-      "category": "reporting",
-      "keywords": [
-        "standup",
-        "git-log",
-        "work-report",
-        "status-update",
-        "conventional-commits"
-      ]
-    },
-    {
       "name": "babysit-prs",
       "source": "./skills/babysit-prs",
       "description": "Babysit a GitHub PR from review all the way to MERGED.",
@@ -503,6 +486,23 @@
         "wstg",
         "dependency-audit",
         "code-review"
+      ]
+    },
+    {
+      "name": "commit-report",
+      "source": "./skills/commit-report",
+      "description": "Work report in two modes \u2014 quick (git-only: prose + bullets from the current repo) and standup (multi-source: GitHub PRs/reviews/comments, git across repos, deploys) \u2014 tunable to audience (dev / pm / client), delivered as a copy-ready channel block or a doc file.",
+      "version": "0.3.0",
+      "author": {
+        "name": "Matheus Malagris"
+      },
+      "category": "reporting",
+      "keywords": [
+        "standup",
+        "git-log",
+        "work-report",
+        "status-update",
+        "conventional-commits"
       ]
     }
   ]
