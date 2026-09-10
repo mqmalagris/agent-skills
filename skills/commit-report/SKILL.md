@@ -14,7 +14,7 @@ One skill, two modes, two deliveries.
 
 Guiding principle (both modes): **name work by what it was, not by its ID.** "Fixed the image cache eviction" beats "Merged PR #481." IDs live in refs/footnotes, never in the headline.
 
-Voice (both modes, every audience): **formal and impersonal.** The subject of a sentence is the change, the system, or the outcome, never the person who did the work. No `I`, `we`, `my`, `our`. See [Voice and tone](#voice-and-tone).
+Voice (both modes, every audience): **formal and agentless.** The subject of a sentence is the change, the system, or the outcome. No personal pronoun in any of the three persons, and no human as a sentence subject. See [Voice and tone](#voice-and-tone).
 
 ## Quick start
 
@@ -79,7 +79,6 @@ On first `--standup` run with no config, ask for and persist:
 {
   "githubLogin": "octocat",
   "displayName": "Matheus",
-  "voice": "impersonal",
   "repoScope": "org:my-org",
   "localRepoRoots": ["C:/Users/malag/projects/work", "C:/Users/malag/projects/side"],
   "tracker": null,
@@ -88,8 +87,8 @@ On first `--standup` run with no config, ask for and persist:
 ```
 
 - `githubLogin` — for `gh` searches (`author:`, `reviewed-by:`, `commenter:`).
-- `displayName`: used in the doc header, and for attribution where a name is genuinely required. Never a sentence subject in report prose.
-- `voice`: `impersonal` (default) or `third`. `impersonal` elides the actor entirely ("Fixed the JWT expiry off-by-one"); `third` names them where a sentence needs a subject ("Matheus reviewed three PRs"). Both are formal. There is no first-person setting, and a legacy `"voice": "first"` is read as `impersonal`.
+- `displayName`: the doc header only. Never a sentence subject in report prose.
+- `voice`: **retired.** Voice is not configurable; it is always agentless ([Voice and tone](#voice-and-tone)). A persisted `voice` of any value, legacy `"first"` included, is read and ignored rather than erroring. Do not prompt for it during first-run setup.
 - `repoScope` — `org:name`, `user:login`, or an explicit list of `owner/repo`.
 - `localRepoRoots` — dirs to scan for local commits (walk one level for git repos).
 - `tracker` — optional MCP for ticket titles (e.g. `linear`, `jira`), else `null`.
@@ -116,7 +115,8 @@ Keep setup to the minimum needed for the flags actually used; don't prompt for a
    - **standup** — run these in parallel (see [Multi-source collection](#multi-source-collection-standup)).
 6. **Parse Conventional Commits prefixes** (`feat:`, `fix:`, `chore:`, `refactor:`, `docs:`, `test:`, `perf:`, `build:`, `ci:`) as the primary bucketing signal: features ship, fixes resolve, refactor/chore/test = "groundwork" for client audience. No prefix → content heuristics. Scope in parens (`feat(auth):`) is a `pm`/`client` framing hint.
 7. **Synthesize** per audience + mode ([Audience map](#audience-map), [Voice and tone](#voice-and-tone), [Standup format](#standup-format)). Group related work; do not echo subjects 1:1. Name by outcome, not ID. Draft straight into the impersonal voice rather than writing first-person prose and stripping pronouns afterwards; the strip leaves "worked on" and "got it working" behind.
-8. **Deliver**: render the mode's format, then always the channel block. If `--metrics`, insert the [flow-metrics](#flow-metrics---metrics) section before the channel block. If `--doc`, write the full report to file and print its path.
+8. **Humanize**: when the `humanizer` skill is available, run it over the drafted prose, then re-check what comes back against [Voice and tone](#voice-and-tone) and [Discretion](#discretion-about-the-prior-state). See [Humanize the prose](#humanize-the-prose-always-when-available).
+9. **Deliver**: render the mode's format, then always the channel block. If `--metrics`, insert the [flow-metrics](#flow-metrics---metrics) section before the channel block. If `--doc`, write the full report to file and print its path.
 
 ## Multi-source collection (standup)
 
@@ -198,10 +198,11 @@ Every temporal claim must trace to a real timestamp from git / GitHub / MCP. Nev
 
 A report is a formal record of work, not personal narration. The subject of every sentence is the change, the system, or the outcome. The author does not appear.
 
-**Banned in report prose, bullets, and the channel block:**
+**Banned in report prose, bullets, and the channel block.** No grammatical person at all, in any of the three:
 
-- First person, singular or plural: `I`, `me`, `my`, `we`, `our`, `us`. This covers the soft forms that slip past a pronoun search: "worked on", "took a look at", "got it working", "spent the morning on".
-- Second-person address to the reader: `you`, `your`. At `client`, name the capability instead of the reader.
+- **First person**, singular or plural: `I`, `me`, `my`, `mine`, `we`, `us`, `our`. This covers the soft forms that slip past a pronoun search: "worked on", "took a look at", "got it working", "spent the morning on".
+- **Second person**, addressing the reader: `you`, `your`, `yours`. At `client`, name the capability rather than the reader.
+- **Third person** standing in for a human: `he`, `she`, `they`, `him`, `her`, `them`, `his`, `their`, plus a person's name used as a sentence subject ("Matheus reviewed three PRs"). `they` referring to a system, a set of PRs, or a batch of commits is fine; `they` referring to people is not.
 - Conversational filler and hedges: "just", "basically", "a bit of", "quick fix", "went ahead and", "some cleanup".
 - Self-assessment: "solid progress", "good day", "happy with how this turned out". State what changed; the reader draws the conclusion.
 
@@ -212,6 +213,8 @@ Rewrites:
 | "I fixed the JWT expiry off-by-one" | "Fixed the JWT expiry off-by-one" |
 | "We shipped the exports endpoint" | "The exports endpoint shipped" |
 | "I reviewed three PRs" | "Three PRs reviewed" |
+| "Matheus reviewed three PRs" | "Three PRs reviewed" |
+| "He left comments on the retry logic" | "The retry logic drew review comments" |
 | "I'm still working on the cache rewrite" | "The cache rewrite remains open" |
 | "I couldn't finish the migration, staging was down" | "The migration did not land; staging was unavailable" |
 | "You can now export your data" | "Data export is now available" |
@@ -222,9 +225,39 @@ Three constructions carry the whole skill. Pick whichever reads cleanest per sen
 2. **The change as subject:** "The exports endpoint now streams its response." The default for prose.
 3. **Deliberate passive:** "Three PRs were reviewed." Passive voice is usually a smell, but here it is the right tool for keeping the author out of the sentence. Use it where an agentless active form would contort.
 
-Paragraph prose (`## Report`, `## Yesterday`, `## Recap`) follows the same rule. An impact paragraph describes what changed about the system, so it rarely needs a person in it at all. Where attribution genuinely matters (a review handed to a teammate, a decision settled with an owner), name the role or the person rather than reaching for a pronoun: "Reviewed by the platform team", "Approach settled with the API owner".
+Paragraph prose (`## Report`, `## Yesterday`, `## Recap`) follows the same rule. An impact paragraph describes what changed about the system, so it rarely needs a human in it at all. Where a handoff or a dependency is the actual news, name the **team, role, or surface**, never an individual: "blocked on platform review", "the approach was settled with the API owner", "awaiting review from the design-system team". A person's name appears only where the report would be wrong without it, and is never followed by a pronoun.
 
 Quoted material is data, not prose: a commit subject, ticket title, or PR title carried through verbatim is never rewritten to fit this voice.
+
+## Discretion about the prior state
+
+Every fix carries two facts: what is true now, and what was broken before. The second one is internal. A client who reads *"now it actually saves; before, it pretended to save but never really did"* has learned two things, and only one of them was the point. The other is that the product was broken, that someone knew, and that it is being narrated to them in a joking register.
+
+**At `client`: state the current behavior. Never narrate the prior defect.**
+
+| Do not write | Write |
+| --- | --- |
+| "Now it actually saves; before it pretended to save but never really did" | "Saving is reliable" |
+| "Fixed the bug that was losing uploads" | "Uploads complete reliably" |
+| "Totals had been wrong since launch, now corrected" | "Order totals are accurate" |
+| "Login was broken for two days" | "Login is stable" |
+| "Finally got the export working properly" | "Data export is available" |
+
+Rules at `client`:
+
+- **No before/after contrast.** One clause about the present, not a comparison against a broken past. "Saving is reliable" beats "saving works now, it didn't before".
+- **No defect scope or duration.** Never state how long something was broken, how many users it reached, or that it shipped that way.
+- **No informality about a failure, and never a joke about one.** "actually", "finally", "for real this time", "pretended to", "was a mess", "turns out" are all out. Dry beats funny: a defect is not a punchline, and the informal register is what makes the confession sting.
+- **No apology or self-blame in the report body.** A bullet that apologizes raises a question the bullet cannot answer, and the report is the wrong channel for it.
+- Consequently a fix and a new feature read alike at `client`, both as plain statements of present capability. That flattening is intended.
+
+A soft comparative about a benefit the client actually feels is still fine: "orders load faster", "the dashboard runs more smoothly". What is banned is naming the defect, its duration, or its blast radius.
+
+**At `pm`: name the prior state once, neutrally.** A PM has to triage and genuinely needs to know something was wrong. "Fixed a bug where saves failed silently" is right. "Saves were completely broken and had been for weeks" is not. One clause, no severity theatre, no duration unless asked.
+
+**At `dev`: the prior state is the substance.** Root cause, the wrong behavior, and the mechanism all belong in the report.
+
+None of this licenses hiding a fix or dropping a commit. Every commit still appears at every audience ([Audience map](#audience-map)); what changes is that the client cut names the outcome and leaves the postmortem inside.
 
 ## Audience map
 
@@ -239,8 +272,8 @@ Quoted material is data, not prose: a commit subject, ticket title, or PR title 
 Rules per level:
 
 - **dev**: backticks for files/functions/symbols. Short SHAs in parens, e.g. `(a3f2c1d)`. May mention internals. *(Not the channel block — see Delivery.)*
-- **pm**: no SHAs, no file paths, no function names. Frame as features / fixes / improvements / cleanup. Light tech terms OK ("API", "auth flow", "caching").
-- **client**: outcomes only. No tech terms, no internal names. Name the capability rather than addressing the reader: "data export is now available", not "you can now export your data". Include every commit; frame refactor/chore/test work as softened reliability statements ("ongoing improvements", "internal work to keep the platform stable", "groundwork for upcoming features"). Never drop commits silently.
+- **pm**: no SHAs, no file paths, no function names. Frame as features / fixes / improvements / cleanup. Light tech terms OK ("API", "auth flow", "caching"). The prior state gets one neutral clause, no more ([Discretion](#discretion-about-the-prior-state)).
+- **client**: outcomes only. No tech terms, no internal names. Name the capability rather than addressing the reader: "data export is now available", not "you can now export your data". State present behavior and never narrate what was broken before ([Discretion](#discretion-about-the-prior-state)). Include every commit; frame refactor/chore/test work as softened reliability statements ("ongoing improvements", "internal work to keep the platform stable", "groundwork for upcoming features"). Never drop commits silently.
 
 ## Output formats
 
@@ -297,15 +330,24 @@ The channel block is the only part printed when neither a doc nor the full body 
 
 - Every run ends with the `## For the channel` block. In quick and standup mode the full format precedes it.
 - Channel block is outcome-only: no SHAs, no file paths, no function names, at any audience.
-- Formal, impersonal voice in every section at every audience: no `I` / `we` / `my` / `our`, no `you` / `your` aimed at the reader, no self-assessment. See [Voice and tone](#voice-and-tone).
+- Formal, agentless voice in every section at every audience: no personal pronoun in any of the three persons, no human as a sentence subject, no self-assessment. See [Voice and tone](#voice-and-tone).
+- At `client`, state present behavior only: no before/after contrast, no defect duration or scope, no jokes about a failure. At `pm`, one neutral clause about the prior state. See [Discretion](#discretion-about-the-prior-state).
+- Run the `humanizer` pass whenever that skill is available, then re-check its output against both voice rules. See [Humanize the prose](#humanize-the-prose-always-when-available).
 - No emoji.
 - Code/file refs in backticks at `dev` only, and never in the channel block.
 - No commit hashes in `pm` / `client`.
 - Never invent timestamps, weekdays, or activity. Every claim traces to real data.
 - Caveman mode does NOT apply to report content — write full, formal prose. Commands/code stay verbatim.
 
-## Humanize the written prose (if available)
+## Humanize the prose (always, when available)
 
-Before writing generated prose to a file (`--doc`), if the `humanizer` skill is installed, run it on the drafted body so the document reads naturally and free of AI tells; skip silently if unavailable. Apply to the human-facing document body only — never to code, frontmatter, file paths, IDs, or literal templates.
+If the `humanizer` skill is installed, **always** run it on the drafted prose before delivering: both modes, both deliveries, every audience. That means the `## Report` / `## Yesterday` / `## Recap` paragraphs, the bullets, and the channel block, not only a `--doc` body. Skip silently when the skill is unavailable; never block a report on it.
 
-Constrain it to word- and sentence-level edits: the [Voice and tone](#voice-and-tone) rules outrank it. Humanizing passes reach for contractions and first-person framing to loosen stiff prose, which is precisely what this report must not carry. Re-read the body afterwards and revert any `I` / `we` / `you` the pass introduced.
+Scope it to human-facing prose. Never run it over code, frontmatter, file paths, SHAs, ticket IDs, commit subjects or PR titles quoted verbatim, the flow-metrics figures, or the literal section headers.
+
+**Both voice rules outrank it, and they are the reason it needs a leash.** A humanizing pass loosens stiff prose by reaching for contractions, a personal voice, and a conversational register, which is exactly the combination this report must not carry. Pass the constraints in with the text:
+
+- No grammatical person, in any of the three ([Voice and tone](#voice-and-tone)).
+- At `pm` and `client`, no added informality, and no restoring the prior-state narration the audience cut removed ([Discretion](#discretion-about-the-prior-state)). "It actually saves now" is the shape a humanizer will happily produce from "saving is reliable".
+
+Then verify rather than trust: re-read the returned body and revert any pronoun, any joke, and any before/after contrast the pass introduced. A humanized report that reads warmly and says "we finally fixed it" has failed, not succeeded.
