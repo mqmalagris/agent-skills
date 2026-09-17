@@ -20,7 +20,7 @@ Before spawning subagents, collect:
 - `git diff --staged`, full diff, the primary input for all subagents.
 - `git diff --staged --name-only`, file list.
 - The **active plan**, look in this order:
-  1. Session context: did a planning skill (`/heist`, `/to-prd`, `/grill-me`) run earlier in this conversation? Use that output.
+  1. Session context: did a planning skill (`/blueprint`, `/to-prd`, `/grill-me`) run earlier in this conversation? Use that output.
   2. `docs/plans/*.md` or `docs/prds/*.md`, the most recently modified file. Falling back further, `docs/intent/*.md` carries the grill-me design notes and edge-case decisions — thinner than a plan, but enough for Checks 1-3 to have something to reconcile against.
   3. The decision log: `docs/adr/`, `docs/prds/`, `docs/development/`. The foundational decision anchors mission and scope.
   4. README or CLAUDE.md scope notes.
@@ -59,7 +59,7 @@ Different from Check 1: use cases can be implicit in the product scope even if t
 
 ### Check 3: Missing test scenarios
 
-**Inputs:** full `git diff --staged`, full content of changed test files, the plan's `## The Blind Spots` table if present. Apply `/testing-philosophy`.
+**Inputs:** full `git diff --staged`, full content of changed test files, the plan's `## Edge Cases` table if present (plans written before the rename call it `## The Blind Spots`; accept either). Apply `/testing-philosophy`.
 
 **First, reconcile against the ledger.** If the plan carries a Blind Spots table, every row is a claim to check:
 

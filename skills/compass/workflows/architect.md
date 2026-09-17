@@ -22,17 +22,24 @@ Follow [reference/architectural-heuristics.md](../reference/architectural-heuris
 
 1. Nature & criticality → 2. Decomposition → 3. Relevance filter → 4. Tech stack → 5. Scaling needs → 6. Distributed-system capability → 7. Sync vs async → 8. UI ↔ domain isolation → 9. Pattern injection check.
 
-### 3. Stack conversation
+### 3. Stack recommendation (checkpoint)
 
-If the user hasn't named a stack:
+Stack is a checkpoint decision. Use the format in SKILL.md → Decision checkpoints.
 
-- Ask what stacks they know.
-- Discuss fit with the project (latency, scale, ecosystem, team familiarity).
-- **Defer to the user's final choice.** After choice, optimize patterns and folder structure for that stack.
+- If the user already named a stack, it is fixed input. Surface a real risk once, then work inside it.
+- If not, **recommend one** against the system class from step 1. Do not open with a survey. Name the
+  fit that drives the pick (latency, scale, ecosystem maturity, operational burden, team familiarity)
+  and the conditions that would flip it.
+- Ask what the user already runs in production before recommending something new. Familiarity is a
+  real force and usually beats a marginal technical edge. When the better answer *is* a stack they do
+  not know, say so and price the learning curve, rather than silently excluding it.
+- **The final call is the user's.** After the choice, optimize patterns and folder structure for that
+  stack's idioms.
 
-### 4. Pick the paradigm
+### 4. Pick the paradigm (checkpoint)
 
-Match the system to a paradigm using [reference/architecture-paradigms.md](../reference/architecture-paradigms.md):
+Paradigm is a checkpoint decision: present the pick with its trade-offs and the conditions that would
+flip it, and confirm before designing against it. Match the system to a paradigm using [reference/architecture-paradigms.md](../reference/architecture-paradigms.md):
 
 - Single-machine app → Layered or MVC
 - Multi-team independent deploys → Microservices
@@ -47,12 +54,14 @@ Pick 2–3 from [reference/quality-criteria.md](../reference/quality-criteria.md
 
 ### 6. Produce the design output
 
-Deliver, in this order:
+By this point every checkpoint decision is settled, so the output **records** decisions rather than
+announcing them for the first time. If one is still open, say so explicitly instead of quietly
+picking. Deliver, in this order:
 
 1. **One-paragraph summary** — what is being built and why.
 2. **Decomposition diagram** (text or Mermaid) — modules + their responsibilities.
 3. **Paradigm + key trade-offs** — why this paradigm, what's deliberately sacrificed.
-4. **Stack choice** — confirm + justify the user's pick.
+4. **Stack** — the decision reached at the checkpoint, plus what would make it worth revisiting.
 5. **Quality targets** — measurable.
 6. **ADR draft** — fill [checklists/adr.md](../checklists/adr.md).
 7. **First slice** — smallest end-to-end vertical that proves the architecture.

@@ -5,7 +5,7 @@
 | **High coupling / domino effect** — change in one class breaks many | concrete class deps, globals, direct DB access | DIP, Observer, Facade, Proxy |
 | **Recurring bugs / regressions** — fixing one breaks another | no automated safety net, hidden coupling | unit tests, TDD, CI |
 | **Integration Hell** — days/weeks resolving merge conflicts | long-lived feature branches | daily CI, trunk-based development |
-| **Slow build** — too long to compile or run tests | excess UI/system tests, network deps in unit tests | Testing Pyramid (70/20/10), mocks |
+| **Slow build** — too long to compile or run tests | excess UI/system tests, network deps in unit tests | push each test down to the cheapest layer that still proves the behavior (see `testing-philosophy`); fake the network at the boundary |
 | **Rejected / obsolete product** — months of work, doesn't fit user | Big Design Up Front, no early validation | Agile (Scrum/XP), user stories, MVP |
 | **Traumatic deploys / bottleneck** — manual, all-night, high stress | rigid monolith, Dev/Ops silos | DevOps culture, CD, microservices |
 | **Duplicated code** — same logic in multiple places | missing abstraction, rushed implementation | Extract Method, Extract Class, Pull Up Method |

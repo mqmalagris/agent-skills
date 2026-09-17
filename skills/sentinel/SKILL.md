@@ -137,12 +137,12 @@ Run it far more often than that and tier 1 has nothing new to say, because git h
 ## Pipeline placement
 
 ```
-grill-me → to-prd → compass → heist → code → review-pass → pr-craft → [shipped]
+grill-me → to-prd → compass → blueprint → code → review-pass → pr-craft → [shipped]
     ↑                                                                      │
     └────────────────── sentinel (scheduled) ←─────────────────────────────┘
 ```
 
-`dev-flow`'s "Instrument what you can't see after ship" rule is the other half of this: it forces `to-prd`/`heist` to name the outcome metric and `code` to add the telemetry. sentinel is what reads them. A feature that named no metric can still be watched by tier 1, just more coarsely.
+`dev-flow`'s "Instrument what you can't see after ship" rule is the other half of this: it forces `to-prd`/`blueprint` to name the outcome metric and `code` to add the telemetry. sentinel is what reads them. A feature that named no metric can still be watched by tier 1, just more coarsely.
 
 ## Humanize the written prose (if available)
 

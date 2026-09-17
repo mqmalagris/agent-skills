@@ -31,7 +31,7 @@ Reference [reference/solid-expanded.md](../reference/solid-expanded.md). For eac
 
 #### Pass 3 — Tests
 
-Reference [reference/tdd-cycle.md](../reference/tdd-cycle.md) and [checklists/testability.md](../checklists/testability.md). Flag:
+Reference [reference/tdd-cycle.md](../reference/tdd-cycle.md) and [checklists/testability.md](../checklists/testability.md); for whether the right *kinds* of test exist, defer to the `testing-philosophy` skill. Flag:
 
 - Missing tests for new logic
 - Flaky timing-based tests

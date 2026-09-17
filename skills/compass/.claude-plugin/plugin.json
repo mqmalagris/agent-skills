@@ -1,6 +1,6 @@
 {
   "name": "compass",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Multi-mode software engineering coach: architect, advisor, reviewer, refactor, legacy, and explainer workflows. Auto-writes ADRs to docs/adr/.",
   "author": {
     "name": "Matheus Malagris",

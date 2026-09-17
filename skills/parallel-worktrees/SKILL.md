@@ -1,6 +1,6 @@
 ---
 name: parallel-worktrees
-description: "Playbook for running work in parallel across git worktrees, so several agents (or one agent dispatching many) edit the same repo at once without colliding. Covers the go/no-go decision, partitioning files so agents don't touch the same file, which isolation mechanism to use (Agent isolation:worktree, Workflow isolation:worktree, EnterWorktree, or manual git worktree), and integrating + cleaning up afterward. Use when the user says 'work in parallel', 'multiple agents', 'fan out', 'dispatch agents', 'git worktree', 'parallelize this across worktrees', or wants concurrent work on one codebase. Defers to /maestro when formal plans/PRDs/ADRs already exist to parallelize."
+description: "Playbook for running work in parallel across git worktrees, so several agents (or one agent dispatching many) edit the same repo at once without colliding. Covers the go/no-go decision, partitioning files so agents don't touch the same file, which isolation mechanism to use (Agent isolation:worktree, Workflow isolation:worktree, EnterWorktree, or manual git worktree), and integrating + cleaning up afterward. Use when the user says 'work in parallel', 'multiple agents', 'fan out', 'dispatch agents', 'git worktree', 'parallelize this across worktrees', or wants concurrent work on one codebase."
 ---
 
 # Parallel worktrees
@@ -15,7 +15,7 @@ Parallel worktrees pay off only when **all three** hold. If any fails, work sequ
 2. The slices touch **disjoint files** (see partitioning below). Overlap means conflicts at integration, which usually costs more than the parallelism saved.
 3. The wall-clock saving is real (each slice is substantial, not a two-line edit).
 
-If you already have formal plans / PRDs / ADRs to run concurrently, **use `/maestro`** instead: it builds the conflict graph from the plans' files-touched data and judges worthwhileness for you. This skill is for the lighter, plan-optional case.
+Works with or without formal planning docs. When plans / PRDs / ADRs exist, read their files-touched sections to build the conflict graph; otherwise partition straight from the change surface.
 
 ## Rung 1: partition the work
 
@@ -83,5 +83,4 @@ Harness-created worktrees (`Agent`/`Workflow` isolation, `EnterWorktree`) are au
 
 ## Relationship to other skills
 
-- **`/maestro`** — plan-driven parallel orchestration (needs PRDs/ADRs/plans). Use it when those exist; use this skill when they do not.
 - **`/dev-flow`** — the single-track chain. This skill is what you reach for when one of its stages fans out.

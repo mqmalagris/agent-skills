@@ -5,26 +5,10 @@
     "url": "https://github.com/mqmalagris"
   },
   "metadata": {
-    "description": "Curated, dual-format skill collection: installable as a Claude Code plugin marketplace or via `bunx skills`. A full dev pipeline (grill-me -> to-prd -> compass -> heist -> maestro), a review stage that merges four checks into one verdict (review-pass over implementation-review + testing-philosophy + security-audit + wstg), language idioms, plus career tools (CV, brag doc, portfolio, opportunity scanning), product, reporting, SEO and ASO.",
+    "description": "Curated, dual-format skill collection: installable as a Claude Code plugin marketplace or via `bunx skills`. A full dev pipeline (grill-me -> to-prd -> compass -> blueprint), a review stage that merges four checks into one verdict (review-pass over implementation-review + testing-philosophy + security-audit + wstg), language idioms, plus career tools (CV, brag doc, portfolio, opportunity scanning), product, reporting, SEO and ASO.",
     "version": "0.12.0"
   },
   "plugins": [
-    {
-      "name": "maestro",
-      "source": "./skills/maestro",
-      "description": "Verify parallel feasibility across plans, orchestrate agents in git worktrees, run integration tests, clean up. Deterministic branch names (parallel/<slug>).",
-      "version": "0.2.0",
-      "author": {
-        "name": "Matheus Malagris"
-      },
-      "category": "engineering-workflow",
-      "keywords": [
-        "orchestration",
-        "parallel-execution",
-        "git-worktree",
-        "multi-agent"
-      ]
-    },
     {
       "name": "write-a-skill",
       "source": "./skills/write-a-skill",
@@ -44,7 +28,7 @@
       "name": "compass",
       "source": "./skills/compass",
       "description": "Multi-mode software engineering coach: architect, advisor, reviewer, refactor, legacy, and explainer workflows. Auto-writes ADRs to docs/adr/.",
-      "version": "0.2.0",
+      "version": "0.3.0",
       "author": {
         "name": "Matheus Malagris"
       },
@@ -78,8 +62,8 @@
     {
       "name": "parallel-worktrees",
       "source": "./skills/parallel-worktrees",
-      "description": "Playbook for parallel work across git worktrees: go/no-go, file partitioning, isolation mechanism, integration and cleanup. The plan-optional counterpart to maestro.",
-      "version": "0.1.1",
+      "description": "Playbook for parallel work across git worktrees: go/no-go, file partitioning, isolation mechanism, integration and cleanup. Works with or without formal planning docs.",
+      "version": "0.2.0",
       "author": {
         "name": "Matheus Malagris"
       },
@@ -90,22 +74,6 @@
         "isolation",
         "fan-out",
         "concurrency"
-      ]
-    },
-    {
-      "name": "heist",
-      "source": "./skills/heist",
-      "description": "Turn a settled feature scope into an implementation plan at docs/plans/NNNN-<slug>.md. Crew, sequence (with parallel phases), getaway, payoff. Consumes PRDs + ADRs.",
-      "version": "0.3.0",
-      "author": {
-        "name": "Matheus Malagris"
-      },
-      "category": "engineering-workflow",
-      "keywords": [
-        "planning",
-        "implementation-plan",
-        "prd",
-        "adr"
       ]
     },
     {
@@ -181,7 +149,7 @@
     {
       "name": "llm-wiki",
       "source": "./skills/llm-wiki",
-      "description": "Build and maintain an LLM-maintained wiki \u2014 a persistent, interlinked Markdown knowledge base distilled from curated raw sources (Karpathy's LLM Wiki pattern).",
+      "description": "Build and maintain an LLM-maintained wiki — a persistent, interlinked Markdown knowledge base distilled from curated raw sources (Karpathy's LLM Wiki pattern).",
       "version": "0.1.0",
       "author": {
         "name": "Matheus Malagris"
@@ -248,7 +216,7 @@
       "name": "code-craft",
       "source": "./skills/code-craft",
       "description": "Language- and framework-specific best practices and idioms. Reader and reviewer modes. Ships 7 languages + 12 frameworks (TS, Rust, CSS, Tailwind, Dart, Go, Python, React, Next, RN+Expo, Hono, Workers, Astro, Svelte, Drizzle, Supabase, Lambda, Terraform, Flutter).",
-      "version": "0.2.2",
+      "version": "0.2.3",
       "author": {
         "name": "Matheus Malagris"
       },
@@ -285,8 +253,8 @@
     {
       "name": "sentinel",
       "source": "./skills/sentinel",
-      "description": "Close the loop after ship \u2014 scan a repo (and optionally its live prod signal) for post-release trouble, then file what it finds as docs/intent/NNNN-<slug>.md so it re-enters the dev-flow chain as ordinary work.",
-      "version": "0.1.0",
+      "description": "Close the loop after ship — scan a repo (and optionally its live prod signal) for post-release trouble, then file what it finds as docs/intent/NNNN-<slug>.md so it re-enters the dev-flow chain as ordinary work.",
+      "version": "0.1.1",
       "author": {
         "name": "Matheus Malagris"
       },
@@ -303,7 +271,7 @@
       "name": "dev-flow",
       "source": "./skills/dev-flow",
       "description": "Conductor for the dev pipeline: detects a task's tier (bug / feature / architecture / client), prints the exact chain of sub-skills it will run and skip with reasons, confirms, then drives them in order. Matches ceremony to stakes.",
-      "version": "0.6.0",
+      "version": "0.7.0",
       "author": {
         "name": "Matheus Malagris"
       },
@@ -319,8 +287,8 @@
     {
       "name": "review-pass",
       "source": "./skills/review-pass",
-      "description": "Single review-only entry point for an existing diff \u2014 runs verify \u2192 code-review \u2192 implementation-review (and security-audit only when the change touches a trust boundary), then consolidates every finding into one go/no-go verdict.",
-      "version": "0.3.0",
+      "description": "Single review-only entry point for an existing diff — runs verify → code-review → implementation-review (and security-audit only when the change touches a trust boundary), then consolidates every finding into one go/no-go verdict.",
+      "version": "0.3.1",
       "author": {
         "name": "Matheus Malagris"
       },
@@ -337,7 +305,7 @@
       "name": "grill-me",
       "source": "./skills/grill-me",
       "description": "Stress-test a plan or design via relentless interview. Resolves each branch of the decision tree, captures domain vocabulary, emits Design Notes + Glossary block for /to-prd. Adapted from mattpocock/skills.",
-      "version": "0.4.0",
+      "version": "0.4.1",
       "author": {
         "name": "Matheus Malagris"
       },
@@ -353,7 +321,7 @@
       "name": "to-prd",
       "source": "./skills/to-prd",
       "description": "Synthesize conversation context into a PRD. Writes docs/prds/NNNN-<slug>.md + publishes to GitHub Issues. Includes Glossary section. Adapted from mattpocock/skills.",
-      "version": "0.3.0",
+      "version": "0.3.1",
       "author": {
         "name": "Matheus Malagris"
       },
@@ -385,7 +353,7 @@
       "name": "implementation-review",
       "source": "./skills/implementation-review",
       "description": "Pre-commit quality gate: seven parallel-subagent checks (plan gaps, use-case coverage, test scenarios, test philosophy, SOLID, Clean Code, security). Runs after /verify, before commit.",
-      "version": "0.2.1",
+      "version": "0.2.2",
       "author": {
         "name": "Matheus Malagris"
       },
@@ -404,7 +372,7 @@
       "name": "testing-philosophy",
       "source": "./skills/testing-philosophy",
       "description": "Defines what a good test is: behavior over implementation, the Testing Trophy, and an e2e floor for user-facing features. Stack-agnostic (TS/Rust/Go/Elixir/Python). Kent Dodds, generalized.",
-      "version": "0.1.1",
+      "version": "0.1.2",
       "author": {
         "name": "Matheus Malagris"
       },
@@ -421,7 +389,7 @@
       "name": "pr-craft",
       "source": "./skills/pr-craft",
       "description": "Create a pull request with a structured description (Problem / Root cause / Fix / Test / Out of scope) derived from the diff and conversation. Drives the branch -> commit -> push -> gh pr create flow.",
-      "version": "0.2.1",
+      "version": "0.3.0",
       "author": {
         "name": "Matheus Malagris"
       },
@@ -437,7 +405,7 @@
     {
       "name": "wstg-security-testing",
       "source": "./skills/wstg-security-testing",
-      "description": "Web application security testing via the OWASP Web Security Testing Guide (WSTG) \u2014 12 categories, ~109 test cases. Four modes: guide a pentest, self-review your app, build/score a coverage checklist, review a diff against WSTG. Mode 2 carries a systematic whole-codebase audit protocol. Methodology from OWASP/wstg. Authorized/defensive use only.",
+      "description": "Web application security testing via the OWASP Web Security Testing Guide (WSTG) — 12 categories, ~109 test cases. Four modes: guide a pentest, self-review your app, build/score a coverage checklist, review a diff against WSTG. Mode 2 carries a systematic whole-codebase audit protocol. Methodology from OWASP/wstg. Authorized/defensive use only.",
       "version": "0.2.0",
       "author": {
         "name": "Matheus Malagris"
@@ -491,7 +459,7 @@
     {
       "name": "commit-report",
       "source": "./skills/commit-report",
-      "description": "Work report in two modes \u2014 quick (git-only: prose + bullets from the current repo) and standup (multi-source: GitHub PRs/reviews/comments, git across repos, deploys) \u2014 tunable to audience (dev / pm / client), delivered as a copy-ready channel block or a doc file.",
+      "description": "Work report in two modes — quick (git-only: prose + bullets from the current repo) and standup (multi-source: GitHub PRs/reviews/comments, git across repos, deploys) — tunable to audience (dev / pm / client), delivered as a copy-ready channel block or a doc file.",
       "version": "0.3.0",
       "author": {
         "name": "Matheus Malagris"
@@ -503,6 +471,22 @@
         "work-report",
         "status-update",
         "conventional-commits"
+      ]
+    },
+    {
+      "name": "blueprint",
+      "source": "./skills/blueprint",
+      "description": "Turn a settled scope into an implementation plan at docs/plans/NNNN-<slug>.md: files affected, phased sequence, acceptance criteria, edge-case ledger, rollback and risk. Consumes PRDs + ADRs. Formerly heist.",
+      "version": "0.4.0",
+      "author": {
+        "name": "Matheus Malagris"
+      },
+      "category": "engineering-workflow",
+      "keywords": [
+        "planning",
+        "implementation-plan",
+        "prd",
+        "adr"
       ]
     }
   ]
