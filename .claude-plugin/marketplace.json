@@ -6,7 +6,7 @@
   },
   "metadata": {
     "description": "Curated, dual-format skill collection: installable as a Claude Code plugin marketplace or via `bunx skills`. A full dev pipeline (grill-me -> to-prd -> compass -> blueprint), a review stage that merges four checks into one verdict (review-pass over implementation-review + testing-philosophy + security-audit + wstg), language idioms, plus career tools (CV, brag doc, portfolio, opportunity scanning), product, reporting, SEO and ASO.",
-    "version": "0.12.0"
+    "version": "0.13.0"
   },
   "plugins": [
     {
@@ -149,7 +149,7 @@
     {
       "name": "llm-wiki",
       "source": "./skills/llm-wiki",
-      "description": "Build and maintain an LLM-maintained wiki — a persistent, interlinked Markdown knowledge base distilled from curated raw sources (Karpathy's LLM Wiki pattern).",
+      "description": "Build and maintain an LLM-maintained wiki \u2014 a persistent, interlinked Markdown knowledge base distilled from curated raw sources (Karpathy's LLM Wiki pattern).",
       "version": "0.1.0",
       "author": {
         "name": "Matheus Malagris"
@@ -253,7 +253,7 @@
     {
       "name": "sentinel",
       "source": "./skills/sentinel",
-      "description": "Close the loop after ship — scan a repo (and optionally its live prod signal) for post-release trouble, then file what it finds as docs/intent/NNNN-<slug>.md so it re-enters the dev-flow chain as ordinary work.",
+      "description": "Close the loop after ship \u2014 scan a repo (and optionally its live prod signal) for post-release trouble, then file what it finds as docs/intent/NNNN-<slug>.md so it re-enters the dev-flow chain as ordinary work.",
       "version": "0.1.1",
       "author": {
         "name": "Matheus Malagris"
@@ -287,7 +287,7 @@
     {
       "name": "review-pass",
       "source": "./skills/review-pass",
-      "description": "Single review-only entry point for an existing diff — runs verify → code-review → implementation-review (and security-audit only when the change touches a trust boundary), then consolidates every finding into one go/no-go verdict.",
+      "description": "Single review-only entry point for an existing diff \u2014 runs verify \u2192 code-review \u2192 implementation-review (and security-audit only when the change touches a trust boundary), then consolidates every finding into one go/no-go verdict.",
       "version": "0.3.1",
       "author": {
         "name": "Matheus Malagris"
@@ -405,7 +405,7 @@
     {
       "name": "wstg-security-testing",
       "source": "./skills/wstg-security-testing",
-      "description": "Web application security testing via the OWASP Web Security Testing Guide (WSTG) — 12 categories, ~109 test cases. Four modes: guide a pentest, self-review your app, build/score a coverage checklist, review a diff against WSTG. Mode 2 carries a systematic whole-codebase audit protocol. Methodology from OWASP/wstg. Authorized/defensive use only.",
+      "description": "Web application security testing via the OWASP Web Security Testing Guide (WSTG) \u2014 12 categories, ~109 test cases. Four modes: guide a pentest, self-review your app, build/score a coverage checklist, review a diff against WSTG. Mode 2 carries a systematic whole-codebase audit protocol. Methodology from OWASP/wstg. Authorized/defensive use only.",
       "version": "0.2.0",
       "author": {
         "name": "Matheus Malagris"
@@ -459,7 +459,7 @@
     {
       "name": "commit-report",
       "source": "./skills/commit-report",
-      "description": "Work report in two modes — quick (git-only: prose + bullets from the current repo) and standup (multi-source: GitHub PRs/reviews/comments, git across repos, deploys) — tunable to audience (dev / pm / client), delivered as a copy-ready channel block or a doc file.",
+      "description": "Work report in two modes \u2014 quick (git-only: prose + bullets from the current repo) and standup (multi-source: GitHub PRs/reviews/comments, git across repos, deploys) \u2014 tunable to audience (dev / pm / client), delivered as a copy-ready channel block or a doc file.",
       "version": "0.3.0",
       "author": {
         "name": "Matheus Malagris"

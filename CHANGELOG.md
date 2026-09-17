@@ -3,6 +3,9 @@
 All notable changes to this collection are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); the collection follows [SemVer](https://semver.org). See [VERSIONING.md](VERSIONING.md) for the per-skill vs collection model.
 
 ## [Unreleased]
+
+## [0.13.0] - 2026-09-17
+
 - blueprint: rename of `heist` (v0.3.0 lineage continued at v0.4.0). Document sections formalized for PR review: The Job / Crew / Sequence / Payoff / Blind Spots / Getaway become Summary / Files Affected / Implementation Phases / Acceptance Criteria / Edge Cases / Rollback and Risk. Drop the `phase` frontmatter field, whose only consumer was maestro. All 10 referring skills updated; `implementation-review` and the plan parser accept both heading styles so pre-rename plans keep working.
 - Remove maestro. Its premise never held in practice: across 54 authored plans no two ever shared a `phase` value, and every declared `depends on` was sequential ("X must merge first"), which is the opposite of the parallelism it existed to find. `parallel-worktrees` absorbs the plan-driven case instead of deferring to it.
 - compass: delegate test strategy to `testing-philosophy`, whose Testing Trophy and e2e floor the old pyramid material contradicted; `topics/testing.md` is now testability-as-design-signal only. Add Decision checkpoints, so a hard-to-reverse decision is presented with a recommendation, trade-offs and flip conditions and then confirmed with the user rather than decided for them. Stack policy now requires a ranked recommendation instead of a survey. Description picks up the legacy-code triggers the workflow already served.
