@@ -17,7 +17,9 @@ Map the user's term to the right file:
 | SOLID, cohesion, coupling, information hiding | [topics/design-principles.md](../topics/design-principles.md) |
 | Factory, Singleton, Strategy, Observer, etc. | [topics/design-patterns.md](../topics/design-patterns.md) |
 | Layered, MVC, microservices, queues, pub/sub | [topics/architecture.md](../topics/architecture.md) |
-| Unit tests, TDD, mocks, FIRST, coverage | [topics/testing.md](../topics/testing.md) |
+| TDD cycle, FIRST rules, test smells | [reference/tdd-cycle.md](../reference/tdd-cycle.md) |
+| Testability as a design signal | [topics/testing.md](../topics/testing.md) |
+| What tests to write, test mix, e2e coverage | the `testing-philosophy` skill |
 | Refactoring, code smells | [topics/refactoring.md](../topics/refactoring.md) |
 | CI, CD, DevOps, feature flags | [topics/devops.md](../topics/devops.md) |
 

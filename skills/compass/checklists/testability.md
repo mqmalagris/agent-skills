@@ -7,7 +7,7 @@ Use to assess whether code under design or review can be tested cleanly.
 - [ ] Class can be instantiated without a database / network / filesystem
 - [ ] Dependencies injected via constructor or method param (DIP)
 - [ ] No reliance on a Singleton for state
-- [ ] No static call to a real clock — time abstracted (`Clock`, `Instant.now()` injected)
+- [ ] No direct call to a real system clock; time injected as a dependency
 - [ ] No reliance on `static` mutables that persist across tests
 
 ## Mocking seams
@@ -30,13 +30,16 @@ Use to assess whether code under design or review can be tested cleanly.
 - [ ] No conditional logic (`if`, `for`, `while`) inside tests
 - [ ] No giant fixture setups for tiny assertions
 - [ ] No multiple unrelated asserts per test
-- [ ] No `@Ignore` / skipped tests left undated
+- [ ] No skipped or ignored tests left undated
 
-## Coverage
+## Coverage and proportion
 
-- [ ] Branch coverage (C1) measured, not just line (C0)
-- [ ] Critical paths covered with an integration test, not just a unit test
-- [ ] System tests reserved for top-of-pyramid critical user journeys (~10%)
+The mix of unit / integration / e2e, and whether a feature needs an end-to-end test at all, belong
+to the `testing-philosophy` skill, not here. Two items that are design concerns rather than
+strategy:
+
+- [ ] Critical paths reachable by a test that crosses real boundaries, not only in isolation
+- [ ] No coverage *target* steering the design; coverage is a side effect of testing real behavior
 
 ## Untestable code = design smell
 

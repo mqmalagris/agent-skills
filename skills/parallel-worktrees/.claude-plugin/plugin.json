@@ -1,7 +1,7 @@
 {
   "name": "parallel-worktrees",
-  "version": "0.1.1",
-  "description": "Playbook for parallel work across git worktrees: go/no-go, file partitioning, isolation mechanism, integration and cleanup. The plan-optional counterpart to maestro.",
+  "version": "0.2.0",
+  "description": "Playbook for parallel work across git worktrees: go/no-go, file partitioning, isolation mechanism, integration and cleanup. Works with or without formal planning docs.",
   "author": {
     "name": "Matheus Malagris",
     "url": "https://github.com/mqmalagris"

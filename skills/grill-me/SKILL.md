@@ -12,7 +12,7 @@ Interview me relentlessly about every aspect of this plan until we reach a share
 - **ADR awareness.** Scan `docs/adr/` before grilling. Don't relitigate settled architectural decisions; treat ADRs as locked inputs and grill *around* them.
 - **Converge.** Stop when every major branch of the decision tree has either a resolved decision or an explicit `OPEN` marker. Cap: ~20 questions per session unless I ask to keep going.
 - **OPEN markers.** If a branch can't be resolved (I defer, codebase silent, needs external input), record it as `OPEN: <question>` and move on. Don't loop.
-- **Edge cases survive the session.** Anything surfaced by lenses 6-7 goes in the `## Edge cases` output block with its decision, even when the decision is "won't". Discussed-then-dropped is how a case reaches production unhandled — the block is what `heist` turns into its Blind Spots table.
+- **Edge cases survive the session.** Anything surfaced by lenses 6-7 goes in the `## Edge cases` output block with its decision, even when the decision is "won't". Discussed-then-dropped is how a case reaches production unhandled — the block is what `blueprint` turns into its Edge Cases table.
 
 ## Questioning lens
 
@@ -79,7 +79,7 @@ Term — definition. (aliases: <other names if any>)
 
 This block is the handoff to `/to-prd`, which synthesizes it into a PRD and cites the intent file in its `Sources` line. Report the written path when you finish.
 
-**Updating an existing intent.** If the user reopens a settled design, find the file by slug and amend it rather than minting a new index — a second file for the same feature splits the Glossary, which is exactly what this artifact exists to prevent. Edit-safe: `Status`, `Open questions`, adding resolved decisions or edge cases. Changing a `## Glossary` term after `to-prd` has consumed it needs an explicit OK, because heist and the implementing code are already using that word.
+**Updating an existing intent.** If the user reopens a settled design, find the file by slug and amend it rather than minting a new index — a second file for the same feature splits the Glossary, which is exactly what this artifact exists to prevent. Edit-safe: `Status`, `Open questions`, adding resolved decisions or edge cases. Changing a `## Glossary` term after `to-prd` has consumed it needs an explicit OK, because blueprint and the implementing code are already using that word.
 
 ## When to skip grill-me
 
@@ -90,13 +90,12 @@ This block is the handoff to `/to-prd`, which synthesizes it into a PRD and cite
 
 ## Pipeline placement
 
-`grill-me → to-prd → compass → heist → maestro → code`
+`grill-me → to-prd → compass → blueprint → code`
 
 - **grill-me** (this skill) — stress-tests decision tree, extracts Glossary + OPEN questions.
 - **to-prd** — synthesizes Design Notes into a PRD on disk + tracker.
 - **compass** — locks architectural decisions in ADRs.
-- **heist** — produces implementation plan.
-- **maestro** — orchestrates parallel execution.
+- **blueprint** — produces implementation plan.
 - **code** — implement.
 
 Skip earlier stages when the artifact already exists. grill-me is optional for small features but high-leverage for anything with non-obvious tradeoffs.

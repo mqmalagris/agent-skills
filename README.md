@@ -12,7 +12,7 @@ Most skills are mine; a few are forks/adaptations of public skills, attributed p
 
 ```bash
 bunx skills add mqmalagris/agent-skills             # pick skills interactively
-bunx skills add mqmalagris/agent-skills -s heist    # just one
+bunx skills add mqmalagris/agent-skills -s blueprint    # just one
 bunx skills add mqmalagris/agent-skills --all -g    # everything, installed globally
 ```
 
@@ -20,7 +20,7 @@ bunx skills add mqmalagris/agent-skills --all -g    # everything, installed glob
 
 ```text
 /plugin marketplace add mqmalagris/agent-skills
-/plugin install heist@agent-skills
+/plugin install blueprint@agent-skills
 ```
 
 ## Layout
@@ -39,13 +39,12 @@ The loop I use to take a feature from vague hunch to merged code without writing
 
 | Skill | What it does |
 |-------|--------------|
-| [`dev-flow`](skills/dev-flow/) | Conductor. Detects a task's tier (bug / feature / architecture / client), prints the exact subset of stages it will run and skip with reasons, confirms, then drives them. Matches ceremony to stakes. |
+| [`dev-flow`](skills/dev-flow/) | Conductor. Detects a task's tier (bug / feature / architecture / design / client), prints the exact subset of stages it will run and skip with reasons, confirms, then drives them. Matches ceremony to stakes. |
 | [`grill-me`](skills/grill-me/) | Stress-test a plan via relentless interview; captures domain vocabulary, emits a Design Notes + Glossary block and persists it to `docs/intent/NNNN-<slug>.md`. Adapted from [mattpocock/skills](https://github.com/mattpocock/skills). |
 | [`to-prd`](skills/to-prd/) | Synthesize the conversation into a PRD at `docs/prds/NNNN-<slug>.md` and publish to GitHub Issues. Adapted from [mattpocock/skills](https://github.com/mattpocock/skills). |
 | [`compass`](skills/compass/) | Multi-mode software-engineering coach (architect, advisor, reviewer, refactor, legacy, explainer). Auto-writes ADRs to `docs/adr/`. |
-| [`heist`](skills/heist/) | Turn a settled scope into an implementation plan at `docs/plans/NNNN-<slug>.md`: crew, sequence, getaway, payoff. Consumes PRDs + ADRs. |
-| [`maestro`](skills/maestro/) | Verify plans for parallel feasibility, build a conflict graph, orchestrate agents in git worktrees (`parallel/<slug>`), run integration tests, clean up. |
-| [`parallel-worktrees`](skills/parallel-worktrees/) | Plan-optional counterpart to maestro: go/no-go, file partitioning, isolation mechanism, integration + cleanup for ad-hoc parallel work. |
+| [`blueprint`](skills/blueprint/) | Turn a settled scope into an implementation plan at `docs/plans/NNNN-<slug>.md`: files affected, phased sequence, acceptance criteria, edge-case ledger, rollback and risk. Consumes PRDs + ADRs. |
+| [`parallel-worktrees`](skills/parallel-worktrees/) | Run work in parallel across git worktrees: go/no-go, file partitioning, isolation mechanism, integration + cleanup. Works with or without formal planning docs. |
 | [`pr-craft`](skills/pr-craft/) | Open a PR with a structured body (Problem / Root cause / Fix / Test / Out of scope). Drives branch → commit → push → `gh pr create`, and opens GitHub-native **stacked PRs** (one PR per dependent layer) for large, layered changes. |
 | [`babysit-prs`](skills/babysit-prs/) | Drive a PR through review on its own loop: fetch feedback (human + bots like Copilot/Qodo/CodeRabbit), triage, fix, report per item with the commit SHA, resolve threads, push — repeating until MERGED. Never merges itself. |
 | [`sentinel`](skills/sentinel/) | The Maintain stage the chain otherwise lacks. Runs on a schedule, not in a build: scans shipped work for recurring fix classes, reverts, and (where configured) prod threshold breaches, then files findings as `docs/intent/NNNN-<slug>.md` so they re-enter the chain as ordinary work. Never fixes or commits. |

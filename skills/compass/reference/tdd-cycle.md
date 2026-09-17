@@ -18,7 +18,7 @@
 
 - [ ] **Obscure test?** Long or complex to read → simplify; one test = one requirement.
 - [ ] **Conditional logic?** `if`, `for`, `while` inside test body → remove; flow must be strictly linear.
-- [ ] **Duplicated setup?** Same fixture across many tests → extract to `@Before` / common init.
+- [ ] **Duplicated setup?** Same fixture across many tests → extract to a shared setup / common init.
 - [ ] **Flaky?** Random pass/fail → isolate concurrency; remove `sleep`-based timing; replace async with sync stand-ins.
 - [ ] **Disconnected asserts?** Multiple unrelated asserts → split tests; same-concept asserts only (multiple attribute checks of one object are fine).
 

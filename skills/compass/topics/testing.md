@@ -1,88 +1,47 @@
-# Raw — Testing
+# Raw — Testability
 
-## 1. Concepts
+> **Test strategy is not compass's call.** What to test, in what proportion, and whether a feature
+> needs an end-to-end test are answered by the **`testing-philosophy`** skill, which is the single
+> source of truth for it: behavior over implementation details, the Testing Trophy, and a hard e2e
+> floor for user-facing features. Load that skill rather than deciding here.
+>
+> Compass owns the *design* half: whether code can be put under test at all, and what it says about
+> the design when it cannot.
 
-### Testing Pyramid
-- **Definition**: tests organized in three granularity layers — base of unit (~70%), middle of integration (~20%), top of system (~10%).
-- **Solves**: balances effort; avoids overload of slow, flaky UI-level tests.
+## 1. Testability as a design signal
 
-### Unit Tests
-- **Definition**: programs that instantiate, call, and verify isolated parts of code (typically classes).
-- **Solves**: catches bugs early; safety net against regressions.
-
-### FIRST Principles
-- **Definition**: tests must be Fast, Independent, Repeatable (deterministic), Self-checking, Timely (written early).
-- **Solves**: stops the test suite from being abandoned due to slowness, mutual dependencies, or unclear results.
-
-### Test-Driven Development (TDD)
-- **Definition**: red → green → refactor. Write failing test first, then code that passes, then improve.
-- **Solves**: guarantees tests get written, raises testability of code, encourages clean interfaces.
-
-### Mocks / Stubs
-- **Definition**: stand-in objects (e.g., Mockito) emulating external systems without real access.
-- **Solves**: isolates tests from slow / flaky deps (DBs, network, remote APIs).
-
-### Test Coverage
-- **Definition**: % of code executed by tests. C0 = command/line coverage. C1 = branch coverage.
-- **Solves**: visualizes blind spots; reveals unprotected code regions.
-
-### Testability
 - **Definition**: how easily parts of the system can be put under test.
-- **Solves**: surfaces critical design problems; forces separation of business rules from UI.
+- **Why it belongs here**: untestable code is a design report, not a testing problem. Difficulty
+  writing the test almost always means hidden coupling, a missing seam, or business rules welded
+  to I/O.
 
-### Integration Tests
-- **Definition**: validate interactions across multiple real classes connected to real dependencies (real DB, etc.).
-- **Solves**: validate persistent, real communication between subsystems.
+Read the difficulty as a diagnosis:
 
-### System Tests
-- **Definition**: end-to-end from the user's perspective (e.g., Selenium clicking through the browser).
-- **Solves**: validate the full integration from UI to network in real flow.
+| Symptom while writing the test | Design defect underneath |
+|---|---|
+| Needs a DB, network or filesystem just to call it | Business rules not separated from I/O |
+| Needs a large object graph constructed first | Dependencies built inside rather than injected (DIP) |
+| Result varies by run, machine or time of day | Ambient state: a singleton, a static mutable, a real clock |
+| Can only be asserted through the UI | Domain logic living in the presentation layer |
+| Requires stubbing a concrete class | Missing interface at the external boundary |
 
-## 2. When to Use
+## 2. The response is refactor, not skip
 
-- **Unit Tests** — building model logic; reproducing reported bugs as a test; debugging instead of `println`.
-- **Mocks** — when scope crosses outside the language / in-memory boundary (disk, web servers, real time/async).
-- **TDD** — predictable input/output; aiming for sustained 90%+ coverage.
-- **System Tests** — critical end-user paths (final purchase click); strict minority of total tests.
+If code cannot be tested cleanly, the answer is rarely "skip the test":
 
-## 3. When NOT to Use
+- Extract pure functions out of side-effecting methods.
+- Inject dependencies that were previously constructed inside the unit.
+- Wrap external libraries behind an interface you own.
+- Pull domain logic out of UI components.
 
-- **Mocks** — when they make tests fragile by coupling to internal implementation details rather than the interface contract; not workable on classic Java `final`/static methods.
-- **Late unit tests** — never start testing after the whole system is built; will be rushed, low quality, or dropped under time pressure.
-- **Mass system tests** — don't replace logic checks with end-to-end (Selenium); any layout change yields false positives.
-- **Blind 100% coverage** — avoid forcing 100% on getters/setters or non-essential async modules; pure waste.
+Assess with [checklists/testability.md](../checklists/testability.md); for the red-green-refactor
+rhythm itself see [reference/tdd-cycle.md](../reference/tdd-cycle.md).
 
-## 4. Smells
+## 3. Cross-references
 
-- **Flaky test** — passes/fails randomly. Caused by concurrency or `sleep`-based timing.
-- **Obscure test** — impossible to read intent. Sign: huge fixture setup, or one test attacking multiple unrelated functions.
-- **Conditional logic in tests** — `if` branches and loops inside tests. Sign: hides paths that don't run; invalidates the test.
-- **Multiple unrelated asserts** — one assert fails and aborts the whole test, masking subsequent errors.
-
-## 5. Operational Checklist
-
-- [ ] Balance volume per the pyramid distribution (70/20/10).
-- [ ] Use the AAA structure: Arrange (fixture) → Act (call SUT) → Assert.
-- [ ] Keep local runs in milliseconds (Fast).
-- [ ] Replace flaky networking/IO with Mocks where possible.
-- [ ] Replace `println` debugging with formal unit tests for routine bug fixes.
-- [ ] Configure branch coverage (C1), stricter than line coverage (C0).
-- [ ] Start TDD in red; force pragmatic interfaces before successful implementation.
-- [ ] Pull domain logic out of UI components → improves testability.
-
-## 6. Examples
-
-- **Simple JUnit unit test** — Arrange object, call method, assert result.
-- **Isolated test with Mockito mock** — stub external dependency, assert behavior of unit under test.
-
-## 7. Trade-offs
-
-- **Unit vs System Tests** — Unit pinpoints failing file, scales infinitely, runs instantly, but doesn't catch UI transitions. System tests reflect the user's real journey, but run for minutes, are fragile to UI changes, and slow root-cause discovery.
-- **Mock vs Real DB (integration)** — Mock gives stable, fast tests but couples to internal call shape. Real DB validates true integration but slows tests and adds infra dependencies.
-- **C0 vs C1 coverage** — C0 verifies command execution but a single `if` only proves the truthy branch. C1 forces branch coverage; stricter and harder to maximize.
-
-## 8. Cross-references
-
-- **DevOps** — modern pipelines run a CI server reading from Git, invoking the full pyramid before code reaches review/Production.
-- **Design Principles (SOLID)** — DIP and decoupled cohesive code yield natural testability; high coupling (globals) breaks FIRST's deterministic property in parallel runs.
-- **Refactoring** — without unit tests as safety net, refactoring becomes impractical; risk of regression on stable algorithms.
+- **Design Principles (SOLID)** — DIP and decoupled, cohesive code yield natural testability; high
+  coupling through globals breaks determinism under parallel runs.
+- **Refactoring** — tests are the safety net that makes refactoring anything other than reckless,
+  which is why [workflows/legacy.md](../workflows/legacy.md) treats getting code under test as a
+  hard prerequisite rather than a nice-to-have.
+- **DevOps** — the pipeline runs whatever suite exists; it does not decide what that suite should be.

@@ -110,7 +110,7 @@ Close with a one-sentence summary. Do not re-print the user's code.
 
 ## Pipeline placement
 
-`grill-me → to-prd → compass → heist → maestro → code (+ code-craft) → compass (review)`
+`grill-me → to-prd → compass → blueprint → code (+ code-craft) → compass (review)`
 
 code-craft sits **during the code phase**, applied tactically per-file as code lands. Use cases:
 

@@ -53,7 +53,7 @@ Slash-command surfaces (Qodo's `/review`, `/describe`, `/improve`; CodeRabbit's 
 Beyond that, on the merits:
 
 - **High precision on the mechanical, low on intent.** They are good at a null deref, an unawaited promise, a missing error branch. They cannot know that the feature was scoped to skip a case deliberately — which is exactly what your plan's Blind Spots table records.
-- **They do not read your plan.** A bot flagging a "missing" case that `heist` marked `defer` is noise. Reconcile against the ledger before acting.
+- **They do not read your plan.** A bot flagging a "missing" case that `blueprint` marked `defer` is noise. Reconcile against the ledger before acting.
 - **Cite, don't re-derive.** If a bot already found it, fold its finding into the verdict with attribution rather than spending a stage rediscovering it. If you disagree, say why — the disagreement is more useful than either verdict alone.
 - **Silence is not a pass.** No bot findings means the bot found nothing it recognizes, which is a much weaker claim than "this code is fine."
 

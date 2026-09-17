@@ -19,7 +19,7 @@ Map intent to [topics/](../topics/):
 - New module structure → `topics/design-principles.md`
 - Variant behavior selection → `topics/design-patterns.md` (Strategy)
 - Async / decoupled communication → `topics/architecture.md`
-- Test approach for a tricky area → `topics/testing.md`
+- Test approach for a tricky area → the `testing-philosophy` skill. Use `topics/testing.md` only when the question is whether the design can be tested at all
 - Cleanup of existing tangled code → `topics/refactoring.md`
 
 ### 3. Apply the principle test before suggesting patterns
@@ -57,9 +57,13 @@ TRADE-OFFS: <gain / loss / simpler alternative>
 NEXT STEP: <one concrete action — write a test, sketch the interface, etc.>
 ```
 
+If the question turns out to settle something hard to reverse (stack, paradigm, persistence,
+deployment, auth), it is a checkpoint, not advice: switch to the checkpoint format in SKILL.md →
+Decision checkpoints and stop for the user's call rather than answering in one shot.
+
 ## Common advisor scenarios
 
 - **"How should I structure this new feature?"** → run a mini-architect flow scoped to the feature; don't redesign the whole system.
 - **"Should I use Strategy / Factory / etc.?"** → run principle test; if ambiguous, suggest the simpler route first.
-- **"How do I test this code?"** → check [reference/tdd-cycle.md](../reference/tdd-cycle.md); if untestable, the design itself is the issue → recommend refactor first.
+- **"How do I test this code?"** → test strategy is the `testing-philosophy` skill's call; for the cycle itself check [reference/tdd-cycle.md](../reference/tdd-cycle.md). If it is untestable, the design itself is the issue → recommend refactor first.
 - **"Monolith or microservices?"** → run architectural heuristics; default to monolith unless scaling/team criteria force the split.
