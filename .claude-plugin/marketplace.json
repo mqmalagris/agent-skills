@@ -96,22 +96,6 @@
       ]
     },
     {
-      "name": "cv-craft",
-      "source": "./skills/cv-craft",
-      "description": "Maintain a canonical master CV in Markdown and produce tailored, ATS-friendly resumes and recruiter-screen prep packs from job descriptions.",
-      "version": "0.2.0",
-      "author": {
-        "name": "Matheus Malagris"
-      },
-      "category": "career",
-      "keywords": [
-        "cv",
-        "resume",
-        "ats",
-        "job-search"
-      ]
-    },
-    {
       "name": "aso-craft",
       "source": "./skills/aso-craft",
       "description": "App Store Optimization for iOS and Android from one per-locale Markdown source.",
@@ -487,6 +471,23 @@
         "implementation-plan",
         "prd",
         "adr"
+      ]
+    },
+    {
+      "name": "cv-craft",
+      "source": "./skills/cv-craft",
+      "description": "Maintain a canonical master CV in Markdown and produce tailored, ATS-friendly resumes and recruiter-screen prep packs from job descriptions.",
+      "version": "0.3.0",
+      "author": {
+        "name": "Matheus Malagris"
+      },
+      "category": "career",
+      "keywords": [
+        "cv",
+        "resume",
+        "ats",
+        "job-search",
+        "recruiter"
       ]
     }
   ]

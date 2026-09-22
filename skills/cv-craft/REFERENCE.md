@@ -345,7 +345,9 @@ When parsing a JD, pull:
 
 ## PDF stylesheet (default `cv-style.css`)
 
-If `cv-style.css` does not exist alongside the master, create it with this content. ATS-safe: single column, sans-serif, no graphics, neutral hierarchy.
+If `cv-style.css` does not exist alongside the master, create it with this content. ATS-safe: single column, sans-serif, no graphics, neutral hierarchy, ligatures off.
+
+The ligature rule is the one that is easy to drop and expensive to miss. Without it Chromium shapes `fi`, `fl` and `ff` into single glyphs (U+FB01, U+FB02, U+FB00) and the PDF stores them that way. `pdftotext` quietly normalises them back, so the file looks fine on inspection, but `pypdf` and Apache PDFBox return the raw ligature. An ATS searching for `Cloudflare`, `workflow`, `backoff` or `profiling` then scores zero matches on a CV that contains all four.
 
 ```css
 body {
@@ -377,6 +379,13 @@ strong { font-weight: 600; }
 a { color: #111; text-decoration: none; }
 code { background: #f4f4f4; padding: 1px 4px; border-radius: 3px; font-size: 0.92em; font-family: 'Consolas', 'Menlo', monospace; }
 hr { border: none; border-top: 1px solid #ddd; margin: 1em 0; }
+
+/* Required for ATS text extraction, not cosmetic. Keeps fi/fl/ff as separate
+   characters so "Cloudflare" extracts as "Cloudflare". */
+body, body * {
+  font-variant-ligatures: none;
+  font-feature-settings: "liga" 0, "clig" 0, "dlig" 0, "hlig" 0;
+}
 ```
 
 ## Common JD-to-master mismatches and how to handle them
