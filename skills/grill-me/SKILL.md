@@ -7,7 +7,7 @@ Interview me relentlessly about every aspect of this plan until we reach a share
 
 ## Rules of engagement
 
-- **One question at a time.** No multi-part dumps.
+- **One question at a time.** One decision per turn: no multi-part dumps, no trailing "Also: ...?", and no second decision folded into the closing line ("Which do you want, and should X...?"). A second question in the same turn splits the user's answer and one of them gets skipped. Before sending, count the decisions you are asking the user to make; if it is more than one, cut every one but the first and hold the rest for later turns.
 - **Codebase first.** If a question can be answered by reading the repo, read it instead of asking.
 - **ADR awareness.** Scan `docs/adr/` before grilling. Don't relitigate settled architectural decisions; treat ADRs as locked inputs and grill *around* them.
 - **Converge.** Stop when every major branch of the decision tree has either a resolved decision or an explicit `OPEN` marker. Cap: ~20 questions per session unless I ask to keep going.

@@ -1,6 +1,6 @@
 {
   "name": "blueprint",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "Turn a settled scope into an implementation plan at docs/plans/NNNN-<slug>.md: files affected, phased sequence, acceptance criteria, edge-case ledger, rollback and risk. Consumes PRDs + ADRs. Formerly heist.",
   "author": {
     "name": "Matheus Malagris",

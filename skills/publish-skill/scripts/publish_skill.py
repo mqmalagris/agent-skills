@@ -35,6 +35,22 @@ def run(cmd, cwd=None, check=True):
     return r
 
 
+def find_bash():
+    """A working bash. On Windows, PATH's first `bash` is often System32's WSL
+    launcher, which only prints an install prompt when WSL is absent, so prefer
+    the Git for Windows bash that sits beside git.exe."""
+    if sys.platform == "win32":
+        git = shutil.which("git")
+        if git:
+            for cand in (Path(git).resolve().parent.parent / "bin" / "bash.exe",
+                         Path(git).resolve().parent.parent.parent / "bin" / "bash.exe"):
+                if cand.exists():
+                    return str(cand)
+        found = shutil.which("bash")
+        return found if found and "system32" not in found.lower() else None
+    return shutil.which("bash")
+
+
 def bump_semver(v, part):
     m = SEMVER.match(v or "0.0.0")
     M, mi, p = (int(x) for x in m.groups()) if m else (0, 0, 0)
@@ -109,6 +125,8 @@ def main():
     ap.add_argument("--merge", action="store_true", help="merge the PR immediately (squash, admin)")
     ap.add_argument("--no-push", action="store_true")
     ap.add_argument("--dry-run", action="store_true")
+    ap.add_argument("--skip-evals", action="store_true",
+                    help="publish without running (and recording) the skill's eval suite")
     args = ap.parse_args()
 
     name = args.skill
@@ -183,6 +201,19 @@ def main():
     if args.dry_run:
         print("dry-run: no commit/push. Repo prepared at", args.repo_dir)
         return
+
+    # Eval gate + trend: run the skill's suite on the publisher's own Claude
+    # login and record the result in evals-history/<name>.jsonl, which the
+    # `git add -A` below commits alongside the skill. The pre-push hook sees
+    # that passing entry for this exact content and doesn't run it twice.
+    runner = args.repo_dir / "scripts" / "eval-run.sh"
+    if (dst / "evals").is_dir() and runner.exists() and not args.skip_evals:
+        bash = find_bash()
+        if not bash:
+            sys.exit("! bash not found to run evals; install Git Bash or pass --skip-evals")
+        print(f"running {name} evals (recorded to evals-history/{name}.jsonl) ...", flush=True)
+        if subprocess.run([bash, "scripts/eval-run.sh", name, "--record"], cwd=args.repo_dir).returncode != 0:
+            sys.exit(f"! {name} evals below threshold; fix the skill, or pass --skip-evals to publish anyway")
 
     repo = args.repo_dir
     title = f"{action} skill: {name} v{version}"
