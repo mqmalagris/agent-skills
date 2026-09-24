@@ -1,0 +1,89 @@
+#!/usr/bin/env bash
+# pre-push: run the eval suite of every skill this push changes.
+#
+# A skill is a prompt, so an edit to SKILL.md is a config change with nothing
+# to catch a regression. This runs `claude plugin eval` on the pusher's own
+# Claude login (subscription usage, not API credits) before the push leaves.
+#
+# Enable once per clone:   git config core.hooksPath scripts/hooks
+# Skip one push:           SKIP_EVALS=1 git push   (or git push --no-verify)
+# More runs per case:      EVAL_RUNS=3 git push    (default 1: a smoke gate)
+#
+# Cases tagged `needs-bash` grant the agent Bash, which the eval runner only
+# allows where an OS sandbox exists (Linux, macOS, WSL2). On native Windows
+# they are skipped and listed, never silently dropped.
+
+set -uo pipefail
+
+[ "${SKIP_EVALS:-}" = "1" ] && { echo "pre-push: SKIP_EVALS=1, evals skipped"; exit 0; }
+command -v claude >/dev/null 2>&1 || { echo "pre-push: claude not on PATH, evals skipped"; exit 0; }
+
+root=$(git rev-parse --show-toplevel)
+cd "$root" || exit 0
+zero=0000000000000000000000000000000000000000
+
+# Collect the skills whose SKILL.md or evals/ changed in the commits being pushed.
+skills=""
+while read -r _lref lsha _rref rsha; do
+  [ "$lsha" = "$zero" ] && continue                     # branch deletion
+  if [ "$rsha" = "$zero" ]; then                        # new branch: diff against main
+    base=$(git merge-base "$lsha" origin/main 2>/dev/null || git merge-base "$lsha" main 2>/dev/null) || continue
+  else
+    base=$rsha
+  fi
+  for f in $(git diff --name-only "$base" "$lsha" -- 'skills/*/SKILL.md' 'skills/*/evals/**'); do
+    s=$(echo "$f" | cut -d/ -f2)
+    [ -d "skills/$s/evals" ] && case " $skills " in *" $s "*) ;; *) skills="$skills $s" ;; esac
+  done
+done
+
+[ -z "${skills// /}" ] && exit 0
+
+case "$(uname -s)" in MINGW*|MSYS*|CYGWIN*) sandbox=0 ;; *) sandbox=1 ;; esac
+runs=${EVAL_RUNS:-1}
+logdir=$(mktemp -d)
+cases=()
+skipped=()
+
+for s in $skills; do
+  for p in skills/"$s"/evals/*/prompt.md; do
+    [ -f "$p" ] || continue
+    if grep -qE '^tags:.*needs-bash' "$p" && [ "$sandbox" = 0 ]; then
+      skipped+=("$(dirname "$p")")
+    else
+      cases+=("$p")
+    fi
+  done
+done
+
+echo "pre-push: evaluating${skills} (${#cases[@]} case(s), ${runs} run(s) each)"
+
+run_case() {
+  local p=$1 runs=$2 sandbox=$3 logdir=$4
+  local log="$logdir/$(echo "$p" | tr '/' '_').log"
+  local extra=()
+  [ "$sandbox" = 1 ] && extra=(--scaffold --allow-tools Bash Write)
+  if claude plugin eval "$p" --runs "$runs" --ablation none --no-publish --trust-plugin \
+       --threshold 0.8 "${extra[@]}" >"$log" 2>&1; then
+    echo "  pass  $(dirname "$p")"
+  else
+    echo "  FAIL  $(dirname "$p")   (log: $log)"
+    return 1
+  fi
+}
+export -f run_case
+
+status=0
+if [ "${#cases[@]}" -gt 0 ]; then
+  printf '%s\n' "${cases[@]}" |
+    xargs -P 4 -I{} bash -c 'run_case "$@"' _ {} "$runs" "$sandbox" "$logdir" || status=1
+fi
+
+for c in "${skipped[@]}"; do
+  echo "  skip  $c   (needs-bash: no OS sandbox on native Windows; run under WSL2/Linux)"
+done
+
+if [ "$status" != 0 ]; then
+  echo "pre-push: eval regression, push blocked. Inspect the logs above, fix, or SKIP_EVALS=1 to override."
+fi
+exit $status
