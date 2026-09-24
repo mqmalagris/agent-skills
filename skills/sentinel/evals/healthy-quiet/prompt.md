@@ -1,5 +1,5 @@
 ---
-description: A healthy repo with no fixes or reverts files nothing, and says so.
+description: "A healthy repo with no fixes or reverts files nothing, and says so."
 tags: [sentinel, maintain, needs-bash]
 max_turns: 20
 timeout_seconds: 420

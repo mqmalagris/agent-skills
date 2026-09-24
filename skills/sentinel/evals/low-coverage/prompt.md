@@ -1,5 +1,5 @@
 ---
-description: Below ~0.7 conventional-commit coverage, tier 1 is noise: report it and file nothing.
+description: "Below ~0.7 conventional-commit coverage, tier 1 is noise: report it and file nothing."
 tags: [sentinel, maintain, needs-bash]
 max_turns: 20
 timeout_seconds: 420

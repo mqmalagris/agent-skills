@@ -1,5 +1,5 @@
 ---
-description: A revert in the window clears the filing bar on its own and produces an intent file.
+description: "A revert in the window clears the filing bar on its own and produces an intent file."
 tags: [sentinel, maintain, needs-bash]
 max_turns: 20
 timeout_seconds: 420
