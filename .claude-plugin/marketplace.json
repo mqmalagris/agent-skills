@@ -221,7 +221,7 @@
       "name": "publish-skill",
       "source": "./skills/publish-skill",
       "description": "Publish one of your own skills from ~/.claude/skills to this repo: copy it under skills/<name>/, mint its plugin.json, upsert marketplace.json, bump SemVer, and open a PR (CI-gated). Idempotent.",
-      "version": "0.1.6",
+      "version": "0.2.0",
       "author": {
         "name": "Matheus Malagris"
       },
@@ -272,7 +272,7 @@
       "name": "grill-me",
       "source": "./skills/grill-me",
       "description": "Stress-test a plan or design via relentless interview. Resolves each branch of the decision tree, captures domain vocabulary, emits Design Notes + Glossary block for /to-prd. Adapted from mattpocock/skills.",
-      "version": "0.4.1",
+      "version": "0.4.2",
       "author": {
         "name": "Matheus Malagris"
       },
@@ -288,7 +288,7 @@
       "name": "to-prd",
       "source": "./skills/to-prd",
       "description": "Synthesize conversation context into a PRD. Writes docs/prds/NNNN-<slug>.md + publishes to GitHub Issues. Includes Glossary section. Adapted from mattpocock/skills.",
-      "version": "0.3.1",
+      "version": "0.3.2",
       "author": {
         "name": "Matheus Malagris"
       },
@@ -320,7 +320,7 @@
       "name": "implementation-review",
       "source": "./skills/implementation-review",
       "description": "Pre-commit quality gate: seven parallel-subagent checks (plan gaps, use-case coverage, test scenarios, test philosophy, SOLID, Clean Code, security). Runs after /verify, before commit.",
-      "version": "0.2.2",
+      "version": "0.2.3",
       "author": {
         "name": "Matheus Malagris"
       },
@@ -356,7 +356,7 @@
       "name": "pr-craft",
       "source": "./skills/pr-craft",
       "description": "Create a pull request with a structured description (Problem / Root cause / Fix / Test / Out of scope) derived from the diff and conversation. Drives the branch -> commit -> push -> gh pr create flow.",
-      "version": "0.3.0",
+      "version": "0.3.1",
       "author": {
         "name": "Matheus Malagris"
       },
@@ -444,7 +444,7 @@
       "name": "blueprint",
       "source": "./skills/blueprint",
       "description": "Turn a settled scope into an implementation plan at docs/plans/NNNN-<slug>.md: files affected, phased sequence, acceptance criteria, edge-case ledger, rollback and risk. Consumes PRDs + ADRs. Formerly heist.",
-      "version": "0.4.0",
+      "version": "0.4.1",
       "author": {
         "name": "Matheus Malagris"
       },

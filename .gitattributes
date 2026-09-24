@@ -1,0 +1,4 @@
+# Shell scripts must stay LF on every checkout: bash rejects CRLF ($'\r': command
+# not found), and core.autocrlf=true on Windows would otherwise convert them.
+*.sh             text eol=lf
+scripts/hooks/*  text eol=lf

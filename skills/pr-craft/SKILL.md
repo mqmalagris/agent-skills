@@ -21,7 +21,7 @@ Drive a clean PR end to end: branch, stage only the relevant files, conventional
      | awk '{a+=$1; d+=$2; f++} END{printf "%d files, +%d -%d (%d lines)\n", f, a, d, a+d}'
    ```
 
-   Work not committed yet? Same pipe over `git diff --numstat HEAD`. The exclusions are deliberate: a regenerated lockfile or a `dist/` rebuild is not review surface, and counting it splits PRs that never needed splitting.
+   Work not committed yet? Same pipe over `git diff --numstat HEAD`, but first mark this task's **new** files with `git add -N <file> …` (intent-to-add, named individually like step 4, never `-A`). `git diff` does not see untracked files, so without it a feature made of brand-new files measures as zero lines and sails past the gate. The exclusions are deliberate: a regenerated lockfile or a `dist/` rebuild is not review surface, and counting it splits PRs that never needed splitting.
 
    | Reading | Action |
    |---------|--------|

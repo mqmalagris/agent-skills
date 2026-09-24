@@ -9,9 +9,9 @@
 # Skip one push:           SKIP_EVALS=1 git push   (or git push --no-verify)
 # More runs per case:      EVAL_RUNS=3 git push    (default 1: a smoke gate)
 #
-# Cases tagged `needs-bash` grant the agent Bash, which the eval runner only
-# allows where an OS sandbox exists (Linux, macOS, WSL2). On native Windows
-# they are skipped and listed, never silently dropped.
+# A skill whose pushed content already has a passing entry in
+# evals-history/<skill>.jsonl (publish-skill records one before committing) is
+# not run again: that entry is the evidence for exactly this content.
 
 set -uo pipefail
 
@@ -20,70 +20,37 @@ command -v claude >/dev/null 2>&1 || { echo "pre-push: claude not on PATH, evals
 
 root=$(git rev-parse --show-toplevel)
 cd "$root" || exit 0
+[ -x scripts/eval-run.sh ] || [ -f scripts/eval-run.sh ] || exit 0
 zero=0000000000000000000000000000000000000000
 
-# Collect the skills whose SKILL.md or evals/ changed in the commits being pushed.
-skills=""
+todo=""
 while read -r _lref lsha _rref rsha; do
+  [ -z "${lsha:-}" ] && continue                        # blank line
   [ "$lsha" = "$zero" ] && continue                     # branch deletion
   if [ "$rsha" = "$zero" ]; then                        # new branch: diff against main
     base=$(git merge-base "$lsha" origin/main 2>/dev/null || git merge-base "$lsha" main 2>/dev/null) || continue
   else
     base=$rsha
   fi
-  for f in $(git diff --name-only "$base" "$lsha" -- 'skills/*/SKILL.md' 'skills/*/evals/**'); do
-    s=$(echo "$f" | cut -d/ -f2)
-    [ -d "skills/$s/evals" ] && case " $skills " in *" $s "*) ;; *) skills="$skills $s" ;; esac
-  done
-done
-
-[ -z "${skills// /}" ] && exit 0
-
-case "$(uname -s)" in MINGW*|MSYS*|CYGWIN*) sandbox=0 ;; *) sandbox=1 ;; esac
-runs=${EVAL_RUNS:-1}
-logdir=$(mktemp -d)
-cases=()
-skipped=()
-
-for s in $skills; do
-  for p in skills/"$s"/evals/*/prompt.md; do
-    [ -f "$p" ] || continue
-    if grep -qE '^tags:.*needs-bash' "$p" && [ "$sandbox" = 0 ]; then
-      skipped+=("$(dirname "$p")")
-    else
-      cases+=("$p")
+  for s in $(git diff --name-only "$base" "$lsha" -- 'skills/*/SKILL.md' 'skills/*/evals/**' | cut -d/ -f2 | sort -u); do
+    git cat-file -e "$lsha:skills/$s/evals" 2>/dev/null || continue
+    tree=$(git rev-parse "$lsha:skills/$s")
+    if git show "$lsha:evals-history/$s.jsonl" 2>/dev/null | grep "\"tree\":\"$tree\"" | grep -q '"passed":true'; then
+      echo "pre-push: $s ${tree:0:7} already has a passing recorded eval, not re-running"
+      continue
     fi
+    case " $todo " in *" $s "*) ;; *) todo="$todo $s" ;; esac
   done
 done
 
-echo "pre-push: evaluating${skills} (${#cases[@]} case(s), ${runs} run(s) each)"
-
-run_case() {
-  local p=$1 runs=$2 sandbox=$3 logdir=$4
-  local log="$logdir/$(echo "$p" | tr '/' '_').log"
-  local extra=()
-  [ "$sandbox" = 1 ] && extra=(--scaffold --allow-tools Bash Write)
-  if claude plugin eval "$p" --runs "$runs" --ablation none --no-publish --trust-plugin \
-       --threshold 0.8 "${extra[@]}" >"$log" 2>&1; then
-    echo "  pass  $(dirname "$p")"
-  else
-    echo "  FAIL  $(dirname "$p")   (log: $log)"
-    return 1
-  fi
-}
-export -f run_case
+[ -z "${todo// /}" ] && exit 0
 
 status=0
-if [ "${#cases[@]}" -gt 0 ]; then
-  printf '%s\n' "${cases[@]}" |
-    xargs -P 4 -I{} bash -c 'run_case "$@"' _ {} "$runs" "$sandbox" "$logdir" || status=1
-fi
-
-for c in "${skipped[@]}"; do
-  echo "  skip  $c   (needs-bash: no OS sandbox on native Windows; run under WSL2/Linux)"
+for s in $todo; do
+  bash scripts/eval-run.sh "$s" || status=1
 done
 
 if [ "$status" != 0 ]; then
-  echo "pre-push: eval regression, push blocked. Inspect the logs above, fix, or SKIP_EVALS=1 to override."
+  echo "pre-push: eval regression, push blocked. Fix, or SKIP_EVALS=1 to override."
 fi
 exit $status
