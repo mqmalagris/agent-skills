@@ -269,23 +269,6 @@
       ]
     },
     {
-      "name": "review-pass",
-      "source": "./skills/review-pass",
-      "description": "Single review-only entry point for an existing diff \u2014 runs verify \u2192 code-review \u2192 implementation-review (and security-audit only when the change touches a trust boundary), then consolidates every finding into one go/no-go verdict.",
-      "version": "0.3.1",
-      "author": {
-        "name": "Matheus Malagris"
-      },
-      "category": "engineering-workflow",
-      "keywords": [
-        "code-review",
-        "diff-review",
-        "quality-gate",
-        "pre-commit",
-        "orchestrator"
-      ]
-    },
-    {
       "name": "grill-me",
       "source": "./skills/grill-me",
       "description": "Stress-test a plan or design via relentless interview. Resolves each branch of the decision tree, captures domain vocabulary, emits Design Notes + Glossary block for /to-prd. Adapted from mattpocock/skills.",
@@ -488,6 +471,23 @@
         "ats",
         "job-search",
         "recruiter"
+      ]
+    },
+    {
+      "name": "review-pass",
+      "source": "./skills/review-pass",
+      "description": "Single review-only entry point for an existing diff \u2014 runs verify \u2192 code-review \u2192 implementation-review (and security-audit only when the change touches a trust boundary), then consolidates every finding into one go/no-go verdict.",
+      "version": "0.4.0",
+      "author": {
+        "name": "Matheus Malagris"
+      },
+      "category": "engineering-workflow",
+      "keywords": [
+        "code-review",
+        "diff-review",
+        "quality-gate",
+        "pre-commit",
+        "orchestrator"
       ]
     }
   ]
