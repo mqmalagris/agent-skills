@@ -1,5 +1,5 @@
 ---
-description: Explicit quick review of a one-file fix runs only the live check and code-review.
+description: "Explicit quick review of a one-file fix runs only the live check and code-review."
 tags: [review-pass, gating, needs-bash]
 max_turns: 10
 timeout_seconds: 300

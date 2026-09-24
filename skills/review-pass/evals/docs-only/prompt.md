@@ -1,5 +1,5 @@
 ---
-description: Docs-only diff: no live-run check, no standalone security audit.
+description: "Docs-only diff: no live-run check, no standalone security audit."
 tags: [review-pass, gating, needs-bash]
 max_turns: 10
 timeout_seconds: 300

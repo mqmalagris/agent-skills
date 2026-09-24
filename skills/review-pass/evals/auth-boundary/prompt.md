@@ -1,5 +1,5 @@
 ---
-description: Auth middleware change sits on a trust boundary: live check runs and security is called out.
+description: "Auth middleware change sits on a trust boundary: live check runs and security is called out."
 tags: [review-pass, gating, needs-bash]
 max_turns: 10
 timeout_seconds: 300
