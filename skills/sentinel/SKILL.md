@@ -31,7 +31,7 @@ Tier 1 is lagging and coarse — it tells you a file keeps breaking, days or wee
 
 1. **Scope** — which repo, which window. Default: current repo, last 30 days. On a multi-repo sweep, run per repo and report separately; findings don't merge across repos.
 2. **Tier 1 scan** — `py -3 scripts/scan_git_signals.py --repo <path> --since "<window>"` (Windows; `python3` on POSIX). Returns JSON: `totals`, `repeat_classes`, `reverts`, `conventional_commit_coverage`.
-3. **Tier 2 scan** (only if the repo appears in [config](#tier-2-config)) — query the configured source, compare against its thresholds.
+3. **Tier 2 scan** (only if the repo appears in [config](#tier-2-config)) — query the configured source, compare against its hard thresholds, and grade any `bands` metrics against their trailing baseline. The deviation picks the [response tier](#response-tiers).
 4. **Triage** — apply the [filing bar](#the-filing-bar). Most runs file nothing, and that is the expected outcome, not a failure.
 5. **Dedup before writing** — for each finding that clears the bar, grep `docs/intent/` for its `signature`. Found → **amend** that file (add a dated observation line, bump the count) rather than minting a new index. This is the difference between a useful log and 52 near-identical files a year.
 6. **File** — write `docs/intent/NNNN-<slug>.md` per the [template](#what-it-files), path from `bash scripts/next-intent-index.sh <slug>`.
@@ -69,6 +69,7 @@ Any revert clears the bar on its own. A revert means something reached users bro
 - **Date**: YYYY-MM-DD
 - **Slug**: <kebab-slug>
 - **Source**: sentinel (tier <1|2>, automated detection)
+- **Priority**: normal | urgent  (urgent = tier 2 at 3σ or a hard threshold crossed)
 - **Signature**: <dedup key — the file path, or the metric name for tier 2>
 
 ## Signal
@@ -78,6 +79,11 @@ metric, its threshold, and the observed value. Facts only.>
 ## Observations
 - YYYY-MM-DD — first detected: <n> fixes over <n> days
 - YYYY-MM-DD — still present: now <n> fixes
+
+## Diagnosis
+<tier 2 at 2σ+ only; delete otherwise. Deploys and merged commits (SHA +
+subject) inside the window where the shift began, and which touched the code
+path this metric measures. Correlation, not cause.>
 
 ## Why this might matter
 <one paragraph of hypothesis, explicitly labelled as hypothesis. The detector
@@ -109,6 +115,31 @@ Status stays `draft` — a machine-detected intent has not been through `grill-m
   }
 }
 ```
+
+`thresholds` are hard ceilings: a budget the metric must never cross, whatever its history (the 400ms startup CPU limit is not negotiable). Add an optional `bands` block to also catch drift *inside* the ceiling:
+
+```json
+"bands": {
+  "metrics": ["cpu_time_p99_ms", "error_rate"],
+  "baseline_days": 28,
+  "min_samples": 14
+}
+```
+
+For each listed metric, compute the mean and standard deviation of its daily values over the trailing `baseline_days` (excluding the window being judged), then grade the current value by how far it sits from that mean. Fewer than `min_samples` daily points → no band for that metric, thresholds only, and say so in the report; a band drawn from a week of data flags every Monday.
+
+### Response tiers
+
+The response scales with the deviation, and the top tier still never touches code:
+
+| Deviation | Response | Output |
+|---|---|---|
+| < 1σ | nothing | — |
+| ≥ 1σ | **log** | one line under "observed, not filed" in the report. Most of these are noise, and the report is where a trend of them becomes visible. |
+| ≥ 2σ | **diagnose, read-only** | file (or amend) the intent, and fill `## Diagnosis`: the deploys and merged commits inside the window where the shift started, with SHAs, and which of them touched the code path the metric measures. Correlation only, labelled as such. |
+| ≥ 3σ, or any hard threshold crossed | **file + alert** | everything in the 2σ tier, `Priority: urgent` in the intent header, and a push notification (PushNotification tool when available, otherwise the first line of the report) naming the metric, the value, and the intent path. |
+
+The 2σ and 3σ tiers count toward the 3-per-run filing cap; alerts are the exception, they always go out. Direction matters: a band is judged only on the side that's bad (latency up, errors up, the outcome metric *down*). An error rate dropping 3σ is good news, not an intent.
 
 The token lives in the environment, never in the file — `token_env` names the variable to read. Scope it to Analytics:Read only; this skill never needs write access to anything.
 
