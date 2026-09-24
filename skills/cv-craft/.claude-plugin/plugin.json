@@ -1,6 +1,6 @@
 {
   "name": "cv-craft",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Maintain a canonical master CV in Markdown and produce tailored, ATS-friendly resumes and recruiter-screen prep packs from job descriptions.",
   "author": {
     "name": "Matheus Malagris",
