@@ -8,6 +8,14 @@
     "thresholds": {
       "cpu_time_p99_ms": 350,
       "error_rate": 0.01
+    },
+    "bands": {
+      "metrics": [
+        "cpu_time_p99_ms",
+        "error_rate"
+      ],
+      "baseline_days": 28,
+      "min_samples": 14
     }
   }
 }

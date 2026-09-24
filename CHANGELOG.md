@@ -4,6 +4,7 @@ All notable changes to this collection are documented here. Format follows [Keep
 
 ## [Unreleased]
 - review-pass: code-review runs in a fresh subagent when the session wrote the diff (the writer does not grade its own work), and a per-repo review ledger turns a mistake class caught twice into a proposed CLAUDE.md rule. Adds a 3-case eval suite (docs-only, auth trust boundary, quick depth).
+- sentinel: tier-2 control bands (mean/σ over a trailing baseline) alongside hard thresholds, with graded responses: 1σ log, 2σ read-only diagnosis in the intent, 3σ or threshold breach files an urgent intent and alerts. Adds a 3-case eval suite (revert files an intent, healthy repo stays quiet, low commit-convention coverage files nothing).
 - cv-craft: disable ligatures in the PDF stylesheet and add verify-pdf.py, so rendered CVs extract as real text for ATS keyword search
 - Add `claude plugin eval` behavioral regression suites, starting with dev-flow (8 cases: one per tier, resume-from-existing-plan, trivial-edit skip, and a negative trigger). New `scripts/hooks/pre-push` runs the suite of any skill a push changes on the pusher's own Claude login (`git config core.hooksPath scripts/hooks`); `needs-bash` cases skip on native Windows. Measured locally at mean Δ +0.50 against a no-skill baseline, +1.00 on every tier-routing case.
 
