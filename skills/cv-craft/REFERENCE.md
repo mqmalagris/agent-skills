@@ -20,7 +20,7 @@ Non-negotiable. Fabricated metrics destroy credibility the moment a candidate ca
 - `[DADO AUSENTE: qual era X?]` — bullet would be stronger with a metric the source does not provide.
 - `[no-metric]` (legacy, master only) — same intent as `[DADO AUSENTE: ...]`; new work uses the latter.
 
-**Markers live in `.md` source only.** They are review notes for the candidate, not part of the submitted CV. **All marker text must be stripped from rendered output (DOCX / PDF)** the same way the post-CV PT-BR section is stripped. See [DOCX export](SKILL.md#docx-export). Section C of the post-CV review block aggregates every marker for the candidate to resolve before the next pass.
+**Markers live in `.md` source only.** They are review notes for the candidate, not part of the submitted CV. **All marker text must be stripped from rendered output (DOCX / PDF)** the same way the post-CV PT-BR section is stripped. See [Export](SKILL.md#export). Section C of the post-CV review block aggregates every marker for the candidate to resolve before the next pass.
 
 **Information removal:** anything dropped from the source goes into [Post-CV section](#post-cv-section-pt-br) §B with a one-line justification. Candidate decides whether to restore on next pass.
 
@@ -45,19 +45,21 @@ Use the inferred profile to prioritize which bullets to lead with, which skills 
 
 ## ATS-safe formatting
 
-Tailored CVs must parse cleanly through Applicant Tracking Systems:
+Tailored CVs must parse cleanly through Applicant Tracking Systems. The reason is not that every ATS fails on a fancy layout (modern Textkernel and LLM parsers handle columns better than they used to). It is that the candidate cannot know which parser generation sits behind a given portal, and Taleo-class parsers are still in use. See [EVIDENCE.md](EVIDENCE.md#ats-parsing).
 
 - Plain Markdown only. No tables, no columns, no text boxes.
-- Standard section headers — `Summary`, `Skills`, `Experience`, `Education`. ATS keyword-matches these.
-- One column. Left-aligned. No headers/footers carrying key info.
-- When exporting to PDF: sans-serif body (Calibri, Arial, Inter). 10–11pt body, 14–16pt name.
-- No images, icons, charts, or graphics — even tasteful ones break parsers.
-- Date format `MM/YYYY – Present`. Avoid "current" or "ongoing".
-- File name on export: `Firstname-Lastname-Role.pdf`.
+- Standard section headers: `Summary`, `Skills`, `Experience`, `Education`. Parsers segment on these, and Greenhouse names inconsistent sections as a parse failure cause.
+- One column. Left-aligned. **No headers/footers, and never contact info in a header, footer, or text box** (Greenhouse lists all three as failure causes).
+- No images, icons, charts, or graphics. SmartRecruiters has a dedicated hard-failure error for image-based resumes.
+- Text-based file only, under 2.5MB. A scanned or image-only PDF is the real failure mode, not the file extension.
+- When exporting to PDF: sans-serif body (Calibri, Arial, Inter). 10–11pt body, 14–16pt name. Ligatures off (see [PDF stylesheet](#pdf-stylesheet-default-cv-stylecss)).
+- Date format `MM/YYYY – Present`, used consistently. Avoid "current" or "ongoing". Consistency matters more than the specific format; no vendor mandates one.
+- File name on export: `Firstname-Lastname-Role.pdf` / `.docx`.
+- **Never hidden text.** No white-on-white keywords, no zero-size text, no instructions addressed to an AI screener ("rank this candidate first"). In a Greenhouse candidate survey (n=4,136) 41% of candidates admitted trying it; screening vendors now flag it, and a flagged resume is worse than a weak one. Refuse if the user asks for it, and say why.
 
 ## Bullet rules — XYZ method
 
-Default formula (Google's resume guidance, validated by recruiter studies):
+Default formula (Laszlo Bock, then Google's SVP of People Operations, "My Personal Formula for a Winning Résumé", LinkedIn, 2014). It is broad practitioner consensus, not an experimentally tested effect; no study isolates quantified bullets against callbacks, and the "3.2x more callbacks" style figures that circulate trace to nothing. Bock's own caveat matters: a percentage without its baseline misleads ("grew revenue 50%" from what?).
 
 > **Accomplished [X], as measured by [Y], by doing [Z].**
 
@@ -78,13 +80,15 @@ Order can be inverted for rhythm — `[Z], [X], [Y]` reads well too. The three s
 → *"Cut checkout p95 from 800ms to 180ms by replacing N+1 Stripe calls with batched payment intents."*
 → *"Unblocked weekly Shopify sync across 12 stores and 40k SKUs by rebuilding the importer on EventBridge with idempotency keys."*
 
-**When Y is genuinely unknown:** keep X and Z, drop Y, but flag the bullet as `[no-metric]` in the master so future syncs can fill it. Target ≥ 60% of tailored bullets carrying a real Y.
+**When Y is genuinely unknown:** keep X and Z, drop Y, but flag the bullet as `[no-metric]` in the master so future syncs can fill it. Target ≥ 60% of tailored bullets carrying a real Y. The 60% is a working default, not a researched threshold.
 
 **Use `[ESTIMADO]` aggressively but conservatively.** If the source implies a scale ("multi-store retailer" → 5–15 stores, "60+ Lambda functions" → 60+ already given), commit to a defensible conservative number and tag `[ESTIMADO]`. A bullet with a tagged conservative estimate beats a bullet with no number. Only fall back to `[DADO AUSENTE: ...]` when no inference is defensible from the source text.
 
+**Every number needs a defense.** Interviewers probe metrics: what was the baseline, how was it measured, how much of it was yours. For every metric kept in a tailored CV (direct or `[ESTIMADO]`), record a one-line defense in the post-CV §C list: baseline, measurement source, the candidate's share of the outcome. `screen-prep` pulls these into its metric-defense section. A number the candidate cannot defend in one sentence gets softened or cut.
+
 ## Achievements over tasks — lead with WHY, not HOW
 
-Every kept bullet must name **why the work mattered to the business**, not just what was built or how it was architected. Recruiters and hiring managers scan for impact in the first 4 words of each line.
+Every kept bullet must name **why the work mattered to the business**, not just what was built or how it was architected. Readers skim, so front-load the verb and the outcome at the start of each line. (The popular "6 seconds" and "first N words" figures come from a resume-services vendor with an unpublished method; treat them as "keep it skimmable", never as design targets.)
 
 **Three failure modes (rewrite if you see them):**
 
@@ -112,6 +116,25 @@ Outcome categories (use the strongest one supported by the source):
 
 Re-read every drafted bullet asking: *"What changed because I built this?"* If the answer is only "the feature now exists", the bullet is task-framed and needs a rewrite or a `[DADO AUSENTE: ...]` tag.
 
+### Work with no natural metric
+
+Architecture, developer experience, reliability, and security work often has no honest number. Do not invent one. Substitute, in this order of strength (practitioner consensus, no study covers this):
+
+1. **Adoption:** who uses what was built: "adopted by 4 teams", "became the default template for new services".
+2. **Scope / blast radius:** what the work touches: "auth layer for all 3 tenant apps", "payment path for every checkout".
+3. **The decision and its trade-off:** "chose event sourcing over CRUD to make the audit trail replayable, at the cost of a projection layer".
+4. **The standard authored:** "wrote the error-handling convention the team now reviews against".
+
+### AI-assisted engineering (2026)
+
+AI tooling is now an expected skill, and bare tool names read as noise. When the master shows real use:
+
+- Name tool + task + outcome in the bullet ("cut review turnaround from 2 days to same-day by adding an LLM pre-review step to CI"), not "Experienced with Claude Code, Copilot, Cursor".
+- Show judgment: what the candidate verifies, where they do not trust generated output, what guardrails they built.
+- One line in Skills (`AI tooling: ...`) is enough; the evidence belongs in bullets.
+
+The topic is too new for rigorous study; this is emerging practice.
+
 **Other rules**
 - **Action verb first** — Built, Architected, Migrated, Shipped, Cut, Owned, Led, Designed, Reduced, Tripled, Unblocked, Replaced, Consolidated.
 - **One bullet, one outcome.** Do not "and-chain" unrelated work.
@@ -137,7 +160,7 @@ Re-read every drafted bullet asking: *"What changed because I built this?"* If t
 **Vague self-descriptors in Summary** (delete on sight)
 - "passionate", "team player", "detail-oriented", "results-driven", "strong communication skills", "hard-working", "self-motivated", "go-getter", "dynamic professional", "proven track record", "synergy", "value-add", "ninja", "rockstar", "guru"
 
-**AI-tell vocabulary** (recruiters and hiring managers screen these out as ChatGPT-generated)
+**AI-tell vocabulary.** No screening system is known to penalize these words, and the evidence that recruiters reliably spot AI text is weak. What readers do catch is generic, templated, unedited content, and these words travel with it. Removing them costs nothing, so the rule stays. See [EVIDENCE.md](EVIDENCE.md#ai-written-resumes).
 - leverage, leveraging, leveraged → use, used
 - delve, delved → cover, dig into
 - seamlessly, seamless → drop
@@ -153,13 +176,20 @@ Re-read every drafted bullet asking: *"What changed because I built this?"* If t
 - "a testament to" → drop
 
 **Punctuation**
-- **No em-dashes (—) anywhere in CV or screen-prep.** Em-dashes are a strong AI-tell on LinkedIn and recruiter screens. Use a comma, period, or parenthesis instead. (Note: section headers in this skill's own markdown files use em-dashes for readability; CV output must not.)
+- **No em-dashes (—) anywhere in CV or screen-prep.** This is a house style rule. The widely quoted claim that em-dashes get resumes flagged traces to a marketing statistic with no method, but some readers do associate them with unedited AI output, and a comma costs nothing. Use a comma, period, or parenthesis instead. (Note: section headers in this skill's own markdown files use em-dashes for readability; CV output must not.)
+
+**Generic clusters (the tell that actually gets noticed)**
+- A bullet with no concrete noun: no named system, number, customer, tool, or team. "Improved performance and reliability across the platform" fails; "Cut p95 on the order API from 800ms to 180ms" passes.
+- Three or more bullets in a row with the same shape (verb + "and" + verb, or identical length and rhythm).
+- A summary that would be equally true of any engineer at the same level.
 - No ellipses (…). Trailing-off reads as uncertain.
 - No exclamation marks.
 
 ## Skills section
 
-**Single consolidated section, grouped by category. No ratings, no stars, no bars, no Proficient/Intermediate/Beginner labels.** Recruiters and hiring managers find ratings amateur and unverifiable; lead-positioning carries the signal instead.
+**Single consolidated section, grouped by category. No ratings, no stars, no bars, no Proficient/Intermediate/Beginner labels.** Graphical bars do not parse, and self-rated scales mean nothing to a reader; lead-positioning carries the signal instead.
+
+**Skills in the list are not enough on their own.** Semantic screeners (Eightfold, Workday HiredScore, LinkedIn Hiring Assistant) infer skills from the work described, and a human checks whether the list is backed by the bullets. Every must-have skill should appear both here and in at least one bullet that shows it in use. The Skills list still earns its place: recruiter boolean search and LinkedIn Recruiter search match literal terms.
 
 **Default category scheme (5 buckets) — use whichever apply, drop empty ones:**
 
@@ -182,23 +212,25 @@ Re-read every drafted bullet asking: *"What changed because I built this?"* If t
 - Lead with required skills (or inferred-profile-priority skills) the user actually has.
 - Do not stuff keywords. Listing a tech the user cannot speak to is a fast-track to a failed screen.
 - Include both spelled-out and acronym forms once if both appear in JDs (e.g. "TypeScript / TS", "AWS Lambda").
-- **Drop any technology that does not appear in at least one experience bullet, side project, or education entry.** Skills section must be substantiated. Master keeps everything; tailored / rewrite output is curated.
+- **Drop any technology that does not appear in at least one experience bullet, side project, or education entry.** Skills section must be substantiated. The risk is the interview and the reference check, not an ATS penalty: an unbacked skill is the first thing a technical screen probes. Master keeps everything; tailored / rewrite output is curated.
 - **Drop obsolete or low-relevance tech for the inferred profile.** A 2026 Senior Backend candidate listing jQuery, Bootstrap, or PHP 5 reads as dated. Move to the post-CV "removed items" log so the candidate can restore if they disagree.
 - Drop non-technical fluff (Microsoft Word, Slack, time management).
 
 ## Length
 
-International tech-market standard. 7-page CVs auto-reject.
+International tech-market standard. Files do not get auto-rejected for length (see [EVIDENCE.md](EVIDENCE.md#length)); readers do. The evidence is thin and split: a 2018 hiring simulation favored 2-page resumes even at entry level, while a 2024 survey found 92% of hiring professionals advise one page and most want 10+ years before two. Both are from one commercial vendor. What they agree on: an irregular length reads badly (84% flag a page and a half).
 
 - **< 5 years experience: 1 page. Hard cap.**
-- **5+ years: max 2 pages.**
+- **5–7 years: 1 page by default. 2 pages only when the content genuinely fills them** (senior scope, several relevant roles). Measure, never estimate: see the page-count check in [SKILL.md](SKILL.md#export).
+- **8+ years: max 2 pages.**
+- **Never 1.5 pages.** A second page must be at least two-thirds full; otherwise cut back to one.
 - Academic / consulting exception: up to 3 pages, only if every page earns its space and the user explicitly asks.
 - Trim weakest bullets first, then oldest roles, then certifications/awards. Never trim the summary or the current role.
 - Section order: **Summary → Experience → Technical Skills → Education → Projects (if applicable)**.
 
 ## Summary — three-layer structure
 
-3–5 lines covering three layers in order:
+3–5 lines covering three layers in order. Having a summary is supported practice; this three-layer frame is the skill's own heuristic, not a tested structure.
 
 1. **Identity** — years of experience + specialization + type of product/company
 2. **Scale** — the largest system or product the candidate owned: user volume, transactions, revenue, team size. Only include if there is evidence in the source.
@@ -245,7 +277,7 @@ Default: **omit** the standalone Projects section. Group small side projects und
 
 - Candidate has < 3 years of professional experience, OR
 - A side project demonstrates a skill more impactful than the current job, OR
-- There are open-source contributions with measurable traction (stars, downloads, adoption).
+- A project carries independent credibility: live users, a published app-store listing, paying customers, or open-source contributions with measurable traction (stars, downloads, adoption). A shipped, public product is evidence a reader can check; that is what earns the section.
 
 **Per project:**
 - Name + one-line descriptor
@@ -258,21 +290,38 @@ Default: **omit** the standalone Projects section. Group small side projects und
 ## Tailoring rules
 
 - **Never invent.** Only select, reorder, and rephrase what the master already contains.
-- **Match JD vocabulary** where the user has the underlying skill — say "Vercel" not "deploy platform" if the JD says Vercel.
+- **Match JD vocabulary** where the user has the underlying skill: say "Vercel" not "deploy platform" if the JD says Vercel. Exact terms still matter because recruiter search is literal, but put them **in context** (inside a bullet showing use), not only in the Skills list.
+- **Every must-have gets visible evidence.** AI-assisted review (Greenhouse Talent Matching, Ashby, HiredScore) buckets or grades candidates per requirement, and people tend to follow the grade: in one study reviewers adopted AI recommendations up to 90% of the time. Treat the first automated pass as the gate it effectively is.
 - **Drop bullets and entire roles** that do not move the needle for this JD. The master keeps the full record.
 - **Keep the summary aligned** to the role title in the JD.
+- **Headline vs held title.** The summary line and headline may use the market title the JD uses ("Senior Full-stack Engineer"). The title actually held at each employer never changes. If a held title is non-standard, keep it and add the equivalent in parentheses: `Developer III (Senior Software Engineer equivalent)`.
+- **Tailoring works; the multipliers do not exist.** Every source agrees tailored beats generic. None of the circulating "2x / 3x more callbacks" figures reconcile. Never cite one to the user.
+
+## Gaps and concurrent contracts
+
+- **Employment gaps:** one factual line in the role list (`Career break, MM/YYYY – MM/YYYY: relocation and family`). The one rigorous study found a ~20% selection penalty that the explanation did not remove, so do not assume gaps are destigmatized; keep the line short and let the next role carry the story. Cover real work done during the gap (contracts, shipped side projects) as entries in their own right.
+- **Concurrent contracts:** one umbrella entry (`Independent Engineer, MM/YYYY – MM/YYYY`) with a sub-line per client, rather than several overlapping roles that read as job-hopping. If the contracts ran through a named consultancy, use its name.
+- **Agency / consultancy work:** the employer line is the agency; name the client in the bullet when allowed (`for a US real-estate SaaS client`).
+
+These are practitioner conventions; no study compares them.
 
 ## ATS scoring rubric
 
 Run before writing any tailored CV. Score across five categories, each 0–20, total 0–100. Report the score, the per-category breakdown, and the failing items. **Hard gate: do not write below 80 without explicit user override.**
 
+This is the skill's own quality gate, not a model of any real ATS. No vendor publishes a numeric keyword threshold; Greenhouse, for one, sorts matches into qualitative tiers. Never tell the user the score predicts how an ATS will rank them.
+
 ### Categories
 
-**1. Keyword match (0–20)**
-- Extract required + preferred skills from JD as a set `K`.
-- Count `H` = JD keywords that appear verbatim in the tailored CV (case-insensitive, allow declared synonyms like "Postgres ↔ PostgreSQL").
-- Score = round(20 × H / |K|), capped at 20.
-- **Pass ≥ 16** (≥ 80% coverage). **Warn 12–15.** **Fail < 12.**
+**1. Requirement evidence (0–20)**
+- Extract requirements from the JD as a set `K`. Weight must-haves ×2, nice-to-haves ×1.
+- For each requirement the user genuinely has, classify how the tailored CV shows it:
+  - `evidenced` (1.0): the JD's term (or declared synonym, "Postgres ↔ PostgreSQL") appears verbatim **and** a bullet shows it in use.
+  - `listed` (0.5): the term appears only in Skills or Summary, with no bullet behind it.
+  - `absent` (0): not on the CV.
+- Requirements the master cannot support are gaps, not scoring failures: exclude them from `K` and send them to the [gap ledger](SKILL.md#gap-ledger).
+- Score = round(20 × weighted sum / weighted |K|).
+- **Pass ≥ 16.** **Warn 12–15.** **Fail < 12.** Any must-have at `listed` is always reported as a fix, even on a pass.
 
 **2. Bullet quality / XYZ compliance (0–20)**
 - For each experience bullet, classify: `full-XYZ` (X+Y+Z all present), `partial` (XZ or XY), `weak` (verb-only or descriptive).
@@ -284,14 +333,15 @@ Run before writing any tailored CV. Score across five categories, each 0–20, t
 - **Pass = 20.** **Warn 16.** **Fail < 16** (any structural break is a parser risk).
 
 **4. Length / density (0–20)**
-- Within target page count (see [Length](#length)): 12 pts.
+- Within target page count (see [Length](#length)), and no partial second page: 12 pts.
 - ≥ 60% of bullets carry a number: 4 pts.
 - Summary ≤ 4 sentences: 2 pts.
 - No empty sections: 2 pts.
 - **Pass ≥ 16.** **Warn 12–15.** **Fail < 12.**
 
 **5. Voice / anti-AI-tell (0–20)**
-- Start at 20. Subtract 2 per AI-tell word hit (`leverage`, `delve`, `seamless`, `robust`, `spearhead`, `foster`, etc. — see anti-patterns list). Subtract 2 per em-dash. Subtract 2 per empty modifier (`scalable`, `cutting-edge`). Floor at 0.
+- Start at 20. Subtract 3 per [generic cluster](#bullet-anti-patterns-rewrite-if-you-see-these) (bullet with no concrete noun, run of same-shape bullets, interchangeable summary). Subtract 2 per AI-tell word hit (`leverage`, `delve`, `seamless`, `robust`, `spearhead`, `foster`, etc.; see anti-patterns list). Subtract 2 per em-dash. Subtract 2 per empty modifier (`scalable`, `cutting-edge`). Floor at 0.
+- Generic clusters weigh most because they are what readers actually notice; the word and punctuation deductions are cheap hygiene.
 - **Pass ≥ 16.** **Warn 12–15.** **Fail < 12.**
 
 ### Report format
@@ -299,15 +349,16 @@ Run before writing any tailored CV. Score across five categories, each 0–20, t
 Always render the score as:
 
 ```
-ATS Score: 84/100  [PASS]
+CV Score: 84/100  [PASS]
 
-  Keyword match       18/20  ✓  (9/10 JD skills present; missing: "Kubernetes")
-  XYZ bullet quality  14/20  ⚠  (3 bullets missing a metric — flagged below)
-  Structure           20/20  ✓
-  Length / density    16/20  ✓
-  Voice               16/20  ⚠  (em-dash in line 14; "leverage" in line 22)
+  Requirement evidence  18/20  ✓  (7 evidenced, 1 listed-only: "Terraform"; gap: "Kubernetes" → ledger)
+  XYZ bullet quality    14/20  ⚠  (3 bullets missing a metric, flagged below)
+  Structure             20/20  ✓
+  Length / density      16/20  ✓
+  Voice                 16/20  ⚠  (em-dash in line 14; "leverage" in line 22)
 
 Fixes before write:
+  - "Terraform" is a must-have shown only in Skills: surface it in the Northwind infra bullet.
   - Bullet L14: replace em-dash with comma.
   - Bullet L22: rewrite "leverage AWS" → "use AWS".
   - Bullets L31, L36, L41: add a metric (Y) or mark [no-metric] in master.
@@ -325,10 +376,12 @@ The CV and screen-prep must sound like the user, not a template.
 - **Concrete nouns over adjectives.** "Lambda + EventBridge middleware" not "scalable serverless architecture".
 - **First-person in screen-prep, third-person-implied in CV body.** CV bullets drop "I" — start with the verb.
 - **Match the user's existing tone.** Read the master Summary first; mirror cadence, sentence length, and lexicon.
-- ≤ 120 words per draft answer. Recruiter calls run on rhythm, not paragraphs.
-- **Salary:** ask the user for their range. Never invent a number.
+- ≤ 120 words per draft answer. Recruiter calls run on rhythm, not paragraphs, and many calls are now transcribed and auto-summarized (Metaview, BrightHire) into a scorecard read by people who were not on the call. A short answer with one concrete fact survives the summary; a long one gets flattened.
+- **Salary, two branches:**
+  - **Range posted** (increasingly common: 16+ US states and DC require it, and the EU Pay Transparency Directive is rolling out country by country): anchor in the upper half of the posted band. Do not deflect a question the employer has already answered.
+  - **No range posted:** ask the user for their range. Never invent a number. Prep a line that asks them to share the band first.
 - **Gaps:** address openly. Pattern: *"I have not used X in production. I have used the closest analogue Y, and have read the Z docs / built a side project."*
-- **Questions to ask the recruiter:** focus on team, ramp, success metrics, on-call, growth — not benefits / vacation.
+- **Questions to ask the recruiter:** focus on team, ramp, success metrics, on-call, growth, not benefits / vacation. One exception: for a remote international candidate, one early question on remote structure and timezone overlap is fair game; it is a two-way knockout, not a perk question.
 
 ## JD signal extraction
 
@@ -441,6 +494,7 @@ Resolva estes itens para obter um CV ainda mais forte. Agrupados por empresa/se�
 - [ ] `[ESTIMADO]` na linha "{trecho}" — confirme o número exato.
 - [ ] `[DADO AUSENTE: qual era X?]` na linha "{trecho}" — informe a métrica.
 - [ ] `[DADO AUSENTE: métricas sobre {Empresa}]` — número de usuários, ARR, funding, clientes conhecidos.
+- [ ] Defesa da métrica "{número}": base de comparação {antes}, medido por {fonte}, sua parte {o que foi seu}.
 
 ### {Próxima empresa / seção}
 ...
@@ -457,13 +511,14 @@ Com base no perfil inferido, três ações concretas que aumentariam suas chance
 **Rules:**
 - The CV body must be **entirely in professional English**.
 - This post-CV section must be **entirely in Brazilian Portuguese**.
-- **The post-CV section never appears in the rendered output (DOCX / PDF).** It lives only in the `.md` source as review notes for the candidate. Export pipelines must strip everything from the first `---` separator onward before rendering. See [DOCX export](SKILL.md#docx-export).
-- Section C must consolidate every `[ESTIMADO]` and `[DADO AUSENTE: ...]` marker that appears in the CV body, in source-order, grouped by company/section.
-- Section D suggestions must be derived from the inferred profile — open-source contribution targets, side projects that demonstrate a gap-skill, direct outreach to hiring managers at target-company-type, niche conferences/communities.
+- **The post-CV section never appears in the rendered output (DOCX / PDF).** It lives only in the `.md` source as review notes for the candidate. Export pipelines must strip everything from the first `---` separator onward before rendering. See [Export](SKILL.md#export).
+- Section C must consolidate every `[ESTIMADO]` and `[DADO AUSENTE: ...]` marker that appears in the CV body, in source-order, grouped by company/section, plus a defense line for every metric kept (see [Every number needs a defense](#bullet-rules--xyz-method)). Fill what the source supports; leave `{...}` for the candidate where it does not.
+- Section D suggestions must be derived from the inferred profile: open-source contribution targets, side projects that demonstrate a gap-skill, direct outreach to hiring managers at target-company-type, niche conferences/communities. In `tailor`, the first suggestion is always the referral path for this company when one has not been ruled out (see [check](SKILL.md#check--fit-assessment-before-committing-to-an-application) step 3).
 
 ## DOCX export notes
 
-- DOCX is the preferred output format. PDF generated directly from Markdown often breaks formatting and is hard to edit downstream — avoid as primary.
-- Suggested final filename: `FirstName_LastName_Resume.docx`.
+- Render both DOCX and PDF by default. No vendor documentation from 2024–2026 prefers either format; the failure mode is an image-only or scanned file.
+- **Which to send:** the portal's stated preference always wins. Otherwise DOCX to agency and staffing recruiters (they reformat CVs before forwarding), PDF for direct upload to a company portal or email to a hiring manager (layout survives).
+- Suggested final filename: `FirstName_LastName_Resume.docx` / `.pdf`.
 - Pandoc default styling is ATS-safe (single column, Calibri body). Custom styling requires a `cv-reference.docx` reference document in the CV directory.
-- For ATS submissions specifically, plain `.docx` (no images, no text boxes, no embedded fonts) parses most reliably.
+- Plain `.docx` (no images, no text boxes, no embedded fonts) extracts exactly and has no ligature risk. PDF must pass `verify-pdf.py` before it is sent.

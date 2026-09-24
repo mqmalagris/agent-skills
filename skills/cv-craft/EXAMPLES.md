@@ -71,15 +71,16 @@ The tailor pass converts master bullets into the XYZ formula. Concrete cases:
 
 Anti-patterns flagged: `worked on`, `responsible for`, `helped`, `robust` (empty modifier), `spearheaded` (AI-tell). Each rewrite supplies an explicit X (impact), Y (metric/scope), and Z (action).
 
-## Sample ATS score report
+## Sample CV score report
 
-Rendered in `tailor` mode after step 5, before any write. Score must be ≥ 80 to proceed without an explicit override.
+Rendered in `tailor` mode before any write. Score must be ≥ 80 to proceed without an explicit override. It is the skill's own quality gate, not a prediction of any ATS ranking.
 
 ```
-ATS Score: 84/100  [PASS]
+CV Score: 84/100  [PASS]
 
-  Keyword match       18/20  ✓  (9/10 JD skills present)
-                                 missing: "Kubernetes"
+  Requirement evidence  18/20  ✓  (8 evidenced, 1 listed-only)
+                                   listed-only: "Terraform" (must-have)
+                                   gap → ledger: "Kubernetes"
   XYZ bullet quality  14/20  ⚠  (8/10 full-XYZ, 1 partial, 1 weak)
                                  weak: L41 "Built internal admin tools."
   Structure           20/20  ✓
@@ -87,6 +88,8 @@ ATS Score: 84/100  [PASS]
   Voice               16/20  ⚠  (em-dash on L14; "leverage" on L22)
 
 Fixes before write (auto-applied unless you object):
+  - "Terraform": must-have shown only in Skills; surface it in the
+    Northwind infra bullet where it was used
   - L14: replace em-dash with comma
   - L22: rewrite "leverage AWS Lambda" → "use AWS Lambda"
   - L41: rewrite to XYZ — propose:
@@ -107,6 +110,13 @@ A `[FAIL]` example (score < 80) lists every category below threshold and blocks 
 ```markdown
 # Screen Prep — Acme — Senior Full-stack
 
+## Logistics knockouts
+
+- **Work authorization / contract:** "I'm based in Brazil and work as a contractor, or through an EOR like Deel if you prefer. No visa needed for remote."
+- **Timezone:** "I'm UTC-3. I can overlap 9am to 3pm US Eastern every day."
+- **English:** "I work in English daily; my current team and clients are US-based."
+- **Notice period / start:** {ASK USER}
+
 ## 30-second intro pitch
 
 "I'm a full-stack engineer based in Rio with eight years of programming experience, the last five focused on Next.js, Node, and AWS. At Northwind Commerce I've architected Lambda-based commerce middleware integrating Shopify, Stripe, and Recharge for multi-store retailers. I'm looking for a senior role where I can own scalable backend integrations end-to-end."
@@ -119,7 +129,8 @@ A `[FAIL]` example (score < 80) lists every category below threshold and blocks 
 
 ## Salary expectation
 
-{ASK USER for range. Suggested phrasing once provided: "Based on my eight years of experience and the senior IC level, I'm targeting USD {X}–{Y}. Happy to discuss the full package."}
+- **If the posting shows a range** (say USD {A}–{B}): anchor in the upper half. "The posted range works for me. Given the Stripe and AWS depth this role needs, I'd expect to land toward {upper half}."
+- **If no range is posted:** {ASK USER for range}. Open by asking theirs: "Could you share the band for this role? Happy to go from there." If pressed, use the user's range: "I'm targeting USD {X}–{Y} for senior IC scope."
 
 ## Top 8 likely first-call questions
 
@@ -132,12 +143,22 @@ A `[FAIL]` example (score < 80) lists every category below threshold and blocks 
 7. **How do you balance shipping speed and code quality?** *(test pyramid, what you skip on a prototype vs production, when you take on tech debt deliberately)*
 8. **What questions do you have for us?** *(see below)*
 
-Each answer ≤ 120 words.
+Each answer ≤ 120 words, with one concrete fact that survives an AI note-taker's summary.
+
+## Metric defense
+
+- **"Cut checkout p95 from 800ms to 180ms"**: measured in CloudWatch p95 over the two weeks before and after the release; the batching change was mine, the CDN tweak shipped the same week was not, so I cite only the API latency.
 
 ## Gaps and risks
 
 - **Kubernetes** — JD lists it; master shows light exposure only. Honest framing: "I have run containerized workloads on Lambda and ECS in production. My Kubernetes exposure has been research and side projects; I would ramp quickly given my AWS background."
 - **Years on Stripe** — master shows ~2 years on Stripe directly. If the JD wants 4+, frame around the depth of the work, not the duration.
+
+## Consistency and authenticity
+
+- [ ] LinkedIn titles and dates match this CV exactly (Northwind start month checked).
+- [ ] Camera on for the first call; quiet, lit room.
+- [ ] One reference ready who can confirm the Northwind work, if they ask.
 
 ## Questions to ask the recruiter
 
