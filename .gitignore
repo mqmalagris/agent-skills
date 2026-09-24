@@ -28,3 +28,6 @@ __pycache__/
 *.pyc
 .venv/
 .env
+
+# claude plugin eval run output
+skills/*/evals/results/

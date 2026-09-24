@@ -4,6 +4,7 @@ All notable changes to this collection are documented here. Format follows [Keep
 
 ## [Unreleased]
 - cv-craft: disable ligatures in the PDF stylesheet and add verify-pdf.py, so rendered CVs extract as real text for ATS keyword search
+- Add `claude plugin eval` behavioral regression suites, starting with dev-flow (8 cases: one per tier, resume-from-existing-plan, trivial-edit skip, and a negative trigger). New `evals` workflow runs the suite of any skill whose SKILL.md or evals change in a PR, gated on the `ANTHROPIC_API_KEY` secret. Measured locally at mean Δ +0.50 against a no-skill baseline, +1.00 on every tier-routing case.
 
 ## [0.13.0] - 2026-09-17
 
