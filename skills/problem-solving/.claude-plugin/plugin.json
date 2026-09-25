@@ -1,0 +1,21 @@
+{
+  "name": "problem-solving",
+  "version": "0.1.0",
+  "description": "Problem-solving coach for real decisions and messy problems that are not about code.",
+  "author": {
+    "name": "Matheus Malagris",
+    "url": "https://github.com/mqmalagris"
+  },
+  "homepage": "https://github.com/mqmalagris/agent-skills/tree/main/skills/problem-solving",
+  "repository": "https://github.com/mqmalagris/agent-skills",
+  "license": "MIT",
+  "keywords": [
+    "problem-solving",
+    "decision-making",
+    "issue-tree",
+    "mece",
+    "prioritization",
+    "hypothesis-driven",
+    "product"
+  ]
+}

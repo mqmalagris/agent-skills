@@ -489,6 +489,24 @@
         "pre-commit",
         "orchestrator"
       ]
+    },
+    {
+      "name": "problem-solving",
+      "source": "./skills/problem-solving",
+      "description": "Problem-solving coach for real decisions and messy problems that are not about code.",
+      "version": "0.1.0",
+      "author": {
+        "name": "Matheus Malagris"
+      },
+      "category": "product",
+      "keywords": [
+        "problem-solving",
+        "decision-making",
+        "issue-tree",
+        "mece",
+        "prioritization",
+        "hypothesis-driven"
+      ]
     }
   ]
 }
