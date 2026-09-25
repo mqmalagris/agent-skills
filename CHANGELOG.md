@@ -3,6 +3,7 @@
 All notable changes to this collection are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); the collection follows [SemVer](https://semver.org). See [VERSIONING.md](VERSIONING.md) for the per-skill vs collection model.
 
 ## [Unreleased]
+- `problem-solving` 0.1.0 — new skill
 - Eval coverage for the rest of the core chain: grill-me (4 cases), to-prd (3), blueprint (4), pr-craft (3) and implementation-review (2), on top of dev-flow, review-pass and sentinel. Fixtures are self-contained scaffold scripts (a shared saved-carts repo with an ADR, intent, PRD and plan), so grill-me, to-prd and blueprint run on native Windows; the git-driven pr-craft and implementation-review cases are tagged `needs-bash`.
 - Eval trend: `evals-history/<skill>.jsonl` is committed, one line per recorded run (date, version, content hash, per-case with/without scores, mean delta). `scripts/eval-run.sh <skill> --record [--runs N] [--baseline]` runs a suite and appends to it; `scripts/eval_history.py trend` prints the history. The pre-push hook now delegates to `eval-run.sh` and skips a skill whose pushed content already has a passing recorded entry.
 - publish-skill: runs the skill's eval suite on the publisher's own Claude login before committing and commits the result to `evals-history/`, aborting below threshold (`--skip-evals` to override). Resolves Git for Windows' bash rather than the System32 WSL launcher stub.
