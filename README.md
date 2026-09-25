@@ -77,11 +77,12 @@ The loop I use to take a feature from vague hunch to merged code without writing
 | [`portfolio-sync`](skills/portfolio-sync/) | Sync the current project into a central project-portfolio archive. `cv-craft` reads it as source of truth. |
 | [`brag-doc`](skills/brag-doc/) | Maintain a monthly brag document and roll it up into a promo packet, self-review, or CV material. Reads `periscope`'s contribution log so influence work with no commit behind it still counts. Feeds `cv-craft`. |
 
-### Product (1)
+### Product (2)
 
 | Skill | What it does |
 |-------|--------------|
 | [`cagan-check`](skills/cagan-check/) | Apply Marty Cagan (SVPG) + Teresa Torres Continuous Discovery to a dev's workflow. Flags feature-factory smells; green/yellow/red per dimension. |
+| [`problem-solving`](skills/problem-solving/) | Hypothesis-driven coach for messy, non-code problems and decisions (career moves, pricing, client asks, metrics that dropped). First reply is a full pass: SMART question, MECE issue tree, what to check first, provisional recommendation. Hands off to `systematic-debugging`, `compass`, `cagan-check` or `grill-me` when the problem changes shape. |
 
 ### Meta (3)
 
