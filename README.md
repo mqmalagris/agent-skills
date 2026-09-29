@@ -31,9 +31,9 @@ Each skill is a directory under [`skills/`](skills/) with a `SKILL.md` (plus opt
 
 Each skill is versioned independently (SemVer in its `plugin.json`); the collection is snapshotted with git tags `vX.Y.Z` and [GitHub Releases](https://github.com/mqmalagris/agent-skills/releases). See [`CHANGELOG.md`](CHANGELOG.md) and [`VERSIONING.md`](VERSIONING.md). Manifests are validated in CI on every push and PR.
 
-## What's in here (29 skills)
+## What's in here (30 skills)
 
-### Dev pipeline (10)
+### Dev pipeline (11)
 
 The loop I use to take a feature from vague hunch to merged code without writing fiction at any step. `dev-flow` conducts; the rest are its stages.
 
@@ -44,6 +44,7 @@ The loop I use to take a feature from vague hunch to merged code without writing
 | [`to-prd`](skills/to-prd/) | Synthesize the conversation into a PRD at `docs/prds/NNNN-<slug>.md` and publish to GitHub Issues. Adapted from [mattpocock/skills](https://github.com/mattpocock/skills). |
 | [`compass`](skills/compass/) | Multi-mode software-engineering coach (architect, advisor, reviewer, refactor, legacy, explainer). Auto-writes ADRs to `docs/adr/`. |
 | [`blueprint`](skills/blueprint/) | Turn a settled scope into an implementation plan at `docs/plans/NNNN-<slug>.md`: files affected, phased sequence, acceptance criteria, edge-case ledger, rollback and risk. Consumes PRDs + ADRs. |
+| [`ai-estimate`](skills/ai-estimate/) | Estimate dev work that's built AI-assisted: read the code first, count agent work in tool-call rounds, add the human layer (review, local run, QA, PR/CI, PM loop) as separate lines, and quote an AI-assisted range with extras priced outside it. Adapted from [ZhangHanDong/agent-estimation](https://github.com/ZhangHanDong/agent-estimation). |
 | [`parallel-worktrees`](skills/parallel-worktrees/) | Run work in parallel across git worktrees: go/no-go, file partitioning, isolation mechanism, integration + cleanup. Works with or without formal planning docs. |
 | [`pr-craft`](skills/pr-craft/) | Open a PR with a structured body (Problem / Root cause / Fix / Test / Out of scope). Drives branch → commit → push → `gh pr create`, and opens GitHub-native **stacked PRs** (one PR per dependent layer) for large, layered changes. |
 | [`babysit-prs`](skills/babysit-prs/) | Drive a PR through review on its own loop: fetch feedback (human + bots like Copilot/Qodo/CodeRabbit), triage, fix, report per item with the commit SHA, resolve threads, push — repeating until MERGED. Never merges itself. |

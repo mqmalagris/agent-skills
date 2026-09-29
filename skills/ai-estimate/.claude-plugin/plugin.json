@@ -1,0 +1,20 @@
+{
+  "name": "ai-estimate",
+  "version": "0.1.0",
+  "description": "Estimate how long a dev task will really take when it's built AI-assisted (an agent writes the code, a human reviews, tests, ships). Grounds every number in the actual code first, counts agent work in tool-call rounds, then adds the human layer (diff review, local run, browser QA, PR/CI, review feedback, PM back-and-forth) as separate lines. Use this whenever someone asks for an estimate, \"how long would X take\", \"how many hours\", sizing, scoping, a quote for a PM or client, or a comparison of options by effort \u2014 even when they don't say \"estimate\" and even for a quick ballpark. Also use it before replying to a ticket, Lobby/Teamwork/Slack thread or PR comment that asks \"estimate to complete?\". Adapted from ZhangHanDong/agent-estimation (MIT).",
+  "author": {
+    "name": "Matheus Malagris",
+    "url": "https://github.com/mqmalagris"
+  },
+  "homepage": "https://github.com/mqmalagris/agent-skills/tree/main/skills/ai-estimate",
+  "repository": "https://github.com/mqmalagris/agent-skills",
+  "license": "MIT",
+  "keywords": [
+    "estimation",
+    "ai-assisted",
+    "scoping",
+    "planning",
+    "sizing",
+    "engineering-workflow"
+  ]
+}
