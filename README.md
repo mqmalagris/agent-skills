@@ -82,7 +82,7 @@ The loop I use to take a feature from vague hunch to merged code without writing
 
 | Skill | What it does |
 |-------|--------------|
-| [`cagan-check`](skills/cagan-check/) | Apply Marty Cagan (SVPG) + Teresa Torres Continuous Discovery to a dev's workflow. Flags feature-factory smells; green/yellow/red per dimension. |
+| [`cagan-check`](skills/cagan-check/) | Apply Marty Cagan (SVPG) + Teresa Torres Continuous Discovery to a dev's workflow. Flags feature-factory smells and business-sense gaps (P&L chain, business-model lever, prize vs. build hours); green/yellow/red per dimension. |
 | [`problem-solving`](skills/problem-solving/) | Hypothesis-driven coach for messy, non-code problems and decisions (career moves, pricing, client asks, metrics that dropped). First reply is a full pass: SMART question, MECE issue tree, what to check first, provisional recommendation. Hands off to `systematic-debugging`, `compass`, `cagan-check` or `grill-me` when the problem changes shape. |
 
 ### Meta (3)
