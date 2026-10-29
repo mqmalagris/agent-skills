@@ -524,6 +524,23 @@
         "product-trio",
         "business-sense"
       ]
+    },
+    {
+      "name": "business-brief",
+      "source": "./skills/business-brief",
+      "description": "Build a one-page business brief on a company the user is about to work for or with, so they walk in knowing how it makes money and where their work moves the number.",
+      "version": "0.1.0",
+      "author": {
+        "name": "Matheus Malagris"
+      },
+      "category": "career",
+      "keywords": [
+        "company-research",
+        "business-sense",
+        "job-offers",
+        "freelance",
+        "unit-economics"
+      ]
     }
   ]
 }
