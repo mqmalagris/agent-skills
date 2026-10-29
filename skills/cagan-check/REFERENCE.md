@@ -30,13 +30,15 @@ Signs it's NOT validated: new tech with no POC, integration with unknown system,
 **This risk is your superpower as a dev.** You're the only one who can answer honestly. Raise it early.
 
 ### 4. Business Viability risk
-**Question**: Does it work for the rest of the business (legal, finance, sales, marketing, support, compliance)?
+**Question**: Does it work for the rest of the business (legal, finance, sales, marketing, support, compliance), and does it pay off for the business?
 
-Validation: stakeholder review early, not at the end.
+Validation: stakeholder review early, not at the end. A one-line chain from the feature metric to a P&L line.
 
-Signs it's NOT validated: LGPD/GDPR not checked, infra cost not calculated, support not trained, client contract doesn't cover it, marketing doesn't know how to sell.
+Signs it's NOT validated: LGPD/GDPR not checked, infra cost not calculated, support not trained, client contract doesn't cover it, marketing doesn't know how to sell, nobody can say whether it moves revenue, retention or cost, the feature pushes a lever the business model doesn't run on.
 
-**In client-services settings**: the client contract IS viability. A feature outside scope = high risk even if the client wants it.
+**In client-services settings**: the client contract IS viability. A feature outside scope = high risk even if the client wants it. The client's business model is the other half: a feature inside scope that moves none of their numbers is still a weak bet.
+
+See [Business sense](#business-sense-the-money-side-of-viability) below for the money side in detail.
 
 ### 5. Ethical risk (Torres)
 **Question**: Should we build it? Who gets harmed?
@@ -46,6 +48,65 @@ Validation: bias/fairness review, impact analysis on vulnerable groups, legal co
 Signs it's NOT validated: AI feature with no bias review, data collection with no clear purpose, UX patterns that pressure the user (fake scarcity, forced continuity, confirmshaming).
 
 **In the AI era**: Cagan (2025) notes that the design of programmatic interfaces (APIs, agents) is driven by the tech lead, not the designer. You (dev) carry this risk on AI features. Ask: does the agent deceive the user? Does an automated decision have a human appeal path?
+
+---
+
+## Business sense (the money side of viability)
+
+Adapted from Sidwyn Koh and Hannah Stulberg, *Business Sense for Engineers: The Missing Half of Product Sense* (Path to Staff, Apr 2026), reframed for the engineering seat.
+
+Product sense = what to build. Business sense = why it matters to the business. Strategic thinking, one of Shreyas Doshi's product-sense components, depends on it. It matters more for engineers now because AI-native teams run more engineers per PM, so calls that used to sit with a PM land in engineering.
+
+### Four questions (one line each)
+
+**1. How does the business make money?** The P&L and its unit economics. Vocabulary worth having ready:
+- **CLV** (customer lifetime value): what a customer is worth over the whole relationship
+- **CAC** (customer acquisition cost): what it costs to win one customer
+- **Payback period**: months until a customer's margin covers its CAC
+- **ARPU** (average revenue per user) and **churn** (share of customers lost per period)
+
+**2. Business model, not pricing model.** The business model is how the company fundamentally earns; the pricing model is how it charges (per seat, per transaction, tiered). The business model decides which outcome a feature should push:
+
+| Business model | Lever features should move |
+|---|---|
+| Subscription / SaaS | Retention, expansion, stickiness |
+| Marketplace | Transaction volume, liquidity on both sides |
+| E-commerce / DTC | Conversion × order value × repeat rate |
+| Direct selling / distributor networks | Distributor activity, qualifying volume, reorders |
+| Ads-funded | Engaged time, audience size |
+| Usage-based / API | Consumption per account |
+| Agency / services | Billable hours, margin, renewals |
+
+In client-services work two rows apply at once: the client's model (what the feature should move) and your firm's (what the engagement earns). An hour that moves the client's number is the one that renews the contract.
+
+**3. Sizing.** Applies to features and technical investments, not only to markets. Business priorities come first; sizing ranks the candidate solutions under them. Rough math beats none: `reach (users or accounts per period) × expected change × value per unit`. An order of magnitude is enough to keep or kill a branch on the OST. Watch the framing: the same opportunity looks tiny or huge depending on whether you size today's market or the one the product could create (Bill Gurley's rebuttal of an early Uber market-size estimate is the classic case).
+
+**4. Right to win.** Who are the real competitors, where does the company win or lose, and what's the moat (switching costs, distribution, network effects, data, brand)? From the engineering seat this answers *how much to invest*: work that deepens the moat earns quality and polish; table stakes gets the cheapest version that holds up, or gets bought instead of built. "Competitor has it" makes something table stakes at most. It is never value evidence on its own.
+
+### Worked example (made-up numbers)
+
+B2B SaaS, 2,000 accounts, $100/month ARPU. One sprint, two candidates:
+
+- **A: fix the sync bug support links to cancellations** (24h). If monthly churn drops from 2.0% to 1.7%, that's ~6 accounts a month kept, so ~$7k more MRR after a year, and it compounds.
+- **B: custom report export three large accounts asked for** (40h). If it lands one $400/month upsell each, that's $1.2k MRR, and only if they actually upgrade.
+
+A wins on both prize and hours. B changes category only if it's blocking a named, committed deal: then it's a revenue bet with a known payoff, not a request. The point isn't precision; it's that the team stops ranking work by who asked loudest.
+
+### Building the muscle
+
+- Trace your team's goals up to a P&L line once, in writing. Reuse the chain in kickoffs and PR descriptions.
+- Sit in one business or leadership review as a listener. List the terms you didn't know and look them up.
+- Public company: read the 10-K (business overview + risk factors). Private: ask finance or ops for a short P&L walkthrough.
+- Client work: once per engagement, ask the stakeholder which number they report up.
+
+### Business-sense questions (use in meetings)
+
+1. "Which number does this move: revenue, retention, or cost?"
+2. "Is this a differentiator for us or table stakes?"
+3. "Roughly how many users or accounts does it touch, and what's one of them worth?"
+4. "If we cut this to half the hours, what do we lose?"
+
+Same rule as the Cagan questions: one per meeting is enough.
 
 ---
 
@@ -250,3 +311,5 @@ One per meeting is enough at first. Don't fire a machine gun.
 SVPG blog: svpg.com/articles — start with "Product vs Feature Teams" and "The Most Important Thing".
 
 Complementary: John Cutler, Teresa Torres (*Continuous Discovery Habits*), Melissa Perri (*Escaping the Build Trap*).
+
+Business sense: Koh & Stulberg, *Business Sense for Engineers* (Path to Staff, 2026) · Bill Gurley, *How to Miss By a Mile* (market sizing) · Gibson Biddle's DHM model (Delight customers in Hard-to-copy, Margin-enhancing ways) for right to win.

@@ -3,6 +3,7 @@
 All notable changes to this collection are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); the collection follows [SemVer](https://semver.org). See [VERSIONING.md](VERSIONING.md) for the per-skill vs collection model.
 
 ## [Unreleased]
+- cagan-check 0.3.0: business-sense lens on the existing dimensions, adapted from Path to Staff's *Business Sense for Engineers*. Outcome traces to revenue, retention or cost; viability covers business-model fit and prize vs. build hours; kickoff ranks OST solutions by rough prize and splits differentiators from table stakes; client work asks which number the stakeholder reports up. REFERENCE.md adds unit-economics terms, a business-model lever table and a worked example. Measured on 3 cases x 2 runs against 0.2.0: 18/18 vs 16/18 checks, no added flag lines.
 - `ai-estimate` 0.1.0 — new skill
 - `problem-solving` 0.1.0 — new skill
 - Eval coverage for the rest of the core chain: grill-me (4 cases), to-prd (3), blueprint (4), pr-craft (3) and implementation-review (2), on top of dev-flow, review-pass and sentinel. Fixtures are self-contained scaffold scripts (a shared saved-carts repo with an ADR, intent, PRD and plan), so grill-me, to-prd and blueprint run on native Windows; the git-driven pr-craft and implementation-review cases are tagged `needs-bash`.
