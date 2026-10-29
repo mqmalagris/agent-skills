@@ -1,0 +1,20 @@
+{
+  "name": "business-brief",
+  "version": "0.1.0",
+  "description": "Build a one-page business brief on a company the user is about to work for or with, so they walk in knowing how it makes money and where their work moves the number.",
+  "author": {
+    "name": "Matheus Malagris",
+    "url": "https://github.com/mqmalagris"
+  },
+  "homepage": "https://github.com/mqmalagris/agent-skills/tree/main/skills/business-brief",
+  "repository": "https://github.com/mqmalagris/agent-skills",
+  "license": "MIT",
+  "keywords": [
+    "company-research",
+    "business-sense",
+    "job-offers",
+    "freelance",
+    "unit-economics",
+    "career"
+  ]
+}
