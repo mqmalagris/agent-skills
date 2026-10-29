@@ -31,7 +31,7 @@ Each skill is a directory under [`skills/`](skills/) with a `SKILL.md` (plus opt
 
 Each skill is versioned independently (SemVer in its `plugin.json`); the collection is snapshotted with git tags `vX.Y.Z` and [GitHub Releases](https://github.com/mqmalagris/agent-skills/releases). See [`CHANGELOG.md`](CHANGELOG.md) and [`VERSIONING.md`](VERSIONING.md). Manifests are validated in CI on every push and PR.
 
-## What's in here (30 skills)
+## What's in here (31 skills)
 
 ### Dev pipeline (11)
 
@@ -69,7 +69,7 @@ The loop I use to take a feature from vague hunch to merged code without writing
 | [`audit-report`](skills/audit-report/) | Renders audit findings (JSON in) as a designed A4 PDF — cover, severity donut, category bars, colored severity chips, evidence-backed strengths, prioritized recommendations, and copy-ready GitHub issue blocks. English default with a pt-BR pack; self-verifying and leaves a re-runnable generator script beside the report. |
 | [`commit-report`](skills/commit-report/) | Work report in two modes — `quick` (git-only: prose + bullets from the current repo) and `standup` (multi-source: GitHub PRs/reviews/comments, git across repos, deploys) — tunable to audience (dev / pm / client), delivered as a copy-ready channel block or a `--doc` file. |
 
-### Career (4)
+### Career (5)
 
 | Skill | What it does |
 |-------|--------------|
@@ -77,6 +77,7 @@ The loop I use to take a feature from vague hunch to merged code without writing
 | [`cv-craft`](skills/cv-craft/) | Maintain a canonical master CV and produce tailored, ATS-friendly resumes + recruiter-screen prep from job descriptions. |
 | [`portfolio-sync`](skills/portfolio-sync/) | Sync the current project into a central project-portfolio archive. `cv-craft` reads it as source of truth. |
 | [`brag-doc`](skills/brag-doc/) | Maintain a monthly brag document and roll it up into a promo packet, self-review, or CV material. Reads `periscope`'s contribution log so influence work with no commit behind it still counts. Feeds `cv-craft`. |
+| [`business-brief`](skills/business-brief/) | One-page brief on a company you're about to work for or with: how it makes money, the lever revenue depends on, market, competition, health, and where engineering moves the number, with every figure tagged sourced, inferred or unknown. Angled to a job (interview points, offer red flags, first-30-days questions) or a side job (pitch, value anchor for pricing, can-they-pay check). Hands off to `interview-coach`, `problem-solving` and `cv-craft`. |
 
 ### Product (2)
 
