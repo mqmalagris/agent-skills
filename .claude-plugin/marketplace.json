@@ -268,21 +268,6 @@
       ]
     },
     {
-      "name": "to-prd",
-      "source": "./skills/to-prd",
-      "description": "Synthesize conversation context into a PRD. Writes docs/prds/NNNN-<slug>.md + publishes to GitHub Issues. Includes Glossary section. Adapted from mattpocock/skills.",
-      "version": "0.3.2",
-      "author": {
-        "name": "Matheus Malagris"
-      },
-      "category": "engineering-workflow",
-      "keywords": [
-        "prd",
-        "feature-spec",
-        "github-issues"
-      ]
-    },
-    {
       "name": "babysit-prs",
       "source": "./skills/babysit-prs",
       "description": "Babysit a GitHub PR from review all the way to MERGED.",
@@ -540,6 +525,21 @@
         "job-offers",
         "freelance",
         "unit-economics"
+      ]
+    },
+    {
+      "name": "to-prd",
+      "source": "./skills/to-prd",
+      "description": "Synthesize conversation context into a PRD. Writes docs/prds/NNNN-<slug>.md + publishes to GitHub Issues. Includes a Glossary and numbered acceptance examples (rules plus Given/When/Then). Adapted from mattpocock/skills.",
+      "version": "0.4.0",
+      "author": {
+        "name": "Matheus Malagris"
+      },
+      "category": "engineering-workflow",
+      "keywords": [
+        "prd",
+        "feature-spec",
+        "github-issues"
       ]
     }
   ]

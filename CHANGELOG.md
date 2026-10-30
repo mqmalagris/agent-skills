@@ -3,6 +3,7 @@
 All notable changes to this collection are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); the collection follows [SemVer](https://semver.org). See [VERSIONING.md](VERSIONING.md) for the per-skill vs collection model.
 
 ## [Unreleased]
+- `to-prd` 0.4.0: PRDs carry numbered acceptance examples (AC-n rules with Given/When/Then examples) taken from grill-me's rules and examples; agent-written ones are marked (proposed) until the user approves, and ids are never renumbered.
 - business-brief 0.1.0: new skill. One-page brief on a company before a job or a side job: how it makes money, the lever, market and competition, health, and where engineering moves the number, with figures tagged sourced, inferred or unknown, then angled to the decision (offer flags, interview points, pitch and value anchor, can-they-pay). Measured on 4 cases x 3 runs against no skill: job offer 0.93 vs 0.47, side-job pitch 0.94 vs 0.78.
 - cagan-check 0.3.0: business-sense lens on the existing dimensions, adapted from Path to Staff's *Business Sense for Engineers*. Outcome traces to revenue, retention or cost; viability covers business-model fit and prize vs. build hours; kickoff ranks OST solutions by rough prize and splits differentiators from table stakes; client work asks which number the stakeholder reports up. REFERENCE.md adds unit-economics terms, a business-model lever table and a worked example. Measured on 3 cases x 2 runs against 0.2.0: 18/18 vs 16/18 checks, no added flag lines.
 - `ai-estimate` 0.1.0 — new skill
