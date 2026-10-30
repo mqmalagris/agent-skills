@@ -3,6 +3,7 @@
 All notable changes to this collection are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); the collection follows [SemVer](https://semver.org). See [VERSIONING.md](VERSIONING.md) for the per-skill vs collection model.
 
 ## [Unreleased]
+- `review-pass` 0.5.0: quick depth adds implementation-review --tests-only when the diff touches a test file (a fix to one source file plus its tests), and the review target is passed to implementation-review at every depth.
 - `implementation-review` 0.3.0: Check 4 adds test integrity (deleted, skipped, loosened or re-expected tests and test-aware code block until the user confirms), Checks 1-2 trace numbered ACs to tests, a --tests-only mode, and a caller-passed review target.
 - `testing-philosophy` 0.2.0: acceptance tests and Given/When/Then at any tier, scenario rules and acid test, agent-written tests as a weaker oracle, test-integrity tells that only a human can clear, plain test code over Gherkin runners by default.
 - business-brief 0.1.0: new skill. One-page brief on a company before a job or a side job: how it makes money, the lever, market and competition, health, and where engineering moves the number, with figures tagged sourced, inferred or unknown, then angled to the decision (offer flags, interview points, pitch and value anchor, can-they-pay). Measured on 4 cases x 3 runs against no skill: job offer 0.93 vs 0.47, side-job pitch 0.94 vs 0.78.
