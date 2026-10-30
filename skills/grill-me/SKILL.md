@@ -1,9 +1,9 @@
 ---
 name: grill-me
-description: Interview the user relentlessly about a plan or design until reaching shared understanding, resolving each branch of the decision tree, then emitting a Design Notes + Glossary + edge-case block and persisting it to docs/intent/NNNN-<slug>.md for handoff to /to-prd. Use when user wants to stress-test a plan, get grilled on their design, do a pre-PRD design review, challenge an idea before writing it up, or mentions "grill me" or runs /grill-me.
+description: Interview the user relentlessly about a plan or design until reaching shared understanding, resolving each branch of the decision tree, then emitting a Design Notes block (decisions, rules with examples, edge cases, Glossary) and persisting it to docs/intent/NNNN-<slug>.md for handoff to /to-prd. Use when user wants to stress-test a plan, get grilled on their design, do a pre-PRD design review, challenge an idea before writing it up, or mentions "grill me" or runs /grill-me.
 ---
 
-Interview me relentlessly about every aspect of this plan until we reach a shared understanding. Walk down each branch of the decision tree, resolving dependencies between decisions one-by-one. For each question, provide your recommended answer (with brief reasoning); skip the recommendation only when the codebase or my prior answers haven't given you enough signal.
+Interview me relentlessly about every aspect of this plan until we reach a shared understanding. Walk down each branch of the decision tree, resolving dependencies between decisions one-by-one. For each question, provide your recommended answer (with brief reasoning); skip the recommendation only when the codebase or my prior answers haven't given you enough signal, or when you are asking me for an example (lens 12).
 
 ## Rules of engagement
 
@@ -16,7 +16,7 @@ Interview me relentlessly about every aspect of this plan until we reach a share
 
 ## Questioning lens
 
-Drive questions through these angles, in roughly this order. Skip ones that don't apply.
+Drive questions through these angles, in roughly this order (lens 12 is the exception: it follows each business rule as it settles). Skip ones that don't apply.
 
 1. **Scope** — what's in, what's out, what's deferred.
 2. **Actors + user stories** — who triggers this, what do they expect.
@@ -29,7 +29,10 @@ Drive questions through these angles, in roughly this order. Skip ones that don'
 9. **Performance + scale** — expected volume, p95 latency targets, hot paths.
 10. **Observability** — what gets logged / metered / traced, alert thresholds.
 11. **Rollback + migration** — how to undo, schema reversibility, feature-flag plan.
-12. **Testability** — what's testable end-to-end, what needs mocks, prior test patterns to mirror.
+12. **Examples**, asked per rule as it settles. In its own turn, ask for one concrete case where the rule applies; in the next turn, one where it doesn't. An abstract rule hides misunderstandings that a concrete case exposes, and these examples become the acceptance examples the code is later held to, so they have to be the user's, in their words and numbers.
+    - This lens is the one exception to offering a recommended answer: an example you suggest and the user nods through becomes an oracle nobody actually chose. If the user asks you to propose one, do, and record it as `(suggested)` so to-prd marks the rule `(proposed)`.
+    - If nobody present can answer, record `OPEN:` and move on. Skip the lens for a tiny or highly technical change where an example adds nothing.
+    - What is testable end-to-end and which test patterns to mirror is a codebase question: read the repo rather than asking.
 
 ## Capture the domain vocabulary
 
@@ -62,6 +65,14 @@ Skip the file only for a throwaway session the user says not to keep, and say th
 - <decision>: <chosen option> — <one-line rationale>
 - ...
 
+## Rules and examples
+Each business rule the interview settled, with the examples the user gave for it (lens 12), in their words and numbers. A rule the user gave no example for is listed alone; to-prd proposes examples for the user to approve. Mark an example you proposed and the user accepted `(suggested)`.
+
+- Rule: <one-line rule>
+  - applies: <concrete example>
+  - doesn't apply: <concrete counter-example>
+- ...
+
 ## Open questions
 - OPEN: <question> — <who/what needs to answer it>
 - ...
@@ -79,7 +90,7 @@ Term — definition. (aliases: <other names if any>)
 
 This block is the handoff to `/to-prd`, which synthesizes it into a PRD and cites the intent file in its `Sources` line. Report the written path when you finish.
 
-**Updating an existing intent.** If the user reopens a settled design, find the file by slug and amend it rather than minting a new index — a second file for the same feature splits the Glossary, which is exactly what this artifact exists to prevent. Edit-safe: `Status`, `Open questions`, adding resolved decisions or edge cases. Changing a `## Glossary` term after `to-prd` has consumed it needs an explicit OK, because blueprint and the implementing code are already using that word.
+**Updating an existing intent.** If the user reopens a settled design, find the file by slug and amend it rather than minting a new index: a second file for the same feature splits the Glossary, which is exactly what this artifact exists to prevent. Edit-safe: `Status`, `Open questions`, adding resolved decisions, rules and examples, or edge cases. Changing a `## Glossary` term after `to-prd` has consumed it needs an explicit OK, because blueprint and the implementing code are already using that word.
 
 ## When to skip grill-me
 
@@ -92,7 +103,7 @@ This block is the handoff to `/to-prd`, which synthesizes it into a PRD and cite
 
 `grill-me → to-prd → compass → blueprint → code`
 
-- **grill-me** (this skill) — stress-tests decision tree, extracts Glossary + OPEN questions.
+- **grill-me** (this skill): stress-tests the decision tree, extracts the Glossary, rules with their examples, and OPEN questions.
 - **to-prd** — synthesizes Design Notes into a PRD on disk + tracker.
 - **compass** — locks architectural decisions in ADRs.
 - **blueprint** — produces implementation plan.

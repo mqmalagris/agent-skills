@@ -1,6 +1,6 @@
 ---
 name: implementation-review
-description: "Pre-commit quality gate. Invoke before every git commit, after the live-run check (/run). Seven checks run as parallel subagents: plan gaps, use-case coverage gaps, missing test scenarios, test-philosophy violations (Kent Dodds Testing Trophy), SOLID violations, Clean Code violations, and security vulnerabilities (via /security-audit, which layers on /wstg). Surfaces findings before they land in history. Also invoke when the user says 'review this', 'am I done', 'did I miss anything', or 'check the quality'."
+description: "Pre-commit quality gate. Invoke before every git commit, after the live-run check (/run). Seven checks run as parallel subagents: plan gaps, use-case coverage gaps, missing test scenarios, test-philosophy and test-integrity violations (Kent Dodds Testing Trophy; deleted, skipped or weakened tests), SOLID violations, Clean Code violations, and security vulnerabilities (via /security-audit, which layers on /wstg). Surfaces findings before they land in history. Also invoke when the user says 'review this', 'am I done', 'did I miss anything', or 'check the quality'."
 ---
 
 # Implementation Review
@@ -10,15 +10,20 @@ Run this before every commit, after the live-run check (`/run` — drive the act
 Each of the seven checks is run by a dedicated subagent. Spawn all seven in parallel, collect their reports, then synthesise into the output format below. Never run the checks sequentially in the main agent, spawn then collect then synthesise.
 
 **Two checks pull in other skills' content, pass it into the subagent brief:**
-- **Checks 2-4** apply `/testing-philosophy`: behavior over implementation detail, the two acid tests, the Testing Trophy, and the e2e necessity floor. Stack-agnostic. Pass that skill's content into the Check 2, 3, and 4 briefs so they judge tests against one shared bar.
+- **Checks 2-4** apply `/testing-philosophy`: behavior over implementation detail, the two acid tests, the Testing Trophy, the e2e necessity floor, the scenario rules for acceptance examples, and the test-integrity list. Stack-agnostic. Pass that skill's content into the Check 2, 3, and 4 briefs so they judge tests against one shared bar.
 - **Check 7** applies `/security-audit` (which itself layers on `/wstg`): the confidence gate, false-positive precedents, three-phase methodology, WSTG mapping, and dependency audit. Pass that skill's content into the Check 7 brief.
+
+**Narrow mode.** `--tests-only` runs Check 4 alone, as one subagent fed only Check 4's inputs, and reports that one line plus the summary. review-pass decides when to call it (see its Depth rules).
+
+**Review target.** By default the diff under review is `git diff --staged`. When a caller passes a target (a commit range, or the working tree vs the merge-base, which is what review-pass scopes), use that diff everywhere below instead, so a change left unstaged or committed earlier on the branch is still in view.
 
 ## Step 1: Gather inputs (main agent)
 
 Before spawning subagents, collect:
 
-- `git diff --staged`, full diff, the primary input for all subagents.
-- `git diff --staged --name-only`, file list.
+- The diff under review (see Review target above), full diff, the primary input for all subagents.
+- Its file list.
+- For Checks 2 and 4: the plan as it stood before the change (`git show <base>:<plan path>`), commit messages in the target range, and every test file that cites the plan's AC ids.
 - The **active plan**, look in this order:
   1. Session context: did a planning skill (`/blueprint`, `/to-prd`, `/grill-me`) run earlier in this conversation? Use that output.
   2. `docs/plans/*.md` or `docs/prds/*.md`, the most recently modified file. Falling back further, `docs/intent/*.md` carries the grill-me design notes and edge-case decisions — thinner than a plan, but enough for Checks 1-3 to have something to reconcile against.
@@ -43,15 +48,17 @@ Spawn all seven simultaneously with `model: "sonnet"`. Each receives the relevan
 
 Compare what the plan said would be built against what the diff implements. For each plan item: in the diff → ✓ implemented; partially there → ⚠ partial, name what is missing; absent → ✗ gap, deferred or forgotten?
 
-Ask: would a reader of the plan consider this commit "phase complete"? If the plan defined a gate ("Phase N is done when ATs #1-4 pass"), does the commit satisfy it? A deferred item is not a gap, but it must be explicitly deferred, not silently absent.
+Ask: would a reader of the plan consider this commit "phase complete"? If the plan defined a gate ("Done when: AC-1 to AC-4 pass", or "ATs #1-4" in older plans), does the commit satisfy it, with a test for each of those ACs present and passing? If nothing in the inputs shows those tests ran, report the gate as unverified, not met. A deferred item is not a gap, but it must be explicitly deferred, not silently absent.
 
 ---
 
 ### Check 2: Use-case coverage
 
-**Inputs:** full `git diff --staged`, the foundational scope doc (`docs/prds/*`, `docs/adr/*`, `docs/development/*`, or CLAUDE.md), README feature description. Apply `/testing-philosophy`.
+**Inputs:** full `git diff --staged`, the foundational scope doc (`docs/prds/*`, `docs/adr/*`, `docs/development/*`, or CLAUDE.md), README feature description, the active plan (for its AC ids and phase gates), and every test file that cites those ids, changed or not (search the repo for them). Apply `/testing-philosophy`.
 
 For every **user-facing capability** in scope for this commit: is there a test that exercises it through the public API? A code path that implements it? Is the critical happy path covered end-to-end through the real assembled system (the e2e floor)?
+
+**Numbered acceptance criteria first.** When the plan numbers ACs (`AC-n`), reconcile them before anything else: every AC example in this phase's gate needs a test, at the tier the example (or its rule) names, whose name or docstring carries the id in whatever form the language allows (`AC-1a`, `ac_1a`, `AC1a`). List each AC with no test, and each test that cites an AC id it doesn't exercise. An AC still marked `(proposed)` gets a ⚠: the code is being held to examples no human has approved yet.
 
 Different from Check 1: use cases can be implicit in the product scope even if the plan did not spell them out. Ask "what would a consumer of this code reasonably expect to be able to do?" Flag any use case with an implementation but no test, a test but no implementation, or a user-facing happy path with no end-to-end coverage.
 
@@ -86,10 +93,12 @@ Not every category applies to every change, exercise judgment, but do not skip a
 
 ---
 
-### Check 4: Test philosophy (Testing Trophy)
+### Check 4: Test philosophy and integrity (Testing Trophy)
 
-**Inputs:** full content of changed test files only. Apply `/testing-philosophy`. A violation is a finding.
+**Inputs:** full content of changed test files; the test-file hunks of the diff, since a deleted test or an edited expected value only shows there; the source diff, read only for test-aware code; the plan as it stood before this change; and any PR body or commit messages in range. Apply `/testing-philosophy`. A violation is a finding.
 
+- **Test integrity:** apply testing-philosophy's integrity tells. This check never clears a tell itself, because every reason it could read can be written by the agent under review. For each tell, report what changed plus any reason in view (an AC or plan entry that changed, a commit message, the PR body, a comment): with a reason → ⚠ needs-a-human, quoting the reason so the user can confirm it in one look; with none → ✗. Both block the commit until the user confirms.
+- **Scenario level:** an acceptance or Given/When/Then test that scripts the UI (clicks, selectors, field names) or checks more than one rule → flag. Run the scenario acid test from testing-philosophy.
 - **Behavior over implementation:** does the test name describe a behavior ("rejects an out-of-range index with RangeError") or a mechanism ("calls chooseIndex with the given index")? Does it assert the observable result or how it was produced?
 - **Public API only:** accessing private fields, `_inner`, unexported functions, or internal state → violation. Asserting an internal function *was called* (spy / mock-call-count on an owned collaborator) → violation. Mocking types it owns → violation. Mocking only genuine external boundaries → ✓.
 - **Real collaborators where cheap:** anything mocked that could be a real instance without significant cost → flag.
@@ -150,8 +159,8 @@ Check 2 · Use-case coverage
 Check 3 · Missing test scenarios
   ✓ Scenarios complete  |  ⚠ [behavior]: missing [scenario type]
   Ledger: [N handled / N deferred / N drifted]  |  ✗ [case]: planned [decision], shipped [reality]
-Check 4 · Test philosophy
-  ✓ Tests pass  |  ✗ [test name]: [violation]
+Check 4 · Test philosophy and integrity
+  ✓ Tests pass  |  ✗ [test name]: [violation]  |  ⚠ integrity: [test or file:line], [tell], reason: [pointer], confirm  |  ✗ integrity: [test or file:line], [deleted / skipped / weakened / expected edited / test-aware code], no reason
 Check 5 · SOLID
   ✓ No violations  |  ✗ [file:line]: [principle], [finding]
 Check 6 · Clean Code
@@ -162,7 +171,7 @@ Check 7 · Security
 Summary: [N findings, fix before committing / Clean, proceed]
 ```
 
-**Blocking** (fix before committing unless the user overrides): a plan gap, a philosophy violation on a public-API test, a SOLID violation that breaks extensibility, a HIGH or MEDIUM security finding. **Advisory** (surface, do not block): an unclear test name, a slightly long function.
+**Blocking** (fix before committing unless the user overrides): a plan gap, a philosophy violation on a public-API test, any test-integrity tell the user hasn't confirmed, a SOLID violation that breaks extensibility, a HIGH or MEDIUM security finding. **Advisory** (surface, do not block): an unclear test name, a slightly long function.
 
 ---
 
@@ -187,7 +196,7 @@ git commit
 - Do not skip a check because "the change is small", that is when violations sneak through.
 - Do not invent a plan if none is findable, skip Checks 1-2 and say so.
 - Do not treat every advisory finding as blocking, use judgment.
-- Do not run Check 4 on non-test files, or Check 5 on test files.
+- Do not apply Check 4's philosophy rules to non-test files (its integrity rule reads the source diff only for test-aware code), or run Check 5 on test files.
 - Do not report a Check 7 finding without a concrete exploit path.
 - Do not fail Check 7 when the dependency auditor is missing, degrade to advisory.
 - Do not report "✓ clean" without the subagent actually reading the diff.
