@@ -1,4 +1,4 @@
 schema_version: "1.1"
-name: fuzzy-spec
+name: plan-from-prd-with-acs
 context:
   scaffold_script: fixture.sh
