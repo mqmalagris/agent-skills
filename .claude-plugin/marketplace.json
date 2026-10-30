@@ -300,25 +300,6 @@
       ]
     },
     {
-      "name": "implementation-review",
-      "source": "./skills/implementation-review",
-      "description": "Pre-commit quality gate: seven parallel-subagent checks (plan gaps, use-case coverage, test scenarios, test philosophy, SOLID, Clean Code, security). Runs after /verify, before commit.",
-      "version": "0.2.3",
-      "author": {
-        "name": "Matheus Malagris"
-      },
-      "category": "engineering-workflow",
-      "keywords": [
-        "code-review",
-        "pre-commit",
-        "quality-gate",
-        "testing",
-        "solid",
-        "security",
-        "multi-agent"
-      ]
-    },
-    {
       "name": "testing-philosophy",
       "source": "./skills/testing-philosophy",
       "description": "Defines what a good test is: behavior over implementation, the Testing Trophy, and an e2e floor for user-facing features. Stack-agnostic (TS/Rust/Go/Elixir/Python). Kent Dodds, generalized.",
@@ -540,6 +521,25 @@
         "job-offers",
         "freelance",
         "unit-economics"
+      ]
+    },
+    {
+      "name": "implementation-review",
+      "source": "./skills/implementation-review",
+      "description": "Pre-commit quality gate: seven parallel-subagent checks (plan gaps, use-case coverage with AC traceability, test scenarios, test philosophy and integrity, SOLID, Clean Code, security), plus a tests-only mode. Runs after /run, before commit.",
+      "version": "0.3.0",
+      "author": {
+        "name": "Matheus Malagris"
+      },
+      "category": "engineering-workflow",
+      "keywords": [
+        "code-review",
+        "pre-commit",
+        "quality-gate",
+        "testing",
+        "solid",
+        "security",
+        "multi-agent"
       ]
     }
   ]
