@@ -319,23 +319,6 @@
       ]
     },
     {
-      "name": "testing-philosophy",
-      "source": "./skills/testing-philosophy",
-      "description": "Defines what a good test is: behavior over implementation, the Testing Trophy, and an e2e floor for user-facing features. Stack-agnostic (TS/Rust/Go/Elixir/Python). Kent Dodds, generalized.",
-      "version": "0.1.2",
-      "author": {
-        "name": "Matheus Malagris"
-      },
-      "category": "engineering-workflow",
-      "keywords": [
-        "testing",
-        "testing-trophy",
-        "integration-tests",
-        "e2e",
-        "kent-dodds"
-      ]
-    },
-    {
       "name": "pr-craft",
       "source": "./skills/pr-craft",
       "description": "Create a pull request with a structured description (Problem / Root cause / Fix / Test / Out of scope) derived from the diff and conversation. Drives the branch -> commit -> push -> gh pr create flow.",
@@ -540,6 +523,24 @@
         "job-offers",
         "freelance",
         "unit-economics"
+      ]
+    },
+    {
+      "name": "testing-philosophy",
+      "source": "./skills/testing-philosophy",
+      "description": "Defines what a good test is: behavior over implementation, the Testing Trophy, an e2e floor for user-facing features, acceptance tests as Given/When/Then examples, and integrity rules for tests an agent writes or changes. Stack-agnostic (TS/Rust/Go/Elixir/Python). Kent Dodds, generalized.",
+      "version": "0.2.0",
+      "author": {
+        "name": "Matheus Malagris"
+      },
+      "category": "engineering-workflow",
+      "keywords": [
+        "testing",
+        "testing-trophy",
+        "e2e",
+        "atdd",
+        "given-when-then",
+        "test-integrity"
       ]
     }
   ]
