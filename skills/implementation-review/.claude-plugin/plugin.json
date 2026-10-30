@@ -1,7 +1,7 @@
 {
   "name": "implementation-review",
-  "version": "0.2.3",
-  "description": "Pre-commit quality gate: seven parallel-subagent checks (plan gaps, use-case coverage, test scenarios, test philosophy, SOLID, Clean Code, security). Runs after /verify, before commit.",
+  "version": "0.3.0",
+  "description": "Pre-commit quality gate: seven parallel-subagent checks (plan gaps, use-case coverage with AC traceability, test scenarios, test philosophy and integrity, SOLID, Clean Code, security), plus a tests-only mode. Runs after /run, before commit.",
   "author": {
     "name": "Matheus Malagris",
     "url": "https://github.com/mqmalagris"
