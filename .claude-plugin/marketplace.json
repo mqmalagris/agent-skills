@@ -254,8 +254,8 @@
     {
       "name": "grill-me",
       "source": "./skills/grill-me",
-      "description": "Stress-test a plan or design via relentless interview. Resolves each branch of the decision tree, captures domain vocabulary, emits Design Notes + Glossary block for /to-prd. Adapted from mattpocock/skills.",
-      "version": "0.4.2",
+      "description": "Stress-test a plan or design via relentless interview. Resolves each branch of the decision tree, captures domain vocabulary and a concrete example per business rule, emits Design Notes + Glossary block for /to-prd. Adapted from mattpocock/skills.",
+      "version": "0.5.0",
       "author": {
         "name": "Matheus Malagris"
       },
