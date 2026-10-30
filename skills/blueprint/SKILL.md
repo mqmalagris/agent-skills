@@ -14,8 +14,14 @@ Turn a settled scope into an ordered build plan. Read the context, output a sing
 3. **Codebase shape** — relevant files, framework, conventions. Use Glob/Grep/Read sparingly; depth proportional to feature size. If the PRD has a `## Glossary`, use those terms verbatim in Summary, Files Affected descriptions, and acceptance criteria.
 4. **Operational constraints** — deadlines, performance/security needs, feature-flag policy.
 
-If feature spec is fuzzy → stop, tell user to run `/grill-me` or `/to-prd` first. Don't invent scope.
+If feature spec is fuzzy → stop, tell user to run `/grill-me` or `/to-prd` first. Don't invent scope, and don't interview the user yourself: that is grill-me's job, so name it in the reply.
 If an architectural choice is unsettled (no ADR, no clear convention) → stop, tell user to run `/compass` first. Don't pick paradigms inside a plan.
+
+**Acceptance examples come from the PRD.** If it has `## Acceptance Examples`, copy them into the plan's Acceptance Criteria verbatim (ids, wording and `(proposed)` marks), the way Glossary terms travel. If a settled spec has none (an older PRD, or a brief that never went through to-prd), draft them in the same format from that spec and mark each rule `(proposed)`. When a PRD exists, the approved ACs go back into it with the same ids (a to-prd "update the PRD"), so ids are only ever minted in one place.
+
+**Proposed ACs get a human read before code is held to them.** Whenever any AC in the plan is still `(proposed)`, copied or drafted, approving them is the plan's first Open Question. On approval, drop the marks in the plan and the PRD together so the two stay verbatim; that is the one change to the locked Acceptance Criteria section that needs no further OK.
+
+Read `testing-philosophy` before choosing tiers and writing the Test Plan.
 
 ## Output format
 
@@ -46,6 +52,7 @@ Phased plan. Each phase is a coherent milestone, ideally one PR. Tasks inside ar
 ### Phase 1: <phase name>
 - **Status**: planned | in-progress | done
 - **Goal**: <what this phase delivers>
+- **Done when**: AC-1 to AC-3 pass
 
 - [ ] **<task name>** — <one line>. Touches: `<files>`. Done when: `<observable result>`.
 - [ ] **<task name>** — ... `(depends on previous)`
@@ -59,10 +66,15 @@ Phased plan. Each phase is a coherent milestone, ideally one PR. Tasks inside ar
 Phases run sequentially unless the header carries a `(parallel with Phase N)` suffix. Parallel phases must not share Files Affected entries. Small features = 1 phase. Large = 3-5. Don't pad.
 
 ## Acceptance Criteria
-Acceptance criteria. Bullet list. Each item testable.
+Copied verbatim from the PRD's `## Acceptance Examples`, with a Trophy tier added in parentheses. The tier after the id is the default for that rule's examples, usually `integration` (`unit` only for pure tricky logic). The example that is the feature's critical happy path carries its own `(e2e)`; its counter-examples stay at the cheaper tier. Each example becomes one test whose name carries its id.
 
-- [ ] <criterion>
-- [ ] <criterion>
+- [ ] **AC-1** (integration) <one-line rule>
+  - *a.* (e2e) **Given** <context, as state> **When** <one action> **Then** <what the actor observes>
+  - *b.* **Given** ... **When** ... **Then** ...
+- [ ] **AC-2** (integration) <one-line rule>
+  - *a.* ...
+
+Criteria that aren't behavior examples (a latency budget, a reversible migration) follow the ACs as plain testable bullets.
 
 ## Edge Cases
 Edge cases swept before coding. One row per case. Decision is `handle` (build now), `defer` (out of scope, say why), or `won't` (deliberately unsupported).
@@ -85,8 +97,11 @@ Rollback + risk plan.
 - **Migration**: <data/schema changes + reversibility>
 
 ## Test Plan
-- **Unit**: <what>
-- **Integration**: <what>
+Follows `testing-philosophy`: behavior through the public surface, mostly integration, and an e2e floor for anything user-facing. Each AC example is one test, at its tier, named with its id.
+
+- **E2E**: <the critical happy path(s) through the assembled system, one or two, and the ACs they prove. Required for a user-facing feature; for a backend or CLI it's an HTTP or subprocess test, not a browser.>
+- **Integration**: <the default tier; most AC examples land here>
+- **Unit**: <pure logic with tricky cases only>
 - **Manual**: <what>
 
 ## Open Questions
@@ -102,6 +117,8 @@ Unresolved items blocking start. If empty, delete section.
 - **Tasks are checkboxes.** Update `- [ ]` → `- [x]` as work progresses. Bump phase Status field too.
 - **Files Affected table is exhaustive for known files.** Add `?` next to speculative ones.
 - **Acceptance criteria are testable.** "Works well" is not. "Login completes in <2s p95" is.
+- **Phases gate on AC ids** (`Done when: AC-1 to AC-3 pass`), which is the gate implementation-review Check 1 holds a commit to.
+- **Key examples, not a scenario dump.** How many examples a rule needs and what makes a good one is testing-philosophy's call; the Edge Cases table covers the rest.
 - **Edge Cases are decisions, not a wish list.** Every row carries `handle` / `defer` / `won't`. A case you can't decide yet is an Open Question, not an Edge Cases row.
 - **No code in plan.** Pseudocode rare; only when sequencing isn't clear without it.
 - **Honor stack conventions** in this priority: (1) ADR-declared stack/paradigm, (2) existing code patterns in the repo, (3) user override. If they conflict, surface the conflict — don't silently pick.
@@ -119,8 +136,8 @@ Unresolved items blocking start. If empty, delete section.
 
 `grill-me → to-prd → compass → blueprint → code`
 
-- **grill-me** stress-tests the design tree, extracts ubiquitous-language Glossary.
-- **to-prd** codifies scope + Glossary into PRD.
+- **grill-me** stress-tests the design tree, extracts ubiquitous-language Glossary and rules with examples.
+- **to-prd** codifies scope, Glossary and numbered acceptance examples into PRD.
 - **compass** locks architecture in ADRs (auto-written to `docs/adr/`).
 - **blueprint** consumes PRD + ADRs, outputs plan in `docs/plans/`.
 - **code** — implements one phase at a time.

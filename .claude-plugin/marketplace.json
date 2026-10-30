@@ -407,22 +407,6 @@
       ]
     },
     {
-      "name": "blueprint",
-      "source": "./skills/blueprint",
-      "description": "Turn a settled scope into an implementation plan at docs/plans/NNNN-<slug>.md: files affected, phased sequence, acceptance criteria, edge-case ledger, rollback and risk. Consumes PRDs + ADRs. Formerly heist.",
-      "version": "0.4.1",
-      "author": {
-        "name": "Matheus Malagris"
-      },
-      "category": "engineering-workflow",
-      "keywords": [
-        "planning",
-        "implementation-plan",
-        "prd",
-        "adr"
-      ]
-    },
-    {
       "name": "cv-craft",
       "source": "./skills/cv-craft",
       "description": "Maintain a canonical master CV in Markdown and produce tailored, ATS-friendly resumes and recruiter-screen prep packs from job descriptions.",
@@ -541,6 +525,22 @@
         "atdd",
         "given-when-then",
         "test-integrity"
+      ]
+    },
+    {
+      "name": "blueprint",
+      "source": "./skills/blueprint",
+      "description": "Turn a settled scope into an implementation plan at docs/plans/NNNN-<slug>.md: files affected, phased sequence gated on numbered acceptance examples, edge-case ledger, rollback and risk. Consumes PRDs + ADRs. Formerly heist.",
+      "version": "0.5.0",
+      "author": {
+        "name": "Matheus Malagris"
+      },
+      "category": "engineering-workflow",
+      "keywords": [
+        "planning",
+        "implementation-plan",
+        "prd",
+        "adr"
       ]
     }
   ]

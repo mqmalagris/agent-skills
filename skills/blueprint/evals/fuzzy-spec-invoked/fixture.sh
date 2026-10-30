@@ -13,6 +13,6 @@ export const routes = new Router();
 routes.get("/cart", (req) => req.session.cart);
 EOF
 cat > src/db/schema.ts <<'EOF'
-// Postgres schema (see docs/adr/0001)
+// Postgres schema
 export const tables = { users: "users", carts: "carts" };
 EOF

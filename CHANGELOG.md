@@ -3,6 +3,7 @@
 All notable changes to this collection are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); the collection follows [SemVer](https://semver.org). See [VERSIONING.md](VERSIONING.md) for the per-skill vs collection model.
 
 ## [Unreleased]
+- `blueprint` 0.5.0: copies numbered acceptance examples from the PRD verbatim with a Trophy tier per rule, gates phases on AC ids, makes approving `(proposed)` ACs the first open question, adds an E2E line to the Test Plan, and halts on a fuzzy spec by naming grill-me instead of interviewing. The fuzzy-spec eval becomes fuzzy-spec-invoked, because the old case never loaded the skill.
 - `dev-flow` 0.8.0: the code stage writes each phase's acceptance tests first (counter-examples may already pass), hands agents those named tests, and stops to ask when an AC test looks wrong; AC ids flow forward with the Glossary; the review-pass gate is no longer restated here.
 - `to-prd` 0.4.0: PRDs carry numbered acceptance examples (AC-n rules with Given/When/Then examples) taken from grill-me's rules and examples; agent-written ones are marked (proposed) until the user approves, and ids are never renumbered.
 - `grill-me` 0.5.0: an examples lens asks for one case where each rule applies and one where it doesn't, in the user's own words; Design Notes gain a Rules and examples section, and agent-suggested examples stay marked.
