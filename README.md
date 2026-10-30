@@ -54,7 +54,7 @@ The loop I use to take a feature from vague hunch to merged code without writing
 
 | Skill | What it does |
 |-------|--------------|
-| [`review-pass`](skills/review-pass/) | Review-only entry point for a diff you already have: harvests any existing automated review, then runs `/run` → `code-review` → `implementation-review` (plus `security-audit` only on trust-boundary changes), then merges every finding into one ranked go/no-go verdict. |
+| [`review-pass`](skills/review-pass/) | Review-only entry point for a diff you already have: harvests any existing automated review, then runs `/run` → `code-review` → `implementation-review` (plus `security-audit` only on trust-boundary changes; `quick` adds the tests-only integrity check when a test file changes), then merges every finding into one ranked go/no-go verdict. |
 | [`implementation-review`](skills/implementation-review/) | Pre-commit quality gate: seven parallel-subagent checks (plan gaps, use-case coverage, test scenarios, test philosophy, SOLID, Clean Code, security). Runs after `verify`, before commit. |
 | [`testing-philosophy`](skills/testing-philosophy/) | What a good test is: behavior over implementation, the Testing Trophy, an e2e floor for user-facing features. Stack-agnostic (TS/Rust/Go/Elixir/Python). |
 | [`security-audit`](skills/security-audit/) | High-confidence security review of a diff, layered on `wstg-security-testing`. Confidence gate, false-positive precedents, WSTG-ID mapping, dependency audit. Deliberately diff-scoped: repo-wide and posture audits route to `wstg-security-testing` mode 2, whose precedents don't suppress absence-shaped findings. |
