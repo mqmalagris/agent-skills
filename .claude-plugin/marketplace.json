@@ -300,20 +300,22 @@
       ]
     },
     {
-      "name": "testing-philosophy",
-      "source": "./skills/testing-philosophy",
-      "description": "Defines what a good test is: behavior over implementation, the Testing Trophy, and an e2e floor for user-facing features. Stack-agnostic (TS/Rust/Go/Elixir/Python). Kent Dodds, generalized.",
-      "version": "0.1.2",
+      "name": "implementation-review",
+      "source": "./skills/implementation-review",
+      "description": "Pre-commit quality gate: seven parallel-subagent checks (plan gaps, use-case coverage with AC traceability, test scenarios, test philosophy and integrity, SOLID, Clean Code, security), plus a tests-only mode. Runs after /run, before commit.",
+      "version": "0.3.0",
       "author": {
         "name": "Matheus Malagris"
       },
       "category": "engineering-workflow",
       "keywords": [
+        "code-review",
+        "pre-commit",
+        "quality-gate",
         "testing",
-        "testing-trophy",
-        "integration-tests",
-        "e2e",
-        "kent-dodds"
+        "solid",
+        "security",
+        "multi-agent"
       ]
     },
     {
@@ -524,22 +526,21 @@
       ]
     },
     {
-      "name": "implementation-review",
-      "source": "./skills/implementation-review",
-      "description": "Pre-commit quality gate: seven parallel-subagent checks (plan gaps, use-case coverage with AC traceability, test scenarios, test philosophy and integrity, SOLID, Clean Code, security), plus a tests-only mode. Runs after /run, before commit.",
-      "version": "0.3.0",
+      "name": "testing-philosophy",
+      "source": "./skills/testing-philosophy",
+      "description": "Defines what a good test is: behavior over implementation, the Testing Trophy, an e2e floor for user-facing features, acceptance tests as Given/When/Then examples, and integrity rules for tests an agent writes or changes. Stack-agnostic (TS/Rust/Go/Elixir/Python). Kent Dodds, generalized.",
+      "version": "0.2.0",
       "author": {
         "name": "Matheus Malagris"
       },
       "category": "engineering-workflow",
       "keywords": [
-        "code-review",
-        "pre-commit",
-        "quality-gate",
         "testing",
-        "solid",
-        "security",
-        "multi-agent"
+        "testing-trophy",
+        "e2e",
+        "atdd",
+        "given-when-then",
+        "test-integrity"
       ]
     }
   ]
