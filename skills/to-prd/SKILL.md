@@ -19,9 +19,15 @@ This skill takes the current conversation context and codebase understanding and
 
    Sources 1–2 are the same artifact and carry the edge-case decisions too — fold those into the PRD rather than re-deriving them, so `blueprint` inherits a ledger instead of starting one.
 
+   They also carry `## Rules and examples`, which become the PRD's `## Acceptance Examples` (step 5).
+
 4. **Sketch the major modules** to build or modify. Actively look for opportunities to extract deep modules — ones that encapsulate substantial functionality behind a simple, testable, slow-to-change interface (Ousterhout). Do not interview; synthesize from context. If module shape is unclear, halt and route back to `/grill-me`.
 
-5. **Write the PRD** following [PRD-TEMPLATE.md](PRD-TEMPLATE.md), to two destinations:
+5. **Write the acceptance examples.** For each user story, the rules it must obey (one line each) and key examples per rule in Given/When/Then, numbered `AC-1`, `AC-2` across the whole PRD (format in the template; what makes a good example is in `testing-philosophy`). Take them from grill-me's `## Rules and examples` first, keeping the user's words and numbers.
+
+   Where a rule has no example from the user, or any `(suggested)` one, write or keep examples from the conversation and mark the rule `(proposed)`. The examples become the oracle that blueprint gates phases on and the code is held to, so a human has to approve any an agent wrote. When the user approves the PRD, drop the marks. A story with no behavior worth an example (too small, or purely technical) gets plain testable criteria instead of ACs; don't invent examples for it.
+
+6. **Write the PRD** following [PRD-TEMPLATE.md](PRD-TEMPLATE.md), to two destinations:
    - **Disk**: get the target path from `bash scripts/next-prd-index.sh <slug>` (prints the zero-padded next-index path, creates `docs/prds/` if missing), then write the filled template there. This is what `blueprint` consumes.
    - **Tracker**: `bash scripts/publish-prd.sh <prd-file> "<title>"` — opens a GitHub issue with the `needs-triage` label, auto-falling back (drop the label, or skip the tracker entirely) and warning to stderr when the label is missing, `gh` is unconfigured/unauthed, or the repo isn't on GitHub.
 
@@ -29,8 +35,9 @@ This skill takes the current conversation context and codebase understanding and
 
 - **No interviewing.** Pure synthesis. Halt to `/grill-me` if context is too thin.
 - **Glossary is load-bearing.** Blueprint and the implementing code must use the same terms verbatim.
+- **AC ids are stable.** Blueprint's phase gates and the test names cite them, so never renumber: a new rule takes the next free number, a dropped one is marked `(removed: <reason>)`, and rewording an existing AC needs an explicit user OK. The on-disk PRD is canonical; the tracker issue is a snapshot, and updating it is outward-facing, so offer rather than do it.
 - **Respect ADRs.** Locked architectural decisions are inputs, not topics to relitigate.
-- **Update existing PRD** if user says "update the PRD" — find by slug. Edit-safe sections: `Status`, `Further Notes`, adding new `User Stories` or `Implementation Decisions` entries, expanding `Out of Scope`. Locked sections (require explicit user OK): `Problem Statement`, `Solution`, `Glossary`, `Sources`. Never silently drop user stories — mark as `(removed: <reason>)` instead.
+- **Update existing PRD** if user says "update the PRD": find by slug. Edit-safe sections: `Status`, `Further Notes`, adding new `User Stories`, `Acceptance Examples` or `Implementation Decisions` entries, expanding `Out of Scope`. Locked sections (require explicit user OK): `Problem Statement`, `Solution`, `Glossary`, `Sources`, existing `Acceptance Examples` entries (dropping their `(proposed)` marks on approval is the exception). Never silently drop user stories; mark them `(removed: <reason>)` instead.
 
 ## When to skip to-prd
 
@@ -44,7 +51,7 @@ This skill takes the current conversation context and codebase understanding and
 
 `grill-me → to-prd → compass → blueprint → code`
 
-- **grill-me** extracts scope, design-tree decisions, edge cases, and Glossary via interview, and writes them to `docs/intent/NNNN-<slug>.md`.
+- **grill-me** extracts scope, design-tree decisions, rules with examples, edge cases, and Glossary via interview, and writes them to `docs/intent/NNNN-<slug>.md`.
 - **to-prd** (this skill) synthesizes the above into a PRD on disk + tracker.
 - **compass** locks architectural decisions in ADRs (auto-written to `docs/adr/`).
 - **blueprint** consumes PRD + ADRs, produces implementation plan at `docs/plans/NNNN-<slug>.md`.
