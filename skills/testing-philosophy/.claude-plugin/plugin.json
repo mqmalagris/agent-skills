@@ -1,7 +1,7 @@
 {
   "name": "testing-philosophy",
-  "version": "0.1.2",
-  "description": "Defines what a good test is: behavior over implementation, the Testing Trophy, and an e2e floor for user-facing features. Stack-agnostic (TS/Rust/Go/Elixir/Python). Kent Dodds, generalized.",
+  "version": "0.2.0",
+  "description": "Defines what a good test is: behavior over implementation, the Testing Trophy, an e2e floor for user-facing features, acceptance tests as Given/When/Then examples, and integrity rules for tests an agent writes or changes. Stack-agnostic (TS/Rust/Go/Elixir/Python). Kent Dodds, generalized.",
   "author": {
     "name": "Matheus Malagris",
     "url": "https://github.com/mqmalagris"
@@ -12,9 +12,10 @@
   "keywords": [
     "testing",
     "testing-trophy",
-    "integration-tests",
     "e2e",
-    "kent-dodds",
+    "atdd",
+    "given-when-then",
+    "test-integrity",
     "engineering-workflow"
   ]
 }
