@@ -40,7 +40,7 @@ The loop I use to take a feature from vague hunch to merged code without writing
 | Skill | What it does |
 |-------|--------------|
 | [`dev-flow`](skills/dev-flow/) | Conductor. Detects a task's tier (bug / feature / architecture / design / client), prints the exact subset of stages it will run and skip with reasons, confirms, then drives them. Matches ceremony to stakes. |
-| [`grill-me`](skills/grill-me/) | Stress-test a plan via relentless interview; captures domain vocabulary, emits a Design Notes + Glossary block and persists it to `docs/intent/NNNN-<slug>.md`. Adapted from [mattpocock/skills](https://github.com/mattpocock/skills). |
+| [`grill-me`](skills/grill-me/) | Stress-test a plan via relentless interview; captures domain vocabulary and a concrete example per business rule, emits a Design Notes + Glossary block and persists it to `docs/intent/NNNN-<slug>.md`. Adapted from [mattpocock/skills](https://github.com/mattpocock/skills). |
 | [`to-prd`](skills/to-prd/) | Synthesize the conversation into a PRD at `docs/prds/NNNN-<slug>.md` and publish to GitHub Issues. Adapted from [mattpocock/skills](https://github.com/mattpocock/skills). |
 | [`compass`](skills/compass/) | Multi-mode software-engineering coach (architect, advisor, reviewer, refactor, legacy, explainer). Auto-writes ADRs to `docs/adr/`. |
 | [`blueprint`](skills/blueprint/) | Turn a settled scope into an implementation plan at `docs/plans/NNNN-<slug>.md`: files affected, phased sequence, acceptance criteria, edge-case ledger, rollback and risk. Consumes PRDs + ADRs. |
