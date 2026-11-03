@@ -173,6 +173,19 @@ logger.info({ userId: user.id }, 'login');
 const logger = pino({ redact: ['req.headers.authorization', '*.password'] });
 ```
 
+### A19. A date-only string is a local day
+**Rule.** Parse a day with ``new Date(`${day}T00:00`)`` and build a day from the local fields (`getFullYear` / `getMonth` / `getDate`); never `new Date("2026-12-01")` or `toISOString().slice(0, 10)` for a local day.
+**Reason.** A date-only ISO string parses as UTC midnight, the day before anywhere west of Greenwich, and `toISOString` turns a local day back into a UTC one. Caught twice: a shift day that rolled at 21:00 in Rio, and an accepted job scheduled a day early.
+```ts
+// wrong
+const scheduled = new Date(offeredDay);              // "2026-12-01" → Nov 30, 19:00 in Toronto
+const today = new Date().toISOString().slice(0, 10); // tomorrow after 21:00 in Rio
+// right
+const scheduled = new Date(`${offeredDay}T00:00`);
+const d = new Date();
+const today = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+```
+
 ---
 
 ## B — Ecosystem idioms
@@ -487,6 +500,19 @@ type User = { nickname?: string }; // not nickname: string | null
 sort(items, true, false);
 // right
 sort(items, { stable: true, descending: false });
+```
+
+### D18. Plain-object lookup keyed by untrusted input
+**Rule.** Never look up a cookie, header, query, path or JWT field in a plain object map (`MAP[input]`). Use `Object.hasOwn(MAP, input)`, a `Map`, or an explicit allowlist comparison.
+**Reason.** `MAP["constructor"]`, `MAP["toString"]` and `MAP["__proto__"]` return inherited members, so a guard like `if (!MAP[x])` passes for input it never meant to accept. Seen twice: a JWT `alg` of `"constructor"` passed the algorithm guard and turned into a caller-triggered 500, and an `og_country=constructor` cookie produced a 302 to the same URL, looping the browser. (Read-side sibling of D13.)
+```ts
+// wrong
+const home = STORE_HOSTS[cookieValue];
+if (!home) return null;
+// right
+if (cookieValue !== "us" && cookieValue !== "ca") return null;
+const home = STORE_HOSTS[cookieValue];
+// or: if (!Object.hasOwn(STORE_HOSTS, cookieValue)) return null;
 ```
 
 ---
