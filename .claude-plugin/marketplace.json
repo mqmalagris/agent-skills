@@ -180,27 +180,6 @@
       ]
     },
     {
-      "name": "code-craft",
-      "source": "./skills/code-craft",
-      "description": "Language- and framework-specific best practices and idioms. Reader and reviewer modes. Ships 7 languages + 12 frameworks (TS, Rust, CSS, Tailwind, Dart, Go, Python, React, Next, RN+Expo, Hono, Workers, Astro, Svelte, Drizzle, Supabase, Lambda, Terraform, Flutter).",
-      "version": "0.2.3",
-      "author": {
-        "name": "Matheus Malagris"
-      },
-      "category": "development",
-      "keywords": [
-        "code-review",
-        "idioms",
-        "typescript",
-        "rust",
-        "react",
-        "nextjs",
-        "go",
-        "python",
-        "flutter"
-      ]
-    },
-    {
       "name": "publish-skill",
       "source": "./skills/publish-skill",
       "description": "Publish one of your own skills from ~/.claude/skills to this repo: copy it under skills/<name>/, mint its plugin.json, upsert marketplace.json, bump SemVer, and open a PR (CI-gated). Idempotent.",
@@ -541,6 +520,27 @@
         "implementation-plan",
         "prd",
         "adr"
+      ]
+    },
+    {
+      "name": "code-craft",
+      "source": "./skills/code-craft",
+      "description": "Language- and framework-specific best practices and idioms. Reader and reviewer modes. Ships 7 languages + 12 frameworks (TS, Rust, CSS, Tailwind, Dart, Go, Python, React, Next, RN+Expo, Hono, Workers, Astro, Svelte, Drizzle, Supabase, Lambda, Terraform, Flutter).",
+      "version": "0.2.4",
+      "author": {
+        "name": "Matheus Malagris"
+      },
+      "category": "development",
+      "keywords": [
+        "code-review",
+        "idioms",
+        "typescript",
+        "rust",
+        "react",
+        "nextjs",
+        "go",
+        "python",
+        "flutter"
       ]
     }
   ]

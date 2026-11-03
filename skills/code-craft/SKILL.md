@@ -14,7 +14,7 @@ Language- and framework-specific code best practices and idiom reference. Comple
 2. Detect the **mode**:
    - **reader** — user asks "what is the best practice for X" or "how should I do Y in Z" → return matching rules from the language file (rule + reason + example).
    - **reviewer** — user pastes code or asks "review this" → load the relevant language file, scan for violations, report `location → rule → fix`.
-3. Load only the relevant file from `languages/` (and a `frameworks/` file if applicable).
+3. Load only the relevant file from `languages/` (and a `frameworks/` file if applicable). When the code touches a store (database, SQLite file, KV), also load [general/data-access.md](general/data-access.md): its rules apply in every stack.
 4. Match the topic the user asked about — do not dump the entire language file when the user asked one question.
 
 ## Supported
@@ -40,6 +40,7 @@ Language- and framework-specific code best practices and idiom reference. Comple
 | Flutter (3.27+) | [frameworks/flutter.md](frameworks/flutter.md) | shipped |
 | Go (1.21+) | [languages/go.md](languages/go.md) | shipped |
 | Python (3.12+) | [languages/python.md](languages/python.md) | shipped |
+| Data access (any stack) | [general/data-access.md](general/data-access.md) | shipped |
 | Angular, Vue 2, Ionic, Express, Strapi, LoopBack, BigCommerce, Miva | `frameworks/*.md` | legacy / on demand |
 
 If the user asks for a language not yet supported, say so and offer to add a stub via the structure documented below.
