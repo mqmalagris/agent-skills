@@ -3,6 +3,7 @@
 All notable changes to this collection are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); the collection follows [SemVer](https://semver.org). See [VERSIONING.md](VERSIONING.md) for the per-skill vs collection model.
 
 ## [Unreleased]
+- `pr-craft` 0.4.0: the size gate blocks, and above 800 lines it stops with the reading and the layer cut until the user decides; size is measured against origin/<target branch>; a stack is always a GitHub stack, with `gh stack link` for layers that already exist
 
 ## [0.14.1] - 2026-11-05
 
