@@ -45,7 +45,7 @@ Apply with `poetry version major|minor|patch`, `hatch version <part>`, or edit `
 
 ## agent-skills — `.claude-plugin/plugin.json`
 
-Do not hand-bump. Per-skill bump + changelog: `publish-skill --bump patch|minor|major`. Collection release: `scripts/release.py --bump ...`. See the repo's `VERSIONING.md`.
+Do not hand-bump. Per-skill bump + changelog: `publish-skill --bump patch|minor|major`. Collection release: follow "Cutting a release" in the repo's `VERSIONING.md`.
 
 ## Generic — `VERSION` file or none of the above
 

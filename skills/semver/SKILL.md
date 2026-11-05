@@ -51,7 +51,7 @@ Internal-only changes (private symbols, tests, docs, refactors with identical pu
 | `go.mod` | Go | `gorelease` / `apidiff` (+ the v2+ import-path rule) |
 | `mix.exs` | Elixir | manual public-surface review |
 | `pyproject.toml` / `setup.py` | Python | `griffe check` |
-| `.claude-plugin/plugin.json` | agent-skills | hand off to `publish-skill --bump` / `release.py` |
+| `.claude-plugin/plugin.json` | agent-skills | hand off to `publish-skill --bump`; collection releases per the repo's `VERSIONING.md` |
 | `VERSION` / other | generic | manual, via the checklist |
 
 ## Output
