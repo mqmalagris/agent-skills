@@ -3,6 +3,7 @@
 All notable changes to this collection are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); the collection follows [SemVer](https://semver.org). See [VERSIONING.md](VERSIONING.md) for the per-skill vs collection model.
 
 ## [Unreleased]
+- `implementation-review` 0.4.0: a small diff (at most 3 files and 50 lines) gets one fresh subagent running all seven checks, and the size is counted over the review target
 - code-craft: TypeScript rule A19, parse a date-only string as a local day
 - `blueprint` 0.5.0: copies numbered acceptance examples from the PRD verbatim with a Trophy tier per rule, gates phases on AC ids, makes approving `(proposed)` ACs the first open question, adds an E2E line to the Test Plan, and halts on a fuzzy spec by naming grill-me instead of interviewing. The fuzzy-spec eval becomes fuzzy-spec-invoked, because the old case never loaded the skill.
 - `dev-flow` 0.8.0: the code stage writes each phase's acceptance tests first (counter-examples may already pass), hands agents those named tests, and stops to ask when an AC test looks wrong; AC ids flow forward with the Glossary; the review-pass gate is no longer restated here.

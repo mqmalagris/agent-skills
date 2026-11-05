@@ -1,5 +1,5 @@
 ---
-description: "Reconciles the staged diff against the plan's Edge Cases ledger and flags the handle-but-missing case and the absent tests."
+description: "Reconciles the staged diff against the plan's Edge Cases ledger and flags the handle-but-missing case and the absent tests. The diff is 1 file and 2 lines, so one subagent runs all seven checks and the report says so."
 tags: [implementation-review, git, expensive, needs-bash]
 max_turns: 40
 timeout_seconds: 900

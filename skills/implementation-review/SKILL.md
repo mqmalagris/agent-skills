@@ -1,21 +1,34 @@
 ---
 name: implementation-review
-description: "Pre-commit quality gate. Invoke before every git commit, after the live-run check (/run). Seven checks run as parallel subagents: plan gaps, use-case coverage gaps, missing test scenarios, test-philosophy and test-integrity violations (Kent Dodds Testing Trophy; deleted, skipped or weakened tests), SOLID violations, Clean Code violations, and security vulnerabilities (via /security-audit, which layers on /wstg). Surfaces findings before they land in history. Also invoke when the user says 'review this', 'am I done', 'did I miss anything', or 'check the quality'."
+description: "Pre-commit quality gate. Invoke before every git commit, after the live-run check (/run). Seven checks, run by subagents (seven in parallel, or one for a small diff): plan gaps, use-case coverage gaps, missing test scenarios, test-philosophy and test-integrity violations (Kent Dodds Testing Trophy; deleted, skipped or weakened tests), SOLID violations, Clean Code violations, and security vulnerabilities (via /security-audit, which layers on /wstg). Surfaces findings before they land in history. Also invoke when the user says 'review this', 'am I done', 'did I miss anything', or 'check the quality'."
 ---
 
 # Implementation Review
 
 Run this before every commit, after the live-run check (`/run` — drive the actual app and see the change work). The goal: **what was planned is implemented, what is implemented is tested, and what is tested is correct**.
 
-Each of the seven checks is run by a dedicated subagent. Spawn all seven in parallel, collect their reports, then synthesise into the output format below. Never run the checks sequentially in the main agent, spawn then collect then synthesise.
+The checks run in subagents, never in the main agent: a subagent reads the diff without this conversation's assumptions, so a session never grades its own work. **Seven subagents or one** below decides how many. Collect their reports, then synthesise into the output format below.
 
-**Two checks pull in other skills' content, pass it into the subagent brief:**
+**Two checks pull in other skills' content, pass it into the brief of the subagent that runs them:**
 - **Checks 2-4** apply `/testing-philosophy`: behavior over implementation detail, the two acid tests, the Testing Trophy, the e2e necessity floor, the scenario rules for acceptance examples, and the test-integrity list. Stack-agnostic. Pass that skill's content into the Check 2, 3, and 4 briefs so they judge tests against one shared bar.
 - **Check 7** applies `/security-audit` (which itself layers on `/wstg`): the confidence gate, false-positive precedents, three-phase methodology, WSTG mapping, and dependency audit. Pass that skill's content into the Check 7 brief.
 
-**Narrow mode.** `--tests-only` runs Check 4 alone, as one subagent fed only Check 4's inputs, and reports that one line plus the summary. review-pass decides when to call it (see its Depth rules).
+**Narrow mode.** `--tests-only` runs Check 4 alone, as one subagent fed only Check 4's inputs, whatever the diff's size, and reports that one line plus the summary. review-pass decides when to call it (see its Depth rules).
 
 **Review target.** By default the diff under review is `git diff --staged`. When a caller passes a target (a commit range, or the working tree vs the merge-base, which is what review-pass scopes), use that diff everywhere below instead, so a change left unstaged or committed earlier on the branch is still in view.
+
+**Seven subagents or one.** Once Step 1 has the diff, count its files and changed lines, the sum of both numstat columns (added plus deleted, so `9 1` is 10 lines), with the command that matches the review target:
+
+- `--staged`, the default: `git diff --staged --numstat`
+- a commit range: `git diff --numstat <range>`
+- the working tree vs the merge-base: `git diff --numstat <merge-base>`, plus every untracked file from `git ls-files --others --exclude-standard`, each counted as all of its lines
+
+Leave lockfiles out. A binary file (`-` in numstat) counts as a file with no lines.
+
+- **At most 3 files and 50 lines:** spawn one subagent that runs all seven checks in order, each against its own inputs below, and returns the seven lines.
+- **Anything larger:** spawn seven, one per check, in parallel.
+
+Under the report's title, say which: `Subagents: 1 (N files, M lines)` or `Subagents: 7 (N files, M lines)`.
 
 ## Step 1: Gather inputs (main agent)
 
@@ -36,9 +49,9 @@ If no plan is findable, say so explicitly and skip Checks 1-2 in the subagent br
 
 ---
 
-## Step 2: Dispatch seven subagents in parallel
+## Step 2: Dispatch the subagents
 
-Spawn all seven simultaneously with `model: "sonnet"`. Each receives the relevant slice of inputs (below) and returns findings as `Check N · [name]: ✓ clean | ⚠ [finding] | ✗ [blocking finding]`.
+Spawn them with `model: "sonnet"`, seven at once or one, per **Seven subagents or one**. Each check receives the relevant slice of inputs (below) and returns findings as `Check N · [name]: ✓ clean | ⚠ [finding] | ✗ [blocking finding]`.
 
 ---
 
@@ -147,10 +160,11 @@ The one rule: **only report a finding with a concrete exploit path, and only whe
 
 ## Step 3: Synthesise (main agent)
 
-Merge the seven reports:
+Merge the seven check reports, in this format:
 
 ```
 Implementation review, [commit subject or staged file summary]
+Subagents: [1 or 7] ([N files, M lines])
 
 Check 1 · Plan gaps
   ✓ All phase items present  |  ✗ Gap: [item], [present/partial/absent]
@@ -182,7 +196,7 @@ Summary: [N findings, fix before committing / Clean, proceed]
      ↓
 /run                       ← does the change actually work end-to-end
      ↓
-/implementation-review     ← THIS SKILL, seven parallel subagents
+/implementation-review     ← THIS SKILL, seven checks in subagents
      ↓
 git commit
      ↓
@@ -200,4 +214,4 @@ git commit
 - Do not report a Check 7 finding without a concrete exploit path.
 - Do not fail Check 7 when the dependency auditor is missing, degrade to advisory.
 - Do not report "✓ clean" without the subagent actually reading the diff.
-- Do not run checks sequentially, the point of subagents is parallel execution.
+- Do not run the checks in the main agent, however small the diff. See **Seven subagents or one**.
