@@ -4,6 +4,9 @@ on:
   push:
     branches: [main]
   pull_request:
+  # release.yml dispatches this on release/vX.Y.Z: a PR opened with the Actions
+  # token triggers no pull_request run, and main requires this check
+  workflow_dispatch:
 
 jobs:
   validate:
@@ -12,8 +15,10 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.x"
+          python-version: "3.13"  # same Python and PyYAML as release.yml, so both parse frontmatter alike
       - name: Install PyYAML (strict frontmatter parsing)
-        run: pip install pyyaml
+        run: "pip install --only-binary :all: pyyaml==6.0.2"
       - name: Validate manifests, versions, and SKILL.md frontmatter
         run: python3 scripts/validate_repo.py
+      - name: Release script tests
+        run: python3 -m unittest discover -s scripts/tests -v
