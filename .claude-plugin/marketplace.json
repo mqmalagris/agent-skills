@@ -180,23 +180,6 @@
       ]
     },
     {
-      "name": "publish-skill",
-      "source": "./skills/publish-skill",
-      "description": "Publish one of your own skills from ~/.claude/skills to this repo: copy it under skills/<name>/, mint its plugin.json, upsert marketplace.json, bump SemVer, and open a PR (CI-gated). Idempotent.",
-      "version": "0.2.0",
-      "author": {
-        "name": "Matheus Malagris"
-      },
-      "category": "meta",
-      "keywords": [
-        "publish",
-        "skill-authoring",
-        "marketplace",
-        "bunx-skills",
-        "git"
-      ]
-    },
-    {
       "name": "sentinel",
       "source": "./skills/sentinel",
       "description": "Close the loop after ship \u2014 scan a repo (and optionally its live prod signal) for post-release trouble, then file what it finds as docs/intent/NNNN-<slug>.md so it re-enters the dev-flow chain as ordinary work.",
@@ -541,6 +524,23 @@
         "solid",
         "security",
         "multi-agent"
+      ]
+    },
+    {
+      "name": "publish-skill",
+      "source": "./skills/publish-skill",
+      "description": "Publish one of your own skills from ~/.claude/skills to this repo: copy it under skills/<name>/, mint its plugin.json, upsert marketplace.json, bump SemVer, and open a PR (CI-gated). Idempotent.",
+      "version": "0.2.1",
+      "author": {
+        "name": "Matheus Malagris"
+      },
+      "category": "meta",
+      "keywords": [
+        "publish",
+        "skill-authoring",
+        "marketplace",
+        "bunx-skills",
+        "git"
       ]
     }
   ]

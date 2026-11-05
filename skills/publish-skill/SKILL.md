@@ -21,10 +21,7 @@ Do not use this for third-party skills — those belong in the repo's `THIRD_PAR
    It refreshes a repo cache, copies the skill, mints `plugin.json`, upserts `marketplace.json`, **bumps the skill's version** (PATCH on update), **logs a `CHANGELOG.md` `[Unreleased]` line**, validates all JSON, commits on a `publish/<name>-v<version>` branch, and **opens a PR against `main`** (CI `validate` gates it). Merge overrides: `--auto-merge` (merge when CI passes), `--merge` (merge now, squash+admin), `--push-main` (legacy: push straight to `main`, no PR). Other: `--bump minor|major`, `--version X.Y.Z`, `--no-bump`, `--changelog "text"`, `--description "..."`, `--no-push`, `--dry-run`, `--skip-evals`. If the skill ships an `evals/` suite, the script runs it on your own Claude login before committing (`scripts/eval-run.sh <name> --record`) and commits the result to `evals-history/<name>.jsonl`, the eval trend; a suite below threshold aborts the publish.
 4. **Update the README table.** The script prints a suggested row and the target `skills/` path. Add that row to the right group section in the repo's `README.md` (goes in the same PR branch, or a follow-up PR). Skip only if the user says the README doesn't matter.
 5. **Report** the PR URL + new version, and (post-merge) the install commands: `bunx skills add mqmalagris/agent-skills -s <name>` and `/plugin install <name>@agent-skills`.
-6. **Cutting a release (optional, when done publishing).** Per-skill publishes accumulate under CHANGELOG `[Unreleased]`. To snapshot the collection, run the repo's release cutter (it validates, bumps the collection version, rolls the changelog, tags `vX.Y.Z`, and creates a GitHub Release):
-   ```bash
-   python3 ~/.cache/agent-skills-publish/scripts/release.py --bump minor   # or --version X.Y.Z
-   ```
+6. **Cutting a release (optional, when done publishing).** Per-skill publishes accumulate under CHANGELOG `[Unreleased]`. Snapshotting the collection is a separate flow that runs in GitHub Actions; follow "Cutting a release" in the repo's `VERSIONING.md`.
 
 ## Notes
 
