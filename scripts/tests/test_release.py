@@ -140,10 +140,10 @@ class ReleaseTest(unittest.TestCase):
         return self.write_main(version, [], [(version, entries), ("0.14.0", ["old entry"])], f"release v{version}", push=True)
 
     def merge_release_branch(self, version):
-        """Merge origin's release branch into main, as GitHub would."""
+        """Merge origin's release branch into main with a two-parent merge commit, as GitHub's merge button does."""
         self.git("fetch", "-q", "origin")
-        self.git("push", "-q", "origin", f"origin/release/v{version}:refs/heads/main")
-        self.git("merge", "-q", "--ff-only", "origin/main")
+        self.git("merge", "-q", "--no-ff", "-m", f"Merge release v{version}", f"origin/release/v{version}")
+        self.git("push", "-q", "origin", "HEAD:main")
         return self.head()
 
     def advance_main(self, message):
@@ -255,8 +255,16 @@ class ReleaseTest(unittest.TestCase):
         cl = self.origin_file("release/v0.14.1", "CHANGELOG.md")
         self.assertTrue(f"## [0.14.1] - {before}" in cl or f"## [0.14.1] - {after}" in cl, cl)
 
-    def test_prepare_refuses_a_malformed_date(self):
-        self.assert_refused(self.release("prepare", "--bump", "patch", "--date", "2026-13-40"), "--date")
+    def test_prepare_refuses_a_date_that_is_not_yyyy_mm_dd(self):
+        for date in ("2026-13-40", "20261105", "2026-W45-4"):
+            with self.subTest(date=date):
+                self.assert_refused(self.release("prepare", "--bump", "patch", "--date", date), "--date")
+        self.assertFalse(self.origin_release_branches())
+
+    def test_prepare_refuses_an_empty_version(self):
+        r = self.release("prepare", "--version", "", "--date", DATE)
+        self.assert_refused(r, "bad version")
+        self.assertNotIn("Traceback", r.stderr)
         self.assertFalse(self.origin_release_branches())
 
     def test_ac_2a_prepare_again_rebuilds_the_branch_and_updates_the_open_pr(self):
@@ -299,6 +307,15 @@ class ReleaseTest(unittest.TestCase):
         self.assert_refused(r, SETTING)
         self.assertEqual(self.pr(old)["state"], "open")
         self.assertIn("release/v0.15.0", self.origin_refs("heads"))
+        self.assertNotIn("release/v1.0.0", self.origin_refs("heads"))
+
+    def test_prepare_dispatches_validate_before_closing_old_release_prs(self):
+        self.git("push", "-q", "origin", "main:refs/heads/release/v0.15.0")
+        self.add_pr("release/v0.15.0")
+        r = self.release("prepare", "--bump", "major", "--pr", "--dispatch-validate", "--date", DATE, FAKE_GH_FAIL="pr close")
+        self.assert_refused(r)
+        self.assertEqual(self.workflow_runs(), ["validate.yml release/v1.0.0"])
+        self.assertIn("release/v1.0.0", [p["headRefName"] for p in self.open_prs()])
 
     def test_prepare_refuses_a_version_that_is_not_above_the_current_one_or_the_latest_tag(self):
         for args in (["--version", "0.14.0"], ["--version", "0.13.0"]):
@@ -311,7 +328,11 @@ class ReleaseTest(unittest.TestCase):
     def test_prepare_refuses_while_the_current_version_has_no_release(self):
         self.write_main("0.14.1", ["next entry"], [("0.14.1", ["first entry"]), ("0.14.0", ["old entry"])],
                         "merged, never published", push=True)
-        self.assert_refused(self.release("prepare", "--bump", "patch", "--date", DATE), "publish")
+        with self.subTest("no tag"):
+            self.assert_refused(self.release("prepare", "--bump", "patch", "--date", DATE), "publish")
+        with self.subTest("tag pushed, Release never created"):
+            self.tag("v0.14.1", push=True)
+            self.assert_refused(self.release("prepare", "--bump", "patch", "--date", DATE), "publish")
         self.assertFalse(self.origin_release_branches())
 
     def test_prepare_validates_and_releases_origin_main_not_the_checkout(self):
@@ -417,9 +438,28 @@ class ReleaseTest(unittest.TestCase):
         r = self.release("publish")
         self.assert_ok(r)
         self.assertIn("nothing to do", r.stdout)
+        self.assertIn("--ref origin/main", r.stdout)
         self.assertNotIn("v0.14.1", self.origin_refs("tags"))
         self.assert_ok(self.release("publish", "--ref", "origin/main"))
         self.assertEqual(self.tag_commit("v0.14.1"), sha)
+
+    def test_publish_reads_the_notes_from_main_when_the_section_lands_after_the_bump(self):
+        bump = self.write_main("0.14.1", [], [("0.14.0", ["old entry"])], "bump, section forgotten", push=True)
+        self.assert_refused(self.release("publish"), "[0.14.1]")
+        self.write_main("0.14.1", [], [("0.14.1", ["first entry"]), ("0.14.0", ["old entry"])], "add the section", push=True)
+        self.assert_ok(self.release("publish"))
+        self.assertEqual(self.tag_commit("v0.14.1"), bump)
+        self.assertEqual(self.release_notes("v0.14.1"), "- first entry\n")
+
+    def test_publish_releases_an_existing_tag_where_it_points(self):
+        self.released_on_main("0.14.1", ["first entry"])
+        self.tag("v0.14.1", rev="HEAD~1", push=True)
+        elsewhere = self.tag_commit("v0.14.1")
+        r = self.release("publish")
+        self.assert_ok(r)
+        self.assertIn(f"at {elsewhere[:7]}", r.stdout)
+        self.assertEqual(self.tag_commit("v0.14.1"), elsewhere)
+        self.assertEqual(self.release_notes("v0.14.1"), "- first entry\n")
 
     def test_publish_creates_the_first_release_when_the_repo_has_no_tags(self):
         first = self.git("rev-list", "--max-parents=0", "HEAD")
@@ -450,6 +490,28 @@ class ReleaseTest(unittest.TestCase):
         self.assertIn("- first entry", r.stdout)
         self.assertNotIn("v0.14.1", self.origin_refs("tags"))
         self.assertIsNone(self.release_notes("v0.14.1"))
+
+
+class GithubRepoTest(unittest.TestCase):
+    """Which repo gh is pointed at, for each form origin's URL can take. Pure parsing, so it runs everywhere."""
+
+    def test_github_repo_maps_each_remote_url_form(self):
+        sys.path.insert(0, str(SCRIPTS))
+        self.addCleanup(sys.path.remove, str(SCRIPTS))
+        import release
+        cases = {
+            "https://github.com/mqmalagris/agent-skills.git": "mqmalagris/agent-skills",
+            "https://github.com/mqmalagris/agent-skills": "mqmalagris/agent-skills",
+            "git@github.com:mqmalagris/agent-skills.git": "mqmalagris/agent-skills",
+            "ssh://git@github.com:22/mqmalagris/agent-skills.git": "mqmalagris/agent-skills",
+            "git@github-personal:mqmalagris/agent-skills.git": "mqmalagris/agent-skills",
+            "https://ghe.example.com/team/skills.git": "ghe.example.com/team/skills",
+            "/tmp/release-test/origin.git": None,
+            "C:\\Users\\me\\origin.git": None,
+        }
+        for url, want in cases.items():
+            with self.subTest(url=url):
+                self.assertEqual(release.github_repo(url), want)
 
 
 if __name__ == "__main__":

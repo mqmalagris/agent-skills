@@ -34,9 +34,9 @@ jobs:
           fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.x"
-      - name: Install PyYAML (strict frontmatter parsing; pinned, since this job holds a write token)
-        run: pip install pyyaml==6.0.2
+          python-version: "3.13"  # PyYAML 6.0.2 ships wheels for it; no source build in a job with a write token
+      - name: Install PyYAML (strict frontmatter parsing; pinned, prebuilt wheel only)
+        run: pip install --only-binary :all: pyyaml==6.0.2
       - name: Open or rebuild the release PR
         env:
           BUMP: ${{ inputs.bump }}
@@ -60,7 +60,7 @@ jobs:
           fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.x"
+          python-version: "3.13"
       - name: Publish the collection version if it has no release yet
         env:
           GH_TOKEN: ${{ github.token }}
