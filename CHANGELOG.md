@@ -3,6 +3,9 @@
 All notable changes to this collection are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); the collection follows [SemVer](https://semver.org). See [VERSIONING.md](VERSIONING.md) for the per-skill vs collection model.
 
 ## [Unreleased]
+
+## [0.14.0] - 2026-11-05
+
 - `implementation-review` 0.4.0: a small diff (at most 3 files and 50 lines) gets one fresh subagent running all seven checks, and the size is counted over the review target
 - code-craft: TypeScript rule A19, parse a date-only string as a local day
 - `blueprint` 0.5.0: copies numbered acceptance examples from the PRD verbatim with a Trophy tier per rule, gates phases on AC ids, makes approving `(proposed)` ACs the first open question, adds an E2E line to the Test Plan, and halts on a fuzzy spec by naming grill-me instead of interviewing. The fuzzy-spec eval becomes fuzzy-spec-invoked, because the old case never loaded the skill.
@@ -14,8 +17,8 @@ All notable changes to this collection are documented here. Format follows [Keep
 - `testing-philosophy` 0.2.0: acceptance tests and Given/When/Then at any tier, scenario rules and acid test, agent-written tests as a weaker oracle, test-integrity tells that only a human can clear, plain test code over Gherkin runners by default.
 - business-brief 0.1.0: new skill. One-page brief on a company before a job or a side job: how it makes money, the lever, market and competition, health, and where engineering moves the number, with figures tagged sourced, inferred or unknown, then angled to the decision (offer flags, interview points, pitch and value anchor, can-they-pay). Measured on 4 cases x 3 runs against no skill: job offer 0.93 vs 0.47, side-job pitch 0.94 vs 0.78.
 - cagan-check 0.3.0: business-sense lens on the existing dimensions, adapted from Path to Staff's *Business Sense for Engineers*. Outcome traces to revenue, retention or cost; viability covers business-model fit and prize vs. build hours; kickoff ranks OST solutions by rough prize and splits differentiators from table stakes; client work asks which number the stakeholder reports up. REFERENCE.md adds unit-economics terms, a business-model lever table and a worked example. Measured on 3 cases x 2 runs against 0.2.0: 18/18 vs 16/18 checks, no added flag lines.
-- `ai-estimate` 0.1.0 — new skill
-- `problem-solving` 0.1.0 — new skill
+- `ai-estimate` 0.1.0: new skill. Estimates a dev task built AI-assisted: grounds the number in the actual code, counts agent work in tool-call rounds, then adds the human layer (review, local run, QA, PR and CI, feedback) as separate lines. Adapted from ZhangHanDong/agent-estimation (MIT).
+- `problem-solving` 0.1.0: new skill. A problem-solving coach for real decisions and messy problems that aren't about code.
 - Eval coverage for the rest of the core chain: grill-me (4 cases), to-prd (3), blueprint (4), pr-craft (3) and implementation-review (2), on top of dev-flow, review-pass and sentinel. Fixtures are self-contained scaffold scripts (a shared saved-carts repo with an ADR, intent, PRD and plan), so grill-me, to-prd and blueprint run on native Windows; the git-driven pr-craft and implementation-review cases are tagged `needs-bash`.
 - Eval trend: `evals-history/<skill>.jsonl` is committed, one line per recorded run (date, version, content hash, per-case with/without scores, mean delta). `scripts/eval-run.sh <skill> --record [--runs N] [--baseline]` runs a suite and appends to it; `scripts/eval_history.py trend` prints the history. The pre-push hook now delegates to `eval-run.sh` and skips a skill whose pushed content already has a passing recorded entry.
 - publish-skill: runs the skill's eval suite on the publisher's own Claude login before committing and commits the result to `evals-history/`, aborting below threshold (`--skip-evals` to override). Resolves Git for Windows' bash rather than the System32 WSL launcher stub.
