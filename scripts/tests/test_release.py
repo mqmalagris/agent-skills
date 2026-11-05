@@ -371,6 +371,7 @@ class ReleaseTest(unittest.TestCase):
         self.assert_ok(self.release("publish"))
         self.assertEqual(self.tag_commit("v0.14.1"), release_sha)
         self.assertEqual(self.release_notes("v0.14.1"), "- first entry\n")
+        self.assertFalse((self.state / "releases" / "v0.14.1.not-latest").exists())
 
     def test_ac_3b_publish_does_nothing_when_the_tag_and_release_exist(self):
         sha = self.released_on_main("0.14.1", ["first entry"])
@@ -389,6 +390,7 @@ class ReleaseTest(unittest.TestCase):
         self.assert_ok(self.release("publish"))
         self.assertEqual(self.release_notes("v0.14.1"), "- first entry\n")
         self.assertEqual(self.tag_commit("v0.14.1"), sha)
+        self.assertFalse((self.state / "releases" / "v0.14.1.not-latest").exists())
 
     def test_ac_3d_publish_fails_without_a_changelog_section_and_creates_no_tag(self):
         self.write_main("0.14.2", [], [("0.14.0", ["old entry"])], "bump by hand", push=True)
@@ -418,6 +420,19 @@ class ReleaseTest(unittest.TestCase):
         self.assertEqual(self.release_notes("v0.14.1"), "- first entry\n")
         self.assertTrue((self.state / "releases" / "v0.14.1.not-latest").exists())
         self.assertEqual(self.tag_commit("v0.14.1"), half)
+
+    def test_publish_finishes_an_older_release_only_with_an_explicit_ref(self):
+        self.released_on_main("0.14.1", ["first entry"])
+        self.tag("v0.14.1", push=True)  # the tag went out, the Release didn't
+        self.write_main("0.14.2", [], [("0.14.2", ["next entry"]), ("0.14.1", ["first entry"]), ("0.14.0", ["old entry"])],
+                        "release v0.14.2", push=True)
+        self.tag("v0.14.2", push=True)
+        self.add_release("v0.14.2")
+        self.released_on_main("0.14.1", ["first entry"])  # main reverted to the older version
+        self.assert_refused(self.release("publish"), "--ref")
+        self.assertIsNone(self.release_notes("v0.14.1"))
+        self.assert_ok(self.release("publish", "--ref", "v0.14.1"))
+        self.assertEqual(self.release_notes("v0.14.1"), "- first entry\n")
 
     def test_ac_4a_prepare_and_publish_never_move_origin_main(self):
         before = self.on_origin("rev-parse", "main")
@@ -461,23 +476,29 @@ class ReleaseTest(unittest.TestCase):
         self.assertEqual(self.tag_commit("v0.14.1"), fixed)
         self.assertEqual(self.release_notes("v0.14.1"), "- first entry\n")
 
-    def test_publish_refuses_an_existing_tag_that_is_not_a_release_commit_on_main(self):
+    def test_publish_refuses_an_existing_tag_on_a_main_commit_with_another_version(self):
         self.released_on_main("0.14.1", ["first entry"])
-        with self.subTest("tag on a main commit with another version"):
-            self.tag("v0.14.1", rev="HEAD~1", push=True)
-            self.assert_refused(self.release("publish"), "fix or delete the tag")
-            self.assertIsNone(self.release_notes("v0.14.1"))
-            self.git("push", "-q", "origin", ":refs/tags/v0.14.1")
-            self.git("tag", "-d", "v0.14.1")
-        with self.subTest("tag on a commit that never reached main"):
-            main_head = self.head()
-            self.git("checkout", "-q", "-b", "side")
-            self.write_main("0.14.1", [], [("0.14.1", ["side entry"]), ("0.14.0", ["old entry"])], "side commit")
-            self.tag("v0.14.1", push=True)
-            self.git("checkout", "-q", "main")
-            self.assertEqual(self.head(), main_head)
-            self.assert_refused(self.release("publish"), "fix or delete the tag")
-            self.assertIsNone(self.release_notes("v0.14.1"))
+        self.tag("v0.14.1", rev="HEAD~1", push=True)
+        self.assert_refused(self.release("publish"), "fix or delete the tag")
+        self.assertIsNone(self.release_notes("v0.14.1"))
+
+    def test_publish_refuses_an_existing_tag_on_a_commit_that_never_reached_main(self):
+        self.released_on_main("0.14.1", ["first entry"])
+        main_head = self.head()
+        self.git("checkout", "-q", "-b", "side")
+        self.write_main("0.14.1", [], [("0.14.1", ["side entry"]), ("0.14.0", ["old entry"])], "side commit")
+        self.tag("v0.14.1", push=True)
+        self.git("checkout", "-q", "main")
+        self.assertEqual(self.head(), main_head)
+        self.assert_refused(self.release("publish"), "fix or delete the tag")
+        self.assertIsNone(self.release_notes("v0.14.1"))
+
+    def test_release_refuses_a_clone_with_several_remotes_unless_gh_repo_is_set(self):
+        self.git("remote", "add", "upstream", str(self.origin))
+        for cmd in (["prepare", "--bump", "patch", "--dry-run"], ["publish", "--dry-run"]):
+            with self.subTest(cmd=cmd[0]):
+                self.assert_refused(self.release(*cmd), "GH_REPO")
+                self.assert_ok(self.release(*cmd, GH_REPO="example/agent-skills"))
 
     def test_publish_creates_the_first_release_when_the_repo_has_no_tags(self):
         first = self.git("rev-list", "--max-parents=0", "HEAD")

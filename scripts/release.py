@@ -144,7 +144,7 @@ def commit_on(base, files, message):
 def next_version(args, cur, tags):
     latest = latest_version(tags)
     if latest and f"v{cur}" not in tags and parse_semver(cur) > parse_semver(latest):
-        sys.exit(f"! collection version {cur} on main has no release yet; run "
+        sys.exit(f"! collection version {cur} on main is not tagged yet; run "
                  f"`release.py publish --ref {BASE}` before preparing the next one")
     new = args.version if args.version is not None else bump(cur, args.bump)
     floor = max([cur] + ([latest] if latest else []), key=parse_semver)
@@ -161,8 +161,11 @@ def prepare(args):
         sys.exit(f"! bad --date {args.date!r}; use YYYY-MM-DD")
     run(["git", "fetch", "-q", REMOTE, "main"])
     base = run(["git", "rev-parse", BASE]).stdout.strip()
-    mp = json.loads(show(base, MARKETPLACE))
-    cur = mp["metadata"]["version"]
+    try:
+        mp = json.loads(show(base, MARKETPLACE))
+        cur = mp["metadata"]["version"]
+    except (ValueError, KeyError, TypeError):
+        sys.exit(f"! {MARKETPLACE} on {BASE} is unreadable; run scripts/validate_repo.py on main")
     cl = show(base, CHANGELOG)
     m, notes = section(cl, "Unreleased")
     if not m:
@@ -247,15 +250,16 @@ def release_commit(sha, version):
         if version_at(c) != version:
             break
         start = c
-    later = run(["git", "rev-list", "--first-parent", "--reverse", f"{start}..{sha}"]).stdout.split()
+    later = run(["git", "rev-list", "--first-parent", "--reverse", f"{start}..{sha}", "--", CHANGELOG]).stdout.split()
     return next((c for c in [start] + later if notes_at(c, version)), None)
 
 
 def publish(args):
     run(["git", "fetch", "-q", REMOTE, "main"])
-    sha = run(["git", "rev-parse", f"{args.ref}^{{commit}}"]).stdout.strip()
+    ref = args.ref or "HEAD"
+    sha = run(["git", "rev-parse", f"{ref}^{{commit}}"]).stdout.strip()
     if not on_main(sha):
-        sys.exit(f"! {args.ref} ({sha[:7]}) is not on {BASE}; publish only tags commits that are")
+        sys.exit(f"! {ref} ({sha[:7]}) is not on {BASE}; publish only tags commits that are")
     version = version_at(sha)
     parse_semver(version)
     tag = f"v{version}"
@@ -264,7 +268,8 @@ def publish(args):
     has_release = has_tag and run(["gh", "release", "view", tag, "--json", "tagName"], check=False).returncode == 0
     if has_tag and has_release:
         main_version = version_at(BASE)
-        hint = "" if main_version == version else f" ({BASE} holds {main_version}; pass --ref {BASE} to publish it)"
+        unreleased = main_version and main_version != version and f"v{main_version}" not in tags
+        hint = f" ({BASE} holds {main_version}, not tagged yet; pass --ref {BASE} to publish it)" if unreleased else ""
         print(f"{tag} is already tagged and released; nothing to do.{hint}")
         return
     latest = latest_version(tags)
@@ -273,6 +278,9 @@ def publish(args):
         # finish a release whose tag got pushed but whose Release didn't, wherever
         # the tag is, as long as it is a release commit for this version on main
         target = tags[tag]
+        if older and args.ref is None:
+            sys.exit(f"! collection version {version} is below the latest tag v{latest}; to finish its Release, "
+                     "pass --ref with the commit to publish")
         if not on_main(target) or version_at(target) != version:
             sys.exit(f"! tag {tag} points at {target[:7]}, which is not a commit on {BASE} with collection version "
                      f"{version}; fix or delete the tag")
@@ -320,9 +328,13 @@ def main():
     prep.add_argument("--dry-run", action="store_true", help="print the version and notes; write and push nothing")
     pub = sub.add_parser("publish", help="tag vX.Y.Z and create the GitHub Release if the collection version has none")
     pub.set_defaults(func=publish)
-    pub.add_argument("--ref", default="HEAD", help=f"commit to publish; must be on {BASE} (default: HEAD)")
+    pub.add_argument("--ref", help=f"commit to publish; must be on {BASE} (default: HEAD). Needed to finish "
+                     "an older release whose tag went out without its Release")
     pub.add_argument("--dry-run", action="store_true", help="check and print; push no tag, create no Release")
     args = ap.parse_args()
+    if not os.environ.get("GH_REPO") and len(run(["git", "remote"]).stdout.split()) > 1:
+        sys.exit("! this clone has several remotes, so gh could pick the wrong repo; set GH_REPO=owner/repo "
+                 "to origin's GitHub repo (CI sets it)")
     args.func(args)
 
 
