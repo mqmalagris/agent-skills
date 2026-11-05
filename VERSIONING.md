@@ -32,13 +32,25 @@ Bump it per [SemVer](https://semver.org) when the skill changes:
 
 ## Cutting a release
 
-```bash
-python3 scripts/validate_repo.py            # runs in CI too; must pass
-python3 scripts/release.py --bump minor      # or --version X.Y.Z / --bump patch|major
-```
+Releases run in GitHub Actions (`.github/workflows/release.yml`), in two steps:
 
-`release.py` validates, sets the collection version, rolls the CHANGELOG, commits, tags `vX.Y.Z`, pushes main + tag, and creates the GitHub Release. Use `--dry-run` to preview, `--no-push` to stop at the local commit + tag.
+1. **Prepare.** Run the `release` workflow by hand (the Actions tab, or `gh workflow run release.yml -f bump=minor`) and pick `patch`, `minor` or `major`. It validates the repo, bumps the collection version, moves the `[Unreleased]` notes under the new version on a `release/vX.Y.Z` branch cut from `main`, and opens a "release vX.Y.Z" PR with the notes as its body. Running it again rebuilds that PR from the current `main`, which is what you want after a skill was published while it was open. An open release PR for a different version is closed and its branch deleted.
+2. **Publish.** Merge the PR. On every push to `main`, the workflow reads the collection version, and if it has no release yet, it tags that commit `vX.Y.Z` and creates the GitHub Release from the version's CHANGELOG section. Running it again is safe: if the tag and the Release both exist there is nothing to do, and a tag without a Release gets its Release.
+
+Nothing pushes `main` directly; a release always lands through its PR and the `validate` check.
+
+**One-time setup.** The prepare step opens the PR with the Actions token, which needs **Settings, Actions, General, "Allow GitHub Actions to create and approve pull requests"** turned on. A PR opened with that token triggers no other workflows, so prepare dispatches `validate.yml` on the release branch itself to put the required check on the PR.
+
+**Local fallback.** The same two steps, for when the workflow is broken or Actions is down:
+
+```bash
+python3 scripts/release.py prepare --bump minor --dry-run   # preview the version and notes
+python3 scripts/release.py prepare --bump minor --pr        # push release/vX.Y.Z and open the PR with your gh login
+python3 scripts/release.py publish                          # after the merge: the tag and the Release; pushes only a tag
+```
 
 ## CI
 
-`.github/workflows/validate.yml` runs `scripts/validate_repo.py` on every push and PR: every `skills/<name>/` has a `SKILL.md` + `plugin.json`, all JSON parses, names are kebab-case and consistent, versions are valid SemVer, and each `plugin.json` version matches its `marketplace.json` entry.
+`.github/workflows/validate.yml` runs on every push to `main`, every PR, and on dispatch. It runs `scripts/validate_repo.py` (every `skills/<name>/` has a `SKILL.md` + `plugin.json`, all JSON parses, names are kebab-case and consistent, versions are valid SemVer, and each `plugin.json` version matches its `marketplace.json` entry) and the release script's tests in `scripts/tests/`. Those tests use a fake `gh` written as a shell script, so on native Windows they skip; run them under WSL or Linux.
+
+`.github/workflows/release.yml` runs the two release steps above.

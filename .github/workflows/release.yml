@@ -1,0 +1,67 @@
+name: release
+
+# Collection releases in two steps (VERSIONING.md, "Cutting a release"):
+#   prepare  manual dispatch: open or rebuild the "release vX.Y.Z" PR
+#   publish  every push to main: tag and release a collection version that has no release yet
+on:
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: Part of the collection version to bump
+        type: choice
+        options: [patch, minor, major]
+        required: true
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  prepare:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write       # push release/vX.Y.Z, delete a replaced release branch
+      pull-requests: write  # open, edit or close release PRs
+      actions: write        # dispatch validate.yml on the release branch
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+      - name: Install PyYAML (strict frontmatter parsing)
+        run: pip install pyyaml
+      - name: Open or rebuild the release PR
+        env:
+          BUMP: ${{ inputs.bump }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          python3 scripts/release.py prepare --bump "$BUMP" --pr --dispatch-validate
+
+  publish:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    concurrency:
+      group: release-publish
+      cancel-in-progress: false
+    permissions:
+      contents: write  # push the vX.Y.Z tag, create the GitHub Release
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+      - name: Publish the collection version if it has no release yet
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          python3 scripts/release.py publish

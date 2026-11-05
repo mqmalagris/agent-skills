@@ -4,6 +4,9 @@ on:
   push:
     branches: [main]
   pull_request:
+  # release.yml dispatches this on release/vX.Y.Z: a PR opened with the Actions
+  # token triggers no pull_request run, and main requires this check
+  workflow_dispatch:
 
 jobs:
   validate:
@@ -17,3 +20,5 @@ jobs:
         run: pip install pyyaml
       - name: Validate manifests, versions, and SKILL.md frontmatter
         run: python3 scripts/validate_repo.py
+      - name: Release script tests
+        run: python3 -m unittest discover -s scripts/tests -v
