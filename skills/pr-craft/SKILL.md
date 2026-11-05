@@ -10,11 +10,13 @@ Drive a clean PR end to end: branch, stage only the relevant files, conventional
 ## Flow
 
 1. **Inspect.** `git status` + `git diff` (and `git diff --staged`). Identify which changed files belong to *this* task. Pre-existing modified/untracked files unrelated to the work (lockfiles, config, scratch dirs) are NOT yours — leave them.
-2. **Size the change.** Measure what the PR will actually ask someone to read, *before* committing, so a split is still cheap:
+2. **Size the change. This gate is blocking: no `gh pr create` until it has run and been printed.** Measure what the PR will actually ask someone to read, *before* committing, so a split is still cheap. It applies just as much when the branch arrives already committed (a dev-flow run, a branch built over several sessions): measure it, and if it trips, split it before opening anything.
 
    ```bash
-   BASE=$(git symbolic-ref --short refs/remotes/origin/HEAD 2>/dev/null | sed 's|origin/||')
-   git diff --numstat "${BASE}...HEAD" -- . \
+   # BASE = the branch the PR will target (the user's, or the repo CLAUDE.md's), NOT origin/HEAD:
+   # a repo whose GitHub default is a release branch measures against the wrong tree.
+   BASE=${BASE:-$(git symbolic-ref --short refs/remotes/origin/HEAD 2>/dev/null | sed 's|origin/||')}
+   git diff --numstat "origin/${BASE}...HEAD" -- . \
      ':(exclude)*.lock' ':(exclude)*lock.json' ':(exclude)*.lockb' \
      ':(exclude)dist/**' ':(exclude)build/**' ':(exclude)vendor/**' \
      ':(exclude)**/*.min.*' ':(exclude)**/*.snap' ':(exclude)**/*.generated.*' \
@@ -27,9 +29,11 @@ Drive a clean PR end to end: branch, stage only the relevant files, conventional
    |---------|--------|
    | **< 400 lines and < 15 files** | One PR. Proceed. |
    | **400-800 lines, or 15-25 files** | One PR, but report the number and offer the split. |
-   | **> 800 lines, or > 25 files** | Propose a [stack](#stacked-prs-large-layered-changes) first. Shipping one PR anyway needs a stated reason. |
+   | **> 800 lines, or > 25 files** | **Stop.** Propose a [stack](#stacked-prs-large-layered-changes): print the reading and the layer cut (each layer's files and line count), and wait for the user. One PR ships only if the user says so for this change; a "Size" note in the PR body is not that. |
 
    These are review-capacity heuristics, not laws: reviewer defect-detection drops off sharply past a few hundred lines in one sitting. Tune the numbers here if a repo consistently runs bigger.
+
+   The failure this guards against: two PRs of 6.5k and 2.1k lines were opened after the gate was measured, with the size explained in the body instead of split. Measuring is not passing; above 800 the user decides, before the PR exists.
 3. **Branch.** If on the base branch (`main`/`staging`/`master`), create `type/short-slug` (e.g. `fix/marketing-consent-required-signup`). Type matches the commit type. If already on a feature branch, stay.
 4. **Stage explicitly.** `git add <file> <file> …` — name each relevant file. Never `git add .` / `-A`. Re-run `git status` to confirm only intended files are staged.
 5. **Commit.** Conventional Commits subject (`type(scope): summary`, ≤72 chars). Body explains *why* + bullet the changes. End with `Refs task <id>` / `Refs <ticket>` when known. Obey the repo's CLAUDE.md (e.g. no `Co-Authored-By` trailer if it says so).
@@ -68,6 +72,12 @@ Default to one focused PR. Reach for a **stack** when the size gate in step 2 tr
 **Size alone is not a reason to split.** Some large changes have exactly one seam: a mechanical rename across 60 files, a regenerated API client, a dependency bump with wide call-site churn. Splitting those yields layers that are individually meaningless and *harder* to review than the whole. When the gate trips but no seam exists, keep the single PR and spend one line of the body saying why it is big and which parts are mechanical (point reviewers at `?w=1` for whitespace-heavy diffs). Aim each layer under ~400 lines, but let the seam pick the cut, never the line count.
 
 Prereq (once per machine): `gh extension install github/gh-stack`.
+
+**A stack is always a GitHub stack.** Never stack by hand, opening each PR with `gh pr create --base <lower-branch>`. GitHub then shows unrelated PRs with no stack map, and CI that only runs on PRs into the default branch skips every upper layer. Use `gh stack` for every stack:
+- **Building it now:** steps 1-3 below.
+- **Layers already exist as branches or PRs** (split after the fact, or opened by hand): `gh stack link <bottom> <next> …` (branch names, PR numbers or URLs, bottom to top). It pushes the branches, opens any missing PRs with the right bases, and links them into one stack.
+
+Confirm the stack exists before reporting: `submit` and `link` print `Created stack with N PRs (stack #…)`. No stack number means it isn't stacked.
 
 1. **Bottom layer.** From the base branch: `gh stack init <layer-1-branch>`. Do that layer's work with the *same* explicit-staging + conventional-commit rules as the single-PR flow above.
 2. **Stack up.** For each next layer: `gh stack add <layer-n-branch>`, then commit its work. Each layer depends on the one below it.
