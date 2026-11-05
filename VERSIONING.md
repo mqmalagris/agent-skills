@@ -34,8 +34,8 @@ Bump it per [SemVer](https://semver.org) when the skill changes:
 
 Releases run in GitHub Actions (`.github/workflows/release.yml`), in two steps:
 
-1. **Prepare.** Run the `release` workflow by hand (the Actions tab, or `gh workflow run release.yml -f bump=minor`) and pick `patch`, `minor` or `major`. It validates the repo, bumps the collection version, moves the `[Unreleased]` notes under the new version on a `release/vX.Y.Z` branch cut from `main`, and opens a "release vX.Y.Z" PR with the notes as its body. Running it again rebuilds that PR from the current `main`, which is what you want after a skill was published while it was open. An open release PR for a different version is closed and its branch deleted.
-2. **Publish.** Merge the PR. On every push to `main`, the workflow reads the collection version, and if it has no release yet, it tags that commit `vX.Y.Z` and creates the GitHub Release from the version's CHANGELOG section. Running it again is safe: if the tag and the Release both exist there is nothing to do, and a tag without a Release gets its Release.
+1. **Prepare.** Run the `release` workflow by hand (the Actions tab, or `gh workflow run release.yml -f bump=minor`) and pick `patch`, `minor` or `major`. It validates `main`, bumps the collection version, moves the `[Unreleased]` notes under the new version on a `release/vX.Y.Z` branch cut from `main`, and opens a "release vX.Y.Z" PR with the notes as its body. Running it again rebuilds that PR from the current `main`, which is what you want after a skill was published while it was open. A rebuild replaces the branch, so fix the notes in `CHANGELOG.md` on `main`, not on the release branch. Once the new PR is up, an open release PR for a different version is closed and its branch deleted. The new version must be above the current one and the latest tag, and prepare refuses while the version already on `main` has no release.
+2. **Publish.** Merge the PR. On every push to `main`, the workflow reads the collection version, and if it has no release yet, it tags the commit that set that version `vX.Y.Z` (the release PR's merge, even if more commits landed since) and creates the GitHub Release from the version's CHANGELOG section. Running it again is safe: if the tag and the Release both exist there is nothing to do, and a tag without a Release gets its Release.
 
 Nothing pushes `main` directly; a release always lands through its PR and the `validate` check.
 
@@ -46,7 +46,7 @@ Nothing pushes `main` directly; a release always lands through its PR and the `v
 ```bash
 python3 scripts/release.py prepare --bump minor --dry-run   # preview the version and notes
 python3 scripts/release.py prepare --bump minor --pr        # push release/vX.Y.Z and open the PR with your gh login
-python3 scripts/release.py publish                          # after the merge: the tag and the Release; pushes only a tag
+python3 scripts/release.py publish --ref origin/main        # after the merge: the tag and the Release; pushes only a tag
 ```
 
 ## CI

@@ -3,35 +3,63 @@
 
 Each test builds a throwaway repo with a bare `origin`, copies release.py and
 validate_repo.py into it, and runs `release.py` as a subprocess, asserting what
-a maintainer would see: exit code, output, branches, tags and files on
-`origin`. `gh` is the one external boundary: a fake on PATH records every call
-and answers from a state directory. Test names carry the plan's AC ids.
+a maintainer would see: exit code, output, and the branches, tags and files on
+`origin`. `gh` is the one external boundary: a fake on PATH keeps the PRs,
+Releases and workflow runs that GitHub would, so tests assert that state. Test
+names carry the acceptance-criteria ids from the release-in-ci plan.
 
   python3 -m unittest discover -s scripts/tests -v
 """
-import json, os, shutil, subprocess, sys, tempfile, unittest
+import datetime, json, os, shutil, subprocess, sys, tempfile, unittest
 from pathlib import Path
 
 SCRIPTS = Path(__file__).resolve().parent.parent
 DATE = "2026-11-05"
+SETTING = "Allow GitHub Actions to create and approve pull requests"
 
-# Logs each call, answers `pr list` and `release view` from $FAKE_GH_STATE, and
-# keeps the last --body-file / --notes-file so tests can read what was sent.
-FAKE_GH = r"""#!/usr/bin/env bash
-printf '%s\n' "$*" >> "$FAKE_GH_STATE/calls.log"
-for ((i = 1; i <= $#; i++)); do
-  case "${!i}" in
-    --body-file) j=$((i + 1)); cp "${!j}" "$FAKE_GH_STATE/body.md" ;;
-    --notes-file) j=$((i + 1)); cp "${!j}" "$FAKE_GH_STATE/notes.md" ;;
-  esac
-done
-case "$1 $2" in
-  "pr list") cat "$FAKE_GH_STATE/prs.json" 2>/dev/null || echo '[]' ;;
-  "pr create") echo "https://github.com/example/agent-skills/pull/99" ;;
-  "release view") [ -e "$FAKE_GH_STATE/releases/$3" ] ;;
-  "release create") mkdir -p "$FAKE_GH_STATE/releases"; cp "$FAKE_GH_STATE/notes.md" "$FAKE_GH_STATE/releases/$3" ;;
-esac
-"""
+FAKE_GH = r'''#!/usr/bin/env python3
+"""Fake gh: keeps PR, Release and workflow-run state in $FAKE_GH_STATE."""
+import json, os, sys
+from pathlib import Path
+
+state = Path(os.environ["FAKE_GH_STATE"])
+args = sys.argv[1:]
+cmd = " ".join(args[:2])
+if cmd in os.environ.get("FAKE_GH_FAIL", "").split(","):
+    sys.exit(f"gh {cmd}: failed (injected by the test)")
+prs_path = state / "prs.json"
+prs = json.loads(prs_path.read_text()) if prs_path.exists() else []
+
+
+def opt(name):
+    return args[args.index(name) + 1] if name in args else None
+
+
+def pr(number):
+    return next(p for p in prs if p["number"] == int(number))
+
+
+if cmd == "pr list":
+    print(json.dumps([p for p in prs if p["state"] == "open"]))
+elif cmd == "pr create":
+    n = max([p["number"] for p in prs], default=0) + 1
+    prs.append({"number": n, "headRefName": opt("--head"), "baseRefName": opt("--base"), "title": opt("--title"),
+                "body": Path(opt("--body-file")).read_text(), "state": "open", "isCrossRepository": False})
+    print(f"https://github.com/example/agent-skills/pull/{n}")
+elif cmd == "pr edit":
+    pr(args[2])["body"] = Path(opt("--body-file")).read_text()
+elif cmd == "pr close":
+    pr(args[2])["state"] = "closed"
+elif cmd == "release view":
+    sys.exit(0 if (state / "releases" / args[2]).exists() else 1)
+elif cmd == "release create":
+    (state / "releases").mkdir(exist_ok=True)
+    (state / "releases" / args[2]).write_text(Path(opt("--notes-file")).read_text())
+elif cmd == "workflow run":
+    with open(state / "workflow-runs", "a") as f:
+        f.write(f"{args[2]} {opt('--ref')}\n")
+prs_path.write_text(json.dumps(prs))
+'''
 
 SKILL_MD = '---\nname: demo\ndescription: "A demo skill for release tests."\n---\n\n# demo\n'
 
@@ -43,7 +71,7 @@ def changelog(unreleased, released):
     return "\n".join(out)
 
 
-@unittest.skipIf(os.name == "nt", "the fake gh is a POSIX shell script; run under Linux or WSL")
+@unittest.skipIf(os.name == "nt", "the fake gh is a POSIX script; run under Linux or WSL")
 class ReleaseTest(unittest.TestCase):
     def setUp(self):
         self.tmp = Path(tempfile.mkdtemp(prefix="release-test-"))
@@ -56,11 +84,14 @@ class ReleaseTest(unittest.TestCase):
         (bindir / "gh").chmod(0o755)
         ident = {f"GIT_{who}_{what}": val for who in ("AUTHOR", "COMMITTER")
                  for what, val in (("NAME", "test"), ("EMAIL", "test@example.com"))}
-        self.env = {**os.environ, **ident, "FAKE_GH_STATE": str(self.state),
+        # ignore the developer's git config (signing, hooks) so the fixture behaves the same everywhere
+        isolate = {"GIT_CONFIG_GLOBAL": os.devnull, "GIT_CONFIG_NOSYSTEM": "1"}
+        self.env = {**os.environ, **ident, **isolate, "FAKE_GH_STATE": str(self.state),
                     "PATH": f"{bindir}{os.pathsep}{os.environ['PATH']}"}
-        self.env.pop("PYTHONIOENCODING", None)
-        subprocess.run(["git", "init", "-q", "--bare", "-b", "main", str(self.origin)], check=True)
-        subprocess.run(["git", "init", "-q", "-b", "main", str(self.repo)], check=True)
+        for name in ("PYTHONIOENCODING", "FAKE_GH_FAIL", "GH_REPO"):
+            self.env.pop(name, None)
+        self.run_git(["init", "-q", "--bare", "-b", "main", str(self.origin)], cwd=self.tmp)
+        self.run_git(["init", "-q", "-b", "main", str(self.repo)], cwd=self.tmp)
         (self.repo / "scripts").mkdir()
         for name in ("release.py", "validate_repo.py"):
             shutil.copy(SCRIPTS / name, self.repo / "scripts" / name)
@@ -72,34 +103,63 @@ class ReleaseTest(unittest.TestCase):
         self.git("remote", "add", "origin", str(self.origin))
         self.git("push", "-q", "-u", "origin", "main")
         # v0.14.0 is already tagged and released, as on the real repo
-        self.git("tag", "-a", "v0.14.0", "-m", "v0.14.0")
-        self.git("push", "-q", "origin", "v0.14.0")
+        self.tag("v0.14.0", push=True)
         self.add_release("v0.14.0")
 
     # --- fixture helpers ---
 
-    def git(self, *args):
-        return subprocess.run(["git", *args], cwd=self.repo, env=self.env, check=True,
+    def run_git(self, args, cwd=None):
+        return subprocess.run(["git", *args], cwd=cwd or self.repo, env=self.env, check=True,
                               capture_output=True, text=True).stdout.strip()
 
-    def write_main(self, version, unreleased, released, message, push=False):
+    def git(self, *args):
+        return self.run_git(list(args))
+
+    def head(self):
+        return self.git("rev-parse", "HEAD")
+
+    def tag(self, name, rev="HEAD", push=False):
+        self.git("tag", "-a", name, rev, "-m", name)
+        if push:
+            self.git("push", "-q", "origin", f"refs/tags/{name}")
+
+    def write_main(self, version, unreleased, released, message, push=False, changelog_text=None, plugin_version="0.1.0"):
         mp = {"name": "agent-skills", "metadata": {"version": version},
-              "plugins": [{"name": "demo", "source": "./skills/demo", "version": "0.1.0"}]}
+              "plugins": [{"name": "demo", "source": "./skills/demo", "version": plugin_version}]}
         (self.repo / ".claude-plugin").mkdir(exist_ok=True)
         (self.repo / ".claude-plugin" / "marketplace.json").write_text(json.dumps(mp, indent=2) + "\n")
-        (self.repo / "CHANGELOG.md").write_text(changelog(unreleased, released))
+        (self.repo / "CHANGELOG.md").write_text(changelog_text or changelog(unreleased, released))
         self.git("add", "-A")
         self.git("commit", "-q", "-m", message)
         if push:
-            self.git("push", "-q", "origin", "main")
+            self.git("push", "-q", "origin", "HEAD:main")
+        return self.head()
+
+    def released_on_main(self, version, entries):
+        """What merging a release PR leaves on main: the bumped version and its section."""
+        return self.write_main(version, [], [(version, entries), ("0.14.0", ["old entry"])], f"release v{version}", push=True)
+
+    def merge_release_branch(self, version):
+        """Merge origin's release branch into main, as GitHub would."""
+        self.git("fetch", "-q", "origin")
+        self.git("push", "-q", "origin", f"origin/release/v{version}:refs/heads/main")
+        self.git("merge", "-q", "--ff-only", "origin/main")
+        return self.head()
+
+    def advance_main(self, message):
+        """An unrelated commit landing on main after the release, like another skill publish."""
+        (self.repo / "later.txt").write_text(message + "\n")
+        self.git("add", "-A")
+        self.git("commit", "-q", "-m", message)
+        self.git("push", "-q", "origin", "HEAD:main")
+        return self.head()
 
     def release(self, *args, **env):
         return subprocess.run([sys.executable, "scripts/release.py", *args], cwd=self.repo,
                               env={**self.env, **env}, capture_output=True, encoding="utf-8", errors="replace")
 
     def on_origin(self, *args):
-        return subprocess.run(["git", "--git-dir", str(self.origin), *args], check=True,
-                              capture_output=True, text=True).stdout.strip()
+        return self.run_git(["--git-dir", str(self.origin), *args], cwd=self.tmp)
 
     def origin_file(self, ref, path):
         return self.on_origin("show", f"{ref}:{path}")
@@ -107,148 +167,289 @@ class ReleaseTest(unittest.TestCase):
     def origin_refs(self, kind):
         return set(self.on_origin("for-each-ref", "--format=%(refname:short)", f"refs/{kind}/").split())
 
-    def gh_calls(self):
-        log = self.state / "calls.log"
-        calls = log.read_text().splitlines() if log.exists() else []
-        log.unlink(missing_ok=True)
-        return calls
+    def origin_release_branches(self):
+        return {b for b in self.origin_refs("heads") if b.startswith("release/")}
 
-    def set_open_prs(self, *prs):
-        (self.state / "prs.json").write_text(json.dumps([{"number": n, "headRefName": h} for n, h in prs]))
+    def tag_commit(self, name):
+        return self.on_origin("rev-parse", f"{name}^{{commit}}")
+
+    def prs(self):
+        path = self.state / "prs.json"
+        return json.loads(path.read_text()) if path.exists() else []
+
+    def open_prs(self):
+        return [p for p in self.prs() if p["state"] == "open"]
+
+    def pr(self, number):
+        return next(p for p in self.prs() if p["number"] == number)
+
+    def add_pr(self, head, cross=False, body="old body\n"):
+        prs = self.prs()
+        n = max([p["number"] for p in prs], default=0) + 1
+        prs.append({"number": n, "headRefName": head, "baseRefName": "main", "title": head, "body": body,
+                    "state": "open", "isCrossRepository": cross})
+        (self.state / "prs.json").write_text(json.dumps(prs))
+        return n
+
+    def workflow_runs(self):
+        path = self.state / "workflow-runs"
+        return path.read_text().splitlines() if path.exists() else []
 
     def add_release(self, tag):
         (self.state / "releases").mkdir(exist_ok=True)
         (self.state / "releases" / tag).write_text("notes\n")
 
+    def release_notes(self, tag):
+        path = self.state / "releases" / tag
+        return path.read_text() if path.exists() else None
+
     def assert_ok(self, r):
         self.assertEqual(r.returncode, 0, f"exit {r.returncode}\n{r.stdout}{r.stderr}")
 
-    def assert_refused(self, r):
+    def assert_refused(self, r, *phrases):
         self.assertNotEqual(r.returncode, 0, f"expected a refusal\n{r.stdout}{r.stderr}")
+        for phrase in phrases:
+            self.assertIn(phrase, r.stdout + r.stderr)
 
     # --- prepare ---
 
     def test_ac_1_prepare_pushes_the_rolled_changelog_to_a_release_branch_and_opens_its_pr(self):
         r = self.release("prepare", "--bump", "patch", "--pr", "--date", DATE)
         self.assert_ok(r)
-        self.assertIn("release/v0.14.1", self.origin_refs("heads"))
+        self.assertEqual(self.on_origin("rev-parse", "release/v0.14.1^"), self.on_origin("rev-parse", "main"))
         mp = json.loads(self.origin_file("release/v0.14.1", ".claude-plugin/marketplace.json"))
         self.assertEqual(mp["metadata"]["version"], "0.14.1")
         cl = self.origin_file("release/v0.14.1", "CHANGELOG.md")
-        self.assertIn(f"## [Unreleased]\n\n## [0.14.1] - {DATE}\n\n- first entry\n", cl)
-        calls = self.gh_calls()
-        self.assertTrue(any(c.startswith("pr create --base main --head release/v0.14.1 --title release v0.14.1")
-                            for c in calls), calls)
-        self.assertEqual((self.state / "body.md").read_text(), "- first entry\n")
+        self.assertIn(f"## [Unreleased]\n\n## [0.14.1] - {DATE}\n\n- first entry\n\n## [0.14.0] - 2026-10-01\n\n- old entry", cl)
+        [pr] = self.open_prs()
+        self.assertEqual((pr["headRefName"], pr["baseRefName"], pr["title"], pr["body"]),
+                         ("release/v0.14.1", "main", "release v0.14.1", "- first entry\n"))
+
+    def test_ac_1_prepare_dispatches_validate_on_the_release_branch_only_when_asked(self):
+        self.assert_ok(self.release("prepare", "--bump", "patch", "--pr", "--dispatch-validate", "--date", DATE))
+        self.assertEqual(self.workflow_runs(), ["validate.yml release/v0.14.1"])
+        self.assert_ok(self.release("prepare", "--bump", "patch", "--pr", "--date", DATE))
+        self.assertEqual(self.workflow_runs(), ["validate.yml release/v0.14.1"])
 
     def test_ac_1b_prepare_refuses_an_empty_unreleased_section(self):
         self.write_main("0.14.0", [], [("0.14.0", ["old entry"])], "nothing new", push=True)
         r = self.release("prepare", "--bump", "patch", "--pr", "--date", DATE)
-        self.assert_refused(r)
-        self.assertIn("nothing to release", r.stdout + r.stderr)
-        self.assertFalse({b for b in self.origin_refs("heads") if b.startswith("release/")})
-        self.assertFalse([c for c in self.gh_calls() if c.startswith("pr ")])
+        self.assert_refused(r, "nothing to release")
+        self.assertFalse(self.origin_release_branches())
+        self.assertFalse(self.open_prs())
+
+    def test_prepare_ends_the_unreleased_notes_at_the_next_heading_even_without_a_blank_line(self):
+        tight = "# Changelog\n\n## [Unreleased]\n## [0.14.0] - 2026-10-01\n\n- old entry\n"
+        self.write_main("0.14.0", [], [], "tight, empty", push=True, changelog_text=tight)
+        self.assert_refused(self.release("prepare", "--bump", "patch", "--date", DATE), "nothing to release")
+        tight = "# Changelog\n\n## [Unreleased]\n- first entry\n## [0.14.0] - 2026-10-01\n\n- old entry\n"
+        self.write_main("0.14.0", [], [], "tight, one entry", push=True, changelog_text=tight)
+        self.assert_ok(self.release("prepare", "--bump", "patch", "--pr", "--date", DATE))
+        self.assertEqual(self.open_prs()[0]["body"], "- first entry\n")
+        self.assertEqual(self.origin_file("release/v0.14.1", "CHANGELOG.md").count("## [0.14.0]"), 1)
+
+    def test_prepare_without_a_date_stamps_todays_utc_date(self):
+        before = datetime.datetime.now(datetime.timezone.utc).date().isoformat()
+        self.assert_ok(self.release("prepare", "--bump", "patch"))
+        after = datetime.datetime.now(datetime.timezone.utc).date().isoformat()
+        cl = self.origin_file("release/v0.14.1", "CHANGELOG.md")
+        self.assertTrue(f"## [0.14.1] - {before}" in cl or f"## [0.14.1] - {after}" in cl, cl)
+
+    def test_prepare_refuses_a_malformed_date(self):
+        self.assert_refused(self.release("prepare", "--bump", "patch", "--date", "2026-13-40"), "--date")
+        self.assertFalse(self.origin_release_branches())
 
     def test_ac_2a_prepare_again_rebuilds_the_branch_and_updates_the_open_pr(self):
         self.assert_ok(self.release("prepare", "--bump", "patch", "--pr", "--date", DATE))
-        self.gh_calls()
-        self.set_open_prs((12, "release/v0.14.1"))
+        [first] = self.open_prs()
         self.write_main("0.14.0", ["first entry", "second entry"], [("0.14.0", ["old entry"])], "publish another skill", push=True)
-        r = self.release("prepare", "--bump", "patch", "--pr", "--date", DATE)
-        self.assert_ok(r)
-        cl = self.origin_file("release/v0.14.1", "CHANGELOG.md")
-        self.assertIn(f"## [0.14.1] - {DATE}\n\n- first entry\n- second entry\n", cl)
+        self.assert_ok(self.release("prepare", "--bump", "patch", "--pr", "--date", DATE))
+        [pr] = self.open_prs()
+        self.assertEqual(pr["number"], first["number"])
+        self.assertEqual(pr["body"], "- first entry\n- second entry\n")
+        self.assertIn(f"## [0.14.1] - {DATE}\n\n- first entry\n- second entry\n",
+                      self.origin_file("release/v0.14.1", "CHANGELOG.md"))
         self.assertEqual(self.on_origin("rev-parse", "release/v0.14.1^"), self.on_origin("rev-parse", "main"))
-        calls = self.gh_calls()
-        self.assertTrue(any(c.startswith("pr edit 12 --body-file") for c in calls), calls)
-        self.assertFalse([c for c in calls if c.startswith("pr create")], calls)
-        self.assertEqual((self.state / "body.md").read_text(), "- first entry\n- second entry\n")
 
     def test_ac_2b_prepare_for_another_version_closes_the_old_release_pr_and_deletes_its_branch(self):
         self.git("push", "-q", "origin", "main:refs/heads/release/v0.15.0")
-        self.set_open_prs((7, "release/v0.15.0"))
-        r = self.release("prepare", "--bump", "major", "--pr", "--date", DATE)
-        self.assert_ok(r)
-        heads = self.origin_refs("heads")
-        self.assertNotIn("release/v0.15.0", heads)
-        self.assertIn("release/v1.0.0", heads)
-        calls = self.gh_calls()
-        self.assertTrue(any(c.startswith("pr close 7") for c in calls), calls)
-        self.assertTrue(any(c.startswith("pr create --base main --head release/v1.0.0") for c in calls), calls)
+        old = self.add_pr("release/v0.15.0")
+        self.assert_ok(self.release("prepare", "--bump", "major", "--pr", "--date", DATE))
+        self.assertEqual(self.pr(old)["state"], "closed")
+        self.assertNotIn("release/v0.15.0", self.origin_refs("heads"))
+        self.assertEqual([p["headRefName"] for p in self.open_prs()], ["release/v1.0.0"])
+
+    def test_prepare_leaves_unrelated_and_fork_prs_alone(self):
+        for branch in ("feature/x", "release/v2-docs"):
+            self.git("push", "-q", "origin", f"main:refs/heads/{branch}")
+        feature, docs = self.add_pr("feature/x"), self.add_pr("release/v2-docs")
+        fork = self.add_pr("release/v0.14.1", cross=True, body="fork body\n")
+        self.assert_ok(self.release("prepare", "--bump", "patch", "--pr", "--date", DATE))
+        for n in (feature, docs, fork):
+            self.assertEqual(self.pr(n)["state"], "open")
+        self.assertEqual(self.pr(fork)["body"], "fork body\n")
+        self.assertTrue({"feature/x", "release/v2-docs"} <= self.origin_refs("heads"))
+        ours = [p for p in self.open_prs() if p["headRefName"] == "release/v0.14.1" and not p["isCrossRepository"]]
+        self.assertEqual([p["body"] for p in ours], ["- first entry\n"])
+
+    def test_prepare_keeps_the_old_release_pr_when_the_new_one_cannot_be_created(self):
+        self.git("push", "-q", "origin", "main:refs/heads/release/v0.15.0")
+        old = self.add_pr("release/v0.15.0")
+        r = self.release("prepare", "--bump", "major", "--pr", "--date", DATE, FAKE_GH_FAIL="pr create")
+        self.assert_refused(r, SETTING)
+        self.assertEqual(self.pr(old)["state"], "open")
+        self.assertIn("release/v0.15.0", self.origin_refs("heads"))
+
+    def test_prepare_refuses_a_version_that_is_not_above_the_current_one_or_the_latest_tag(self):
+        for args in (["--version", "0.14.0"], ["--version", "0.13.0"]):
+            with self.subTest(args=args):
+                self.assert_refused(self.release("prepare", *args, "--date", DATE), "must be above")
+        self.tag("v0.14.1", push=True)
+        self.assert_refused(self.release("prepare", "--bump", "patch", "--date", DATE), "must be above")
+        self.assertFalse(self.origin_release_branches())
+
+    def test_prepare_refuses_while_the_current_version_has_no_release(self):
+        self.write_main("0.14.1", ["next entry"], [("0.14.1", ["first entry"]), ("0.14.0", ["old entry"])],
+                        "merged, never published", push=True)
+        self.assert_refused(self.release("prepare", "--bump", "patch", "--date", DATE), "publish")
+        self.assertFalse(self.origin_release_branches())
+
+    def test_prepare_validates_and_releases_origin_main_not_the_checkout(self):
+        self.git("checkout", "-q", "-b", "wip")
+        self.write_main("0.14.0", ["first entry"], [("0.14.0", ["old entry"])], "broken locally", plugin_version="9.9.9")
+        self.assert_ok(self.release("prepare", "--bump", "patch", "--pr", "--date", DATE))
+        self.assertEqual(self.on_origin("rev-parse", "release/v0.14.1^"), self.on_origin("rev-parse", "main"))
+        mp = json.loads(self.origin_file("release/v0.14.1", ".claude-plugin/marketplace.json"))
+        self.assertEqual(mp["plugins"][0]["version"], "0.1.0")
+
+    def test_prepare_refuses_when_origin_main_fails_validation(self):
+        healthy = self.head()
+        self.write_main("0.14.0", ["first entry"], [("0.14.0", ["old entry"])], "broken on main", push=True,
+                        plugin_version="9.9.9")
+        self.git("checkout", "-q", "-b", "healthy", healthy)
+        self.assert_refused(self.release("prepare", "--bump", "patch", "--pr", "--date", DATE), "version mismatch")
+        self.assertFalse(self.origin_release_branches())
+        self.assertFalse(self.open_prs())
 
     def test_ac_5a_prepare_dry_run_prints_non_ascii_notes_on_a_cp1252_console(self):
         self.write_main("0.14.0", ["sentinel: mean/σ bands"], [("0.14.0", ["old entry"])], "sigma", push=True)
         r = self.release("prepare", "--bump", "patch", "--dry-run", PYTHONIOENCODING="cp1252")
         self.assert_ok(r)
         self.assertIn("mean/σ bands", r.stdout)
-        self.assertFalse({b for b in self.origin_refs("heads") if b.startswith("release/")})
+
+    def test_prepare_dry_run_pushes_nothing_and_opens_no_pr(self):
+        self.assert_ok(self.release("prepare", "--bump", "patch", "--pr", "--dispatch-validate", "--dry-run"))
+        self.assertFalse(self.origin_release_branches())
+        self.assertFalse(self.open_prs())
+        self.assertFalse(self.workflow_runs())
 
     # --- publish ---
 
-    def merge_release(self, version, entries):
-        """What merging a release PR leaves on main: the bumped version and its section."""
-        self.write_main(version, [], [(version, entries), ("0.14.0", ["old entry"])], f"release v{version}", push=True)
-        return self.git("rev-parse", "HEAD")
-
-    def test_ac_3_publish_tags_the_release_commit_and_creates_the_release(self):
-        sha = self.merge_release("0.14.1", ["first entry"])
-        r = self.release("publish")
-        self.assert_ok(r)
-        self.assertEqual(self.on_origin("rev-parse", "v0.14.1^{commit}"), sha)
-        self.assertEqual((self.state / "releases" / "v0.14.1").read_text(), "- first entry\n")
+    def test_ac_3_publish_tags_the_commit_that_set_the_version_even_after_main_moved_on(self):
+        self.assert_ok(self.release("prepare", "--bump", "patch", "--pr", "--date", DATE))
+        release_sha = self.merge_release_branch("0.14.1")
+        self.advance_main("a later skill publish")
+        self.assert_ok(self.release("publish"))
+        self.assertEqual(self.tag_commit("v0.14.1"), release_sha)
+        self.assertEqual(self.release_notes("v0.14.1"), "- first entry\n")
 
     def test_ac_3b_publish_does_nothing_when_the_tag_and_release_exist(self):
-        sha = self.merge_release("0.14.1", ["first entry"])
-        self.git("tag", "-a", "v0.14.1", "-m", "v0.14.1")
-        self.git("push", "-q", "origin", "v0.14.1")
+        sha = self.released_on_main("0.14.1", ["first entry"])
+        self.tag("v0.14.1", push=True)
         self.add_release("v0.14.1")
         r = self.release("publish")
         self.assert_ok(r)
         self.assertIn("nothing to do", r.stdout)
-        self.assertFalse([c for c in self.gh_calls() if c.startswith("release create")])
-        self.assertEqual(self.on_origin("rev-parse", "v0.14.1^{commit}"), sha)
+        self.assertEqual(self.release_notes("v0.14.1"), "notes\n")
+        self.assertEqual(self.tag_commit("v0.14.1"), sha)
 
     def test_ac_3c_publish_creates_the_missing_release_for_an_existing_tag(self):
-        sha = self.merge_release("0.14.1", ["first entry"])
-        self.git("tag", "-a", "v0.14.1", "-m", "v0.14.1")
-        self.git("push", "-q", "origin", "v0.14.1")
-        r = self.release("publish")
-        self.assert_ok(r)
-        self.assertEqual((self.state / "releases" / "v0.14.1").read_text(), "- first entry\n")
-        self.assertEqual(self.on_origin("rev-parse", "v0.14.1^{commit}"), sha)
+        sha = self.released_on_main("0.14.1", ["first entry"])
+        self.tag("v0.14.1", push=True)
+        self.assertNotEqual(self.advance_main("a later skill publish"), sha)
+        self.assert_ok(self.release("publish"))
+        self.assertEqual(self.release_notes("v0.14.1"), "- first entry\n")
+        self.assertEqual(self.tag_commit("v0.14.1"), sha)
 
     def test_ac_3d_publish_fails_without_a_changelog_section_and_creates_no_tag(self):
         self.write_main("0.14.2", [], [("0.14.0", ["old entry"])], "bump by hand", push=True)
-        r = self.release("publish")
-        self.assert_refused(r)
-        self.assertIn("[0.14.2]", r.stdout + r.stderr)
+        self.assert_refused(self.release("publish"), "[0.14.2]")
         self.assertNotIn("v0.14.2", self.origin_refs("tags"))
 
     def test_ac_3e_publish_refuses_a_version_below_the_latest_tag(self):
-        self.git("tag", "-a", "v0.14.1", "-m", "v0.14.1")
-        self.git("push", "-q", "origin", "v0.14.1")
+        self.tag("v0.14.1", push=True)
         self.write_main("0.13.5", [], [("0.13.5", ["backport"]), ("0.14.0", ["old entry"])], "downgrade", push=True)
-        r = self.release("publish")
-        self.assert_refused(r)
-        out = r.stdout + r.stderr
-        self.assertIn("0.13.5", out)
-        self.assertIn("v0.14.1", out)
+        self.assert_refused(self.release("publish"), "0.13.5", "v0.14.1")
         self.assertNotIn("v0.13.5", self.origin_refs("tags"))
 
-    # --- no path pushes main ---
+    def test_publish_compares_versions_as_numbers_not_text(self):
+        self.tag("v0.14.1", push=True)
+        self.write_main("0.9.5", [], [("0.9.5", ["backport"]), ("0.14.0", ["old entry"])], "downgrade", push=True)
+        self.assert_refused(self.release("publish"), "0.9.5", "v0.14.1")
+        self.assertNotIn("v0.9.5", self.origin_refs("tags"))
+
+    def test_publish_refuses_a_release_for_an_older_version_even_when_its_tag_exists(self):
+        self.write_main("0.9.5", [], [("0.9.5", ["backport"]), ("0.14.0", ["old entry"])], "revert to 0.9.5", push=True)
+        self.tag("v0.9.5", push=True)
+        self.tag("v0.14.1", rev="HEAD~1", push=True)
+        self.add_release("v0.14.1")
+        self.assert_refused(self.release("publish"), "0.9.5", "v0.14.1")
+        self.assertIsNone(self.release_notes("v0.9.5"))
 
     def test_ac_4a_prepare_and_publish_never_move_origin_main(self):
         before = self.on_origin("rev-parse", "main")
         self.assert_ok(self.release("prepare", "--bump", "patch", "--pr", "--date", DATE))
-        self.assert_ok(self.release("publish"))
         self.assertEqual(self.on_origin("rev-parse", "main"), before)
+        merged = self.merge_release_branch("0.14.1")
+        self.assert_ok(self.release("publish"))
+        self.assertIn("v0.14.1", self.origin_refs("tags"))
+        self.assertEqual(self.on_origin("rev-parse", "main"), merged)
 
     def test_ac_4b_publish_refuses_a_commit_that_is_not_on_origin_main(self):
         self.write_main("0.14.1", [], [("0.14.1", ["first entry"]), ("0.14.0", ["old entry"])], "local only")
-        r = self.release("publish")
-        self.assert_refused(r)
-        self.assertIn("not on origin/main", r.stdout + r.stderr)
+        self.assert_refused(self.release("publish"), "not on origin/main")
         self.assertNotIn("v0.14.1", self.origin_refs("tags"))
+
+    def test_publish_from_a_checkout_behind_origin_main(self):
+        stale = self.head()
+        sha = self.released_on_main("0.14.1", ["first entry"])
+        self.git("reset", "-q", "--hard", stale)
+        r = self.release("publish")
+        self.assert_ok(r)
+        self.assertIn("nothing to do", r.stdout)
+        self.assertNotIn("v0.14.1", self.origin_refs("tags"))
+        self.assert_ok(self.release("publish", "--ref", "origin/main"))
+        self.assertEqual(self.tag_commit("v0.14.1"), sha)
+
+    def test_publish_creates_the_first_release_when_the_repo_has_no_tags(self):
+        first = self.git("rev-list", "--max-parents=0", "HEAD")
+        self.git("push", "-q", "origin", ":refs/tags/v0.14.0")
+        self.git("tag", "-d", "v0.14.0")
+        (self.state / "releases" / "v0.14.0").unlink()
+        self.assert_ok(self.release("publish"))
+        self.assertEqual(self.tag_commit("v0.14.0"), first)
+        self.assertEqual(self.release_notes("v0.14.0"), "- old entry\n")
+
+    def test_publish_reuses_a_local_tag_left_by_a_rejected_push(self):
+        sha = self.released_on_main("0.14.1", ["first entry"])
+        self.tag("v0.14.1")
+        self.assert_ok(self.release("publish"))
+        self.assertEqual(self.tag_commit("v0.14.1"), sha)
+        self.assertEqual(self.release_notes("v0.14.1"), "- first entry\n")
+
+    def test_publish_refuses_a_local_tag_that_points_elsewhere(self):
+        self.released_on_main("0.14.1", ["first entry"])
+        self.tag("v0.14.1", rev="HEAD~1")
+        self.assert_refused(self.release("publish"), "git tag -d v0.14.1")
+        self.assertNotIn("v0.14.1", self.origin_refs("tags"))
+
+    def test_publish_dry_run_tags_nothing_and_creates_no_release(self):
+        self.released_on_main("0.14.1", ["first entry"])
+        r = self.release("publish", "--dry-run")
+        self.assert_ok(r)
+        self.assertIn("- first entry", r.stdout)
+        self.assertNotIn("v0.14.1", self.origin_refs("tags"))
+        self.assertIsNone(self.release_notes("v0.14.1"))
 
 
 if __name__ == "__main__":

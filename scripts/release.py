@@ -1,22 +1,24 @@
 #!/usr/bin/env python3
 """Cut a collection release for agent-skills, in two steps.
 
-  prepare  validate, bump the collection version, roll CHANGELOG [Unreleased]
-           into it, and force-push that as one commit on release/vX.Y.Z, cut
-           from origin/main. --pr opens the release PR (or updates its body)
-           and closes any other open release/* PR.
+  prepare  validate origin/main, bump the collection version, roll CHANGELOG
+           [Unreleased] into it, and force-push that as one commit on
+           release/vX.Y.Z, cut from origin/main. --pr opens the release PR (or
+           updates its body), then closes any other open release PR from this
+           repo and deletes its branch.
   publish  if the collection version of a commit on origin/main has no
-           release yet, tag it vX.Y.Z and create the GitHub Release from that
-           version's CHANGELOG section. Safe to re-run; pushes only a tag.
+           release yet, tag the commit that introduced that version vX.Y.Z and
+           create the GitHub Release from the version's CHANGELOG section.
+           Safe to re-run; pushes only a tag.
 
 Neither step pushes main, and neither touches the working tree. CI runs both
 (.github/workflows/release.yml); locally they are the fallback:
 
   python3 scripts/release.py prepare --bump minor --pr
   python3 scripts/release.py prepare --bump patch --dry-run
-  python3 scripts/release.py publish
+  python3 scripts/release.py publish --ref origin/main
 """
-import argparse, datetime, json, os, re, subprocess, sys, tempfile
+import argparse, datetime, json, os, re, subprocess, sys, tarfile, tempfile
 from pathlib import Path
 
 # CHANGELOG entries carry σ, arrows and dashes; a cp1252 console (the Windows
@@ -29,20 +31,24 @@ ROOT = Path(__file__).resolve().parent.parent
 SEMVER = re.compile(r"^(\d+)\.(\d+)\.(\d+)$")
 MARKETPLACE = ".claude-plugin/marketplace.json"
 CHANGELOG = "CHANGELOG.md"
+REMOTE, BASE = "origin", "origin/main"
 RELEASE_BRANCH = "release/v"
+RELEASE_BRANCH_RE = re.compile(r"^release/v\d+\.\d+\.\d+$")
+VALIDATE_WORKFLOW = "validate.yml"
+SETTING = "Allow GitHub Actions to create and approve pull requests"
 
 
 def run(cmd, check=True, capture=True, env=None, stdin=None):
+    """Run a command in the repo. Text in and out, except bytes when `stdin` is bytes."""
     r = subprocess.run(cmd, cwd=ROOT, capture_output=capture, env=env, input=stdin,
                        encoding=None if isinstance(stdin, bytes) else "utf-8")
     if check and r.returncode:
-        out = r.stdout.decode() if isinstance(r.stdout, bytes) else (r.stdout or "")
-        err = r.stderr.decode() if isinstance(r.stderr, bytes) else (r.stderr or "")
-        sys.exit(f"! `{' '.join(cmd)}` failed:\n{out}{err}")
+        text = lambda s: s.decode(errors="replace") if isinstance(s, bytes) else (s or "")
+        sys.exit(f"! `{' '.join(cmd)}` failed:\n{text(r.stdout)}{text(r.stderr)}")
     return r
 
 
-def semver(v):
+def parse_semver(v):
     m = SEMVER.match(v)
     if not m:
         sys.exit(f"! bad version {v}")
@@ -50,7 +56,7 @@ def semver(v):
 
 
 def bump(v, part):
-    M, m, p = semver(v)
+    M, m, p = parse_semver(v)
     return {"major": f"{M+1}.0.0", "minor": f"{M}.{m+1}.0", "patch": f"{M}.{m}.{p+1}"}[part]
 
 
@@ -58,19 +64,52 @@ def show(rev, path):
     return run(["git", "show", f"{rev}:{path}"]).stdout
 
 
-def section_re(heading):
-    return re.compile(rf"##\s*\[{re.escape(heading)}\][^\n]*\n(.*?)(?=\n##\s*\[|\Z)", re.S)
+def collection_version(rev):
+    return json.loads(show(rev, MARKETPLACE))["metadata"]["version"]
+
+
+def section(changelog, heading):
+    """(match, text) of a `## [heading]` section, ending at the next `## [` line."""
+    m = re.compile(rf"^##\s*\[{re.escape(heading)}\][^\n]*(?:\n|\Z)(.*?)(?=^##\s*\[|\Z)", re.S | re.M).search(changelog)
+    return (m, m.group(1).strip()) if m else (None, "")
 
 
 def remote_tags():
-    out = run(["git", "ls-remote", "--tags", "--refs", "origin"]).stdout
+    out = run(["git", "ls-remote", "--tags", "--refs", REMOTE]).stdout
     return {line.split("refs/tags/", 1)[1] for line in out.splitlines() if "refs/tags/" in line}
+
+
+def latest_version(tags):
+    released = [t[1:] for t in tags if t.startswith("v") and SEMVER.match(t[1:])]
+    return max(released, key=parse_semver, default=None)
+
+
+def print_notes(notes):
+    print("--- notes ---"); print(notes); print("---")
 
 
 def write_temp(directory, name, text):
     path = Path(directory) / name
     path.write_text(text + "\n", encoding="utf-8", newline="\n")
     return str(path)
+
+
+def target_github_repo():
+    """Point gh at origin's repo, so a clone with other remotes can't send the PR or Release elsewhere."""
+    url = run(["git", "remote", "get-url", REMOTE], check=False).stdout.strip()
+    m = re.search(r"github\.com[:/]([^/]+/[^/]+?)(?:\.git)?/?$", url)
+    if m:
+        os.environ["GH_REPO"] = m.group(1)
+
+
+def validate_tree(rev):
+    """Run validate_repo.py on `rev`'s tree, the one being released, not on the checkout."""
+    with tempfile.TemporaryDirectory() as d:
+        archive = Path(d) / "tree.tar"
+        run(["git", "archive", "--format=tar", "-o", str(archive), rev])
+        with tarfile.open(archive) as tar:
+            tar.extractall(Path(d) / "tree", **({"filter": "data"} if hasattr(tarfile, "data_filter") else {}))
+        run([sys.executable, str(Path(d) / "tree" / "scripts" / "validate_repo.py")], capture=False)
 
 
 def commit_on(base, files, message):
@@ -87,78 +126,109 @@ def commit_on(base, files, message):
     return run(["git", "commit-tree", tree, "-p", base, "-m", message]).stdout.strip()
 
 
-def prepare(args):
-    run([sys.executable, str(ROOT / "scripts" / "validate_repo.py")], capture=False)
-    run(["git", "fetch", "-q", "origin", "main"])
-    base = run(["git", "rev-parse", "origin/main"]).stdout.strip()
-    mp = json.loads(show(base, MARKETPLACE))
-    cur = mp["metadata"]["version"]
+def next_version(args, base, tags):
+    cur = collection_version(base)
+    latest = latest_version(tags)
+    if latest and f"v{cur}" not in tags and parse_semver(cur) > parse_semver(latest):
+        sys.exit(f"! collection version {cur} on main has no release yet; run "
+                 f"`release.py publish --ref {BASE}` before preparing the next one")
     new = args.version or bump(cur, args.bump)
-    semver(new)
+    floor = max([cur] + ([latest] if latest else []), key=parse_semver)
+    if parse_semver(new) <= parse_semver(floor) or f"v{new}" in tags:
+        sys.exit(f"! {new} must be above the current version {cur} and the latest tag "
+                 f"{'v' + latest if latest else '(none)'}, and not tagged already")
+    return cur, new
+
+
+def prepare(args):
+    if args.date:
+        try:
+            datetime.date.fromisoformat(args.date)
+        except ValueError:
+            sys.exit(f"! bad --date {args.date}; use YYYY-MM-DD")
+    run(["git", "fetch", "-q", REMOTE, "main"])
+    base = run(["git", "rev-parse", BASE]).stdout.strip()
+    validate_tree(base)
+    cur, new = next_version(args, base, remote_tags())
     date = args.date or datetime.datetime.now(datetime.timezone.utc).date().isoformat()
     tag, branch = f"v{new}", f"{RELEASE_BRANCH}{new}"
 
     cl = show(base, CHANGELOG)
-    m = section_re("Unreleased").search(cl)
+    m, notes = section(cl, "Unreleased")
     if not m:
         sys.exit(f"! {CHANGELOG} has no [Unreleased] section")
-    notes = m.group(1).strip()
     if not notes:
         sys.exit("! [Unreleased] is empty; nothing to release")
-    rolled = cl[:m.start()] + f"## [Unreleased]\n\n## [{new}] - {date}\n\n{notes}\n" + cl[m.end():]
+    rest = cl[m.end():]
+    rolled = cl[:m.start()] + f"## [Unreleased]\n\n## [{new}] - {date}\n\n{notes}\n" + ("\n" + rest if rest else "")
+    mp = json.loads(show(base, MARKETPLACE))
     mp["metadata"]["version"] = new
 
-    print(f"release {tag} ({cur} -> {new}) on {date}, from origin/main {base[:7]}")
-    print("--- notes ---"); print(notes); print("---")
+    print(f"release {tag} ({cur} -> {new}) on {date}, from {BASE} {base[:7]}")
+    print_notes(notes)
     if args.dry_run:
         print("dry-run: nothing written or pushed.")
         return
 
     commit = commit_on(base, {MARKETPLACE: json.dumps(mp, indent=2) + "\n", CHANGELOG: rolled}, f"release {tag}")
-    run(["git", "push", "-q", "--force", "origin", f"{commit}:refs/heads/{branch}"])
+    run(["git", "push", "-q", "--force", REMOTE, f"{commit}:refs/heads/{branch}"])
     print(f"pushed {branch} at {commit[:7]}")
     if args.pr:
-        open_release_pr(branch, tag, notes)
+        sync_release_pr(branch, tag, notes)
     if args.dispatch_validate:
         # A PR opened with the Actions token triggers no workflows; a dispatch
         # is the exception, and it puts the required check on the PR's head.
-        run(["gh", "workflow", "run", "validate.yml", "--ref", branch])
-        print(f"dispatched validate on {branch}")
+        run(["gh", "workflow", "run", VALIDATE_WORKFLOW, "--ref", branch])
+        print(f"dispatched {VALIDATE_WORKFLOW} on {branch}")
 
 
-def open_release_pr(branch, tag, notes):
-    prs = json.loads(run(["gh", "pr", "list", "--state", "open", "--json", "number,headRefName",
-                          "--limit", "100"]).stdout or "[]")
-    mine = None
-    for pr in prs:
-        head = pr["headRefName"]
-        if head == branch:
-            mine = pr["number"]
-        elif head.startswith(RELEASE_BRANCH):
-            run(["gh", "pr", "close", str(pr["number"]), "--comment", f"Replaced by {branch}."])
-            run(["git", "push", "-q", "origin", "--delete", head], check=False)
-            print(f"closed #{pr['number']} and deleted {head}")
+def sync_release_pr(branch, tag, notes):
+    """Open the release PR or update its body, then close the other release PRs.
+    Only PRs from this repo whose branch is exactly release/vX.Y.Z count: a fork
+    can name its branch anything, and closing comes last so a failed create
+    leaves the old PR in place."""
+    prs = json.loads(run(["gh", "pr", "list", "--state", "open", "--limit", "500",
+                          "--json", "number,headRefName,isCrossRepository"]).stdout or "[]")
+    ours = [pr for pr in prs if not pr.get("isCrossRepository") and RELEASE_BRANCH_RE.match(pr["headRefName"])]
+    mine = next((pr["number"] for pr in ours if pr["headRefName"] == branch), None)
     with tempfile.TemporaryDirectory() as d:
         body = write_temp(d, "body.md", notes)
         if mine:
             run(["gh", "pr", "edit", str(mine), "--body-file", body])
             print(f"updated release PR #{mine}")
-            return
-        r = run(["gh", "pr", "create", "--base", "main", "--head", branch, "--title", f"release {tag}",
-                 "--body-file", body], check=False)
-    if r.returncode:
-        sys.exit("! gh pr create failed. From CI, check the repo setting \"Allow GitHub Actions to create and "
-                 f"approve pull requests\" (Settings, Actions, General).\n{r.stdout}{r.stderr}")
-    print(f"opened {r.stdout.strip()}")
+        else:
+            r = run(["gh", "pr", "create", "--base", "main", "--head", branch, "--title", f"release {tag}",
+                     "--body-file", body], check=False)
+            if r.returncode:
+                sys.exit(f"! gh pr create failed. From CI, check the repo setting \"{SETTING}\" "
+                         f"(Settings, Actions, General).\n{r.stdout}{r.stderr}")
+            print(f"opened {r.stdout.strip()}")
+    for pr in ours:
+        if pr["headRefName"] != branch:
+            run(["gh", "pr", "close", str(pr["number"]), "--comment", f"Replaced by {branch}."])
+            gone = run(["git", "push", "-q", REMOTE, "--delete", pr["headRefName"]], check=False).returncode == 0
+            print(f"closed #{pr['number']}" + (f" and deleted {pr['headRefName']}" if gone else
+                                               f"; could not delete {pr['headRefName']}"))
+
+
+def release_commit(sha, version):
+    """The commit on sha's first-parent history that set the collection version
+    to `version`: the release PR's merge, even when main has moved on since."""
+    found = sha
+    for c in run(["git", "rev-list", "--first-parent", sha, "--", MARKETPLACE]).stdout.split():
+        if collection_version(c) != version:
+            break
+        found = c
+    return found
 
 
 def publish(args):
-    run(["git", "fetch", "-q", "origin", "main"])
+    run(["git", "fetch", "-q", REMOTE, "main"])
     sha = run(["git", "rev-parse", f"{args.ref}^{{commit}}"]).stdout.strip()
-    if run(["git", "merge-base", "--is-ancestor", sha, "origin/main"], check=False).returncode:
-        sys.exit(f"! {args.ref} ({sha[:7]}) is not on origin/main; publish only tags commits that are")
-    version = json.loads(show(sha, MARKETPLACE))["metadata"]["version"]
-    semver(version)
+    if run(["git", "merge-base", "--is-ancestor", sha, BASE], check=False).returncode:
+        sys.exit(f"! {args.ref} ({sha[:7]}) is not on {BASE}; publish only tags commits that are")
+    version = collection_version(sha)
+    parse_semver(version)
     tag = f"v{version}"
     tags = remote_tags()
     has_tag = tag in tags
@@ -166,24 +236,26 @@ def publish(args):
     if has_tag and has_release:
         print(f"{tag} is already tagged and released; nothing to do.")
         return
-    if not has_tag:
-        released = [t[1:] for t in tags if t.startswith("v") and SEMVER.match(t[1:])]
-        latest = max(released, key=semver, default=None)
-        if latest and semver(version) < semver(latest):
-            sys.exit(f"! collection version {version} is below the latest tag v{latest}; refusing to tag it")
-    m = section_re(version).search(show(sha, CHANGELOG))
-    notes = m.group(1).strip() if m else ""
+    latest = latest_version(tags)
+    if latest and parse_semver(version) < parse_semver(latest):
+        sys.exit(f"! collection version {version} is below the latest tag v{latest}; refusing to release it")
+    target = release_commit(sha, version)
+    _, notes = section(show(target, CHANGELOG), version)
     if not notes:
-        sys.exit(f"! {CHANGELOG} at {sha[:7]} has no [{version}] section; refusing to release {tag}")
+        sys.exit(f"! {CHANGELOG} at {target[:7]} has no [{version}] section; refusing to release {tag}")
 
-    print(f"publish {tag} at {sha[:7]}" + (" (tag exists; creating the missing Release)" if has_tag else ""))
+    print(f"publish {tag} at {target[:7]}" + (" (tag exists; creating the missing Release)" if has_tag else ""))
     if args.dry_run:
-        print("--- notes ---"); print(notes); print("---")
+        print_notes(notes)
         print("dry-run: no tag pushed, no Release created.")
         return
     if not has_tag:
-        run(["git", "tag", "-a", tag, sha, "-m", f"agent-skills {tag}"])
-        run(["git", "push", "-q", "origin", f"refs/tags/{tag}"])
+        local = run(["git", "rev-parse", "-q", "--verify", f"refs/tags/{tag}^{{commit}}"], check=False).stdout.strip()
+        if local and local != target:
+            sys.exit(f"! a local tag {tag} points at {local[:7]}, not {target[:7]}; delete it with `git tag -d {tag}`")
+        if not local:
+            run(["git", "tag", "-a", tag, target, "-m", f"agent-skills {tag}"])
+        run(["git", "push", "-q", REMOTE, f"refs/tags/{tag}"])
     with tempfile.TemporaryDirectory() as d:
         run(["gh", "release", "create", tag, "--title", tag, "--notes-file", write_temp(d, "notes.md", notes),
              "--verify-tag"])
@@ -193,20 +265,23 @@ def publish(args):
 def main():
     ap = argparse.ArgumentParser(description="Cut a collection release: prepare a release PR, then publish it")
     sub = ap.add_subparsers(dest="cmd", required=True)
-    p = sub.add_parser("prepare", help="bump and roll the changelog on release/vX.Y.Z; --pr opens the release PR")
-    g = p.add_mutually_exclusive_group(required=True)
-    g.add_argument("--version", help="explicit new collection version X.Y.Z")
+    prep = sub.add_parser("prepare", help="bump and roll the changelog on release/vX.Y.Z; --pr opens the release PR")
+    prep.set_defaults(func=prepare)
+    g = prep.add_mutually_exclusive_group(required=True)
+    g.add_argument("--version", help="explicit new collection version X.Y.Z (above the current one)")
     g.add_argument("--bump", choices=["major", "minor", "patch"])
-    p.add_argument("--date", help="release date YYYY-MM-DD (default: today, UTC)")
-    p.add_argument("--pr", action="store_true", help="open the release PR or update its body; close other release/* PRs")
-    p.add_argument("--dispatch-validate", action="store_true",
-                   help="run validate.yml on the release branch (needed when the Actions token opened the PR)")
-    p.add_argument("--dry-run", action="store_true", help="print the version and notes; write and push nothing")
-    q = sub.add_parser("publish", help="tag vX.Y.Z and create the GitHub Release if the collection version has none")
-    q.add_argument("--ref", default="HEAD", help="commit to publish; must be on origin/main (default: HEAD)")
-    q.add_argument("--dry-run", action="store_true", help="check and print; push no tag, create no Release")
+    prep.add_argument("--date", help="release date YYYY-MM-DD (default: today, UTC)")
+    prep.add_argument("--pr", action="store_true", help="open the release PR or update its body; close other release PRs")
+    prep.add_argument("--dispatch-validate", action="store_true",
+                      help=f"run {VALIDATE_WORKFLOW} on the release branch (needed when the Actions token opened the PR)")
+    prep.add_argument("--dry-run", action="store_true", help="print the version and notes; write and push nothing")
+    pub = sub.add_parser("publish", help="tag vX.Y.Z and create the GitHub Release if the collection version has none")
+    pub.set_defaults(func=publish)
+    pub.add_argument("--ref", default="HEAD", help=f"commit to publish; must be on {BASE} (default: HEAD)")
+    pub.add_argument("--dry-run", action="store_true", help="check and print; push no tag, create no Release")
     args = ap.parse_args()
-    prepare(args) if args.cmd == "prepare" else publish(args)
+    target_github_repo()
+    args.func(args)
 
 
 if __name__ == "__main__":
