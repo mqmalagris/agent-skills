@@ -1,18 +1,19 @@
 #!/usr/bin/env python3
 """Cut a collection release for agent-skills, in two steps.
 
-  prepare  validate origin/main, bump the collection version, roll CHANGELOG
-           [Unreleased] into it, and force-push that as one commit on
-           release/vX.Y.Z, cut from origin/main. --pr opens the release PR (or
-           updates its body), then closes any other open release PR from this
-           repo and deletes its branch.
+  prepare  bump the collection version on origin/main, roll CHANGELOG
+           [Unreleased] into it, validate, and force-push that as one commit
+           on release/vX.Y.Z. --pr opens the release PR (or updates its body),
+           then closes any other open release PR from this repo and deletes
+           its branch.
   publish  if the collection version of a commit on origin/main has no
-           release yet, tag the commit that introduced that version vX.Y.Z and
-           create the GitHub Release from the version's CHANGELOG section.
-           Safe to re-run; pushes only a tag.
+           release yet, tag the first commit that has both that version and
+           its CHANGELOG section vX.Y.Z, and create the GitHub Release from
+           that section. Safe to re-run; pushes only a tag.
 
 Neither step pushes main, and neither touches the working tree. CI runs both
-(.github/workflows/release.yml); locally they are the fallback:
+(.github/workflows/release.yml, which sets GH_REPO); locally they are the
+fallback, run from a clone whose only remote is origin (or with GH_REPO set):
 
   python3 scripts/release.py prepare --bump minor --pr
   python3 scripts/release.py prepare --bump patch --dry-run
@@ -61,18 +62,27 @@ def bump(v, part):
     return {"major": f"{M+1}.0.0", "minor": f"{M}.{m+1}.0", "patch": f"{M}.{m}.{p+1}"}[part]
 
 
-def show(rev, path):
-    return run(["git", "show", f"{rev}:{path}"]).stdout
+def show(rev, path, check=True):
+    r = run(["git", "show", f"{rev}:{path}"], check=check)
+    return r.stdout if r.returncode == 0 else None
 
 
-def collection_version(rev):
-    return json.loads(show(rev, MARKETPLACE))["metadata"]["version"]
+def version_at(rev):
+    """The collection version at `rev`, or None if marketplace.json is missing or unreadable there."""
+    try:
+        return json.loads(show(rev, MARKETPLACE, check=False) or "")["metadata"]["version"]
+    except (ValueError, KeyError, TypeError):
+        return None
 
 
 def section(changelog, heading):
     """(match, text) of a `## [heading]` section, ending at the next `## [` line."""
-    m = re.compile(rf"^##\s*\[{re.escape(heading)}\][^\n]*(?:\n|\Z)(.*?)(?=^##\s*\[|\Z)", re.S | re.M).search(changelog)
+    m = re.compile(rf"^##\s*\[{re.escape(heading)}\][^\n]*(?:\n|\Z)(.*?)(?=^##\s*\[|\Z)", re.S | re.M).search(changelog or "")
     return (m, m.group(1).strip()) if m else (None, "")
+
+
+def notes_at(rev, version):
+    return section(show(rev, CHANGELOG, check=False), version)[1]
 
 
 def remote_tags():
@@ -93,8 +103,8 @@ def latest_version(tags):
     return max(released, key=parse_semver, default=None)
 
 
-def has_github_release(tag):
-    return run(["gh", "release", "view", tag, "--json", "tagName"], check=False).returncode == 0
+def on_main(rev):
+    return run(["git", "merge-base", "--is-ancestor", rev, BASE], check=False).returncode == 0
 
 
 def print_notes(notes):
@@ -105,27 +115,6 @@ def write_temp(directory, name, text):
     path = Path(directory) / name
     path.write_text(text + "\n", encoding="utf-8", newline="\n")
     return str(path)
-
-
-def github_repo(url):
-    """The GH_REPO value for a remote URL: owner/repo, or host/owner/repo off
-    github.com. None for a local path. An SSH host alias (no dot) is github.com."""
-    if "://" not in url and "@" not in url:
-        return None
-    m = re.match(r"^(?:[a-z+]+://)?(?:[^@/]+@)?([^/:]+)[:/](?:\d+/)?([^/]+)/([^/]+?)(?:\.git)?/?$", url)
-    if not m:
-        return None
-    host, owner, repo = m.groups()
-    return f"{owner}/{repo}" if host == "github.com" or "." not in host else f"{host}/{owner}/{repo}"
-
-
-def target_github_repo():
-    """Point gh at origin's repo, so a clone with other remotes can't send the PR or Release elsewhere."""
-    if os.environ.get("GH_REPO"):
-        return
-    repo = github_repo(run(["git", "remote", "get-url", REMOTE], check=False).stdout.strip())
-    if repo:
-        os.environ["GH_REPO"] = repo
 
 
 def validate_tree(rev):
@@ -154,7 +143,7 @@ def commit_on(base, files, message):
 
 def next_version(args, cur, tags):
     latest = latest_version(tags)
-    if latest and not (f"v{cur}" in tags and has_github_release(f"v{cur}")):
+    if latest and f"v{cur}" not in tags and parse_semver(cur) > parse_semver(latest):
         sys.exit(f"! collection version {cur} on main has no release yet; run "
                  f"`release.py publish --ref {BASE}` before preparing the next one")
     new = args.version if args.version is not None else bump(cur, args.bump)
@@ -166,28 +155,24 @@ def next_version(args, cur, tags):
 
 
 def prepare(args):
-    if args.date:
-        try:
-            if not DATE.match(args.date):
-                raise ValueError
-            datetime.date.fromisoformat(args.date)
-        except ValueError:
-            sys.exit(f"! bad --date {args.date!r}; use YYYY-MM-DD")
+    if args.version is not None:
+        parse_semver(args.version)
+    if args.date is not None and not (DATE.match(args.date) and _iso_date(args.date)):
+        sys.exit(f"! bad --date {args.date!r}; use YYYY-MM-DD")
     run(["git", "fetch", "-q", REMOTE, "main"])
     base = run(["git", "rev-parse", BASE]).stdout.strip()
-    validate_tree(base)
     mp = json.loads(show(base, MARKETPLACE))
     cur = mp["metadata"]["version"]
-    new = next_version(args, cur, remote_tags())
-    date = args.date or datetime.datetime.now(datetime.timezone.utc).date().isoformat()
-    tag, branch = f"v{new}", f"{RELEASE_BRANCH}{new}"
-
     cl = show(base, CHANGELOG)
     m, notes = section(cl, "Unreleased")
     if not m:
         sys.exit(f"! {CHANGELOG} has no [Unreleased] section")
     if not notes:
         sys.exit("! [Unreleased] is empty; nothing to release")
+    new = next_version(args, cur, remote_tags())
+    validate_tree(base)
+    date = args.date or datetime.datetime.now(datetime.timezone.utc).date().isoformat()
+    tag, branch = f"v{new}", f"{RELEASE_BRANCH}{new}"
     rest = cl[m.end():]
     rolled = cl[:m.start()] + f"## [Unreleased]\n\n## [{new}] - {date}\n\n{notes}\n" + ("\n" + rest if rest else "")
     mp["metadata"]["version"] = new
@@ -210,6 +195,14 @@ def prepare(args):
     close_release_prs(replaced, branch)
 
 
+def _iso_date(text):
+    try:
+        datetime.date.fromisoformat(text)
+        return True
+    except ValueError:
+        return False
+
+
 def open_or_update_release_pr(branch, tag, notes):
     """Open the release PR or update its body; return the other open release PRs.
     Only PRs from this repo whose branch is exactly release/vX.Y.Z count, since
@@ -227,9 +220,9 @@ def open_or_update_release_pr(branch, tag, notes):
             r = run(["gh", "pr", "create", "--base", "main", "--head", branch, "--title", f"release {tag}",
                      "--body-file", body], check=False)
             if r.returncode:
-                run(["git", "push", "-q", REMOTE, "--delete", branch], check=False)
-                sys.exit(f"! gh pr create failed, so {branch} was deleted again. From CI, check the repo setting "
-                         f"\"{SETTING}\" (Settings, Actions, General).\n{r.stdout}{r.stderr}")
+                gone = run(["git", "push", "-q", REMOTE, "--delete", branch], check=False).returncode == 0
+                sys.exit(f"! gh pr create failed; {branch} was {'deleted again' if gone else 'left on origin'}. "
+                         f"From CI, check the repo setting \"{SETTING}\" (Settings, Actions, General).\n{r.stdout}{r.stderr}")
             print(f"opened {r.stdout.strip()}")
     return [pr for pr in ours if pr["headRefName"] != branch]
 
@@ -245,43 +238,53 @@ def close_release_prs(prs, branch):
 
 
 def release_commit(sha, version):
-    """The commit on sha's first-parent history that set the collection version
-    to `version`: the release PR's merge, even when main has moved on since."""
-    found = sha
+    """The commit to tag for `version`: on sha's first-parent history, the first
+    commit at or after the one that set the version whose CHANGELOG has the
+    version's section. Normally that is the release PR's merge. None if no
+    commit up to sha has the section."""
+    start = sha
     for c in run(["git", "rev-list", "--first-parent", sha, "--", MARKETPLACE]).stdout.split():
-        try:
-            if collection_version(c) != version:
-                break
-        except (json.JSONDecodeError, KeyError, TypeError):
+        if version_at(c) != version:
             break
-        found = c
-    return found
+        start = c
+    later = run(["git", "rev-list", "--first-parent", "--reverse", f"{start}..{sha}"]).stdout.split()
+    return next((c for c in [start] + later if notes_at(c, version)), None)
 
 
 def publish(args):
     run(["git", "fetch", "-q", REMOTE, "main"])
     sha = run(["git", "rev-parse", f"{args.ref}^{{commit}}"]).stdout.strip()
-    tip = run(["git", "rev-parse", BASE]).stdout.strip()
-    if run(["git", "merge-base", "--is-ancestor", sha, BASE], check=False).returncode:
+    if not on_main(sha):
         sys.exit(f"! {args.ref} ({sha[:7]}) is not on {BASE}; publish only tags commits that are")
-    version = collection_version(sha)
+    version = version_at(sha)
     parse_semver(version)
     tag = f"v{version}"
     tags = remote_tags()
     has_tag = tag in tags
-    has_release = has_tag and has_github_release(tag)
+    has_release = has_tag and run(["gh", "release", "view", tag, "--json", "tagName"], check=False).returncode == 0
     if has_tag and has_release:
-        hint = "" if sha == tip else f" ({args.ref} is behind {BASE}; pass --ref {BASE} to publish what main holds)"
+        main_version = version_at(BASE)
+        hint = "" if main_version == version else f" ({BASE} holds {main_version}; pass --ref {BASE} to publish it)"
         print(f"{tag} is already tagged and released; nothing to do.{hint}")
         return
     latest = latest_version(tags)
-    if latest and parse_semver(version) < parse_semver(latest):
-        sys.exit(f"! collection version {version} is below the latest tag v{latest}; refusing to release it")
-    # notes come from sha, so a section that landed after the version bump still counts
-    _, notes = section(show(sha, CHANGELOG), version)
+    older = bool(latest) and parse_semver(version) < parse_semver(latest)
+    if has_tag:
+        # finish a release whose tag got pushed but whose Release didn't, wherever
+        # the tag is, as long as it is a release commit for this version on main
+        target = tags[tag]
+        if not on_main(target) or version_at(target) != version:
+            sys.exit(f"! tag {tag} points at {target[:7]}, which is not a commit on {BASE} with collection version "
+                     f"{version}; fix or delete the tag")
+    elif older:
+        sys.exit(f"! collection version {version} is below the latest tag v{latest}; refusing to tag it")
+    else:
+        target = release_commit(sha, version)
+        if not target:
+            sys.exit(f"! {CHANGELOG} has no [{version}] section on {BASE} up to {sha[:7]}; refusing to release {tag}")
+    notes = notes_at(target, version) or notes_at(sha, version)
     if not notes:
-        sys.exit(f"! {CHANGELOG} at {sha[:7]} has no [{version}] section; refusing to release {tag}")
-    target = tags[tag] if has_tag else release_commit(sha, version)
+        sys.exit(f"! {CHANGELOG} has no [{version}] section at {target[:7]}; refusing to release {tag}")
 
     print(f"publish {tag} at {target[:7]}" + (" (tag exists; creating the missing Release)" if has_tag else ""))
     if args.dry_run:
@@ -296,9 +299,10 @@ def publish(args):
             run(["git", "tag", "-a", tag, target, "-m", f"agent-skills {tag}"])
         run(["git", "push", "-q", REMOTE, f"refs/tags/{tag}"])
     with tempfile.TemporaryDirectory() as d:
+        # an older version's Release must not become the repo's Latest
         run(["gh", "release", "create", tag, "--title", tag, "--notes-file", write_temp(d, "notes.md", notes),
-             "--verify-tag"])
-    print(f"OK released {tag}")
+             "--verify-tag"] + (["--latest=false"] if older else []))
+    print(f"OK released {tag}" + (" (not marked Latest)" if older else ""))
 
 
 def main():
@@ -319,7 +323,6 @@ def main():
     pub.add_argument("--ref", default="HEAD", help=f"commit to publish; must be on {BASE} (default: HEAD)")
     pub.add_argument("--dry-run", action="store_true", help="check and print; push no tag, create no Release")
     args = ap.parse_args()
-    target_github_repo()
     args.func(args)
 
 

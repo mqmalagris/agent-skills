@@ -55,6 +55,8 @@ elif cmd == "release view":
 elif cmd == "release create":
     (state / "releases").mkdir(exist_ok=True)
     (state / "releases" / args[2]).write_text(Path(opt("--notes-file")).read_text())
+    if "--latest=false" in args:
+        (state / "releases" / f"{args[2]}.not-latest").touch()
 elif cmd == "workflow run":
     with open(state / "workflow-runs", "a") as f:
         f.write(f"{args[2]} {opt('--ref')}\n")
@@ -256,7 +258,7 @@ class ReleaseTest(unittest.TestCase):
         self.assertTrue(f"## [0.14.1] - {before}" in cl or f"## [0.14.1] - {after}" in cl, cl)
 
     def test_prepare_refuses_a_date_that_is_not_yyyy_mm_dd(self):
-        for date in ("2026-13-40", "20261105", "2026-W45-4"):
+        for date in ("2026-13-40", "20261105", "2026-W45-4", ""):
             with self.subTest(date=date):
                 self.assert_refused(self.release("prepare", "--bump", "patch", "--date", date), "--date")
         self.assertFalse(self.origin_release_branches())
@@ -328,11 +330,7 @@ class ReleaseTest(unittest.TestCase):
     def test_prepare_refuses_while_the_current_version_has_no_release(self):
         self.write_main("0.14.1", ["next entry"], [("0.14.1", ["first entry"]), ("0.14.0", ["old entry"])],
                         "merged, never published", push=True)
-        with self.subTest("no tag"):
-            self.assert_refused(self.release("prepare", "--bump", "patch", "--date", DATE), "publish")
-        with self.subTest("tag pushed, Release never created"):
-            self.tag("v0.14.1", push=True)
-            self.assert_refused(self.release("prepare", "--bump", "patch", "--date", DATE), "publish")
+        self.assert_refused(self.release("prepare", "--bump", "patch", "--date", DATE), "publish")
         self.assertFalse(self.origin_release_branches())
 
     def test_prepare_validates_and_releases_origin_main_not_the_checkout(self):
@@ -409,13 +407,17 @@ class ReleaseTest(unittest.TestCase):
         self.assert_refused(self.release("publish"), "0.9.5", "v0.14.1")
         self.assertNotIn("v0.9.5", self.origin_refs("tags"))
 
-    def test_publish_refuses_a_release_for_an_older_version_even_when_its_tag_exists(self):
-        self.write_main("0.9.5", [], [("0.9.5", ["backport"]), ("0.14.0", ["old entry"])], "revert to 0.9.5", push=True)
-        self.tag("v0.9.5", push=True)
-        self.tag("v0.14.1", rev="HEAD~1", push=True)
-        self.add_release("v0.14.1")
-        self.assert_refused(self.release("publish"), "0.9.5", "v0.14.1")
-        self.assertIsNone(self.release_notes("v0.9.5"))
+    def test_publish_completes_an_older_tagged_release_without_marking_it_latest(self):
+        half = self.released_on_main("0.14.1", ["first entry"])
+        self.tag("v0.14.1", push=True)  # the tag went out, the Release didn't
+        self.write_main("0.14.2", [], [("0.14.2", ["next entry"]), ("0.14.1", ["first entry"]), ("0.14.0", ["old entry"])],
+                        "release v0.14.2", push=True)
+        self.tag("v0.14.2", push=True)
+        self.add_release("v0.14.2")
+        self.assert_ok(self.release("publish", "--ref", half))
+        self.assertEqual(self.release_notes("v0.14.1"), "- first entry\n")
+        self.assertTrue((self.state / "releases" / "v0.14.1.not-latest").exists())
+        self.assertEqual(self.tag_commit("v0.14.1"), half)
 
     def test_ac_4a_prepare_and_publish_never_move_origin_main(self):
         before = self.on_origin("rev-parse", "main")
@@ -442,24 +444,40 @@ class ReleaseTest(unittest.TestCase):
         self.assertNotIn("v0.14.1", self.origin_refs("tags"))
         self.assert_ok(self.release("publish", "--ref", "origin/main"))
         self.assertEqual(self.tag_commit("v0.14.1"), sha)
+        with self.subTest("main only gained an unrelated commit: no hint"):
+            self.git("merge", "-q", "--ff-only", "origin/main")
+            self.add_release("v0.14.1")
+            self.advance_main("a later skill publish")
+            self.git("reset", "-q", "--hard", "HEAD~1")
+            r = self.release("publish")
+            self.assert_ok(r)
+            self.assertNotIn("--ref origin/main", r.stdout)
 
-    def test_publish_reads_the_notes_from_main_when_the_section_lands_after_the_bump(self):
-        bump = self.write_main("0.14.1", [], [("0.14.0", ["old entry"])], "bump, section forgotten", push=True)
+    def test_publish_tags_the_first_commit_that_has_the_version_and_its_section(self):
+        self.write_main("0.14.1", [], [("0.14.0", ["old entry"])], "bump, section forgotten", push=True)
         self.assert_refused(self.release("publish"), "[0.14.1]")
-        self.write_main("0.14.1", [], [("0.14.1", ["first entry"]), ("0.14.0", ["old entry"])], "add the section", push=True)
+        fixed = self.write_main("0.14.1", [], [("0.14.1", ["first entry"]), ("0.14.0", ["old entry"])], "add the section", push=True)
         self.assert_ok(self.release("publish"))
-        self.assertEqual(self.tag_commit("v0.14.1"), bump)
+        self.assertEqual(self.tag_commit("v0.14.1"), fixed)
         self.assertEqual(self.release_notes("v0.14.1"), "- first entry\n")
 
-    def test_publish_releases_an_existing_tag_where_it_points(self):
+    def test_publish_refuses_an_existing_tag_that_is_not_a_release_commit_on_main(self):
         self.released_on_main("0.14.1", ["first entry"])
-        self.tag("v0.14.1", rev="HEAD~1", push=True)
-        elsewhere = self.tag_commit("v0.14.1")
-        r = self.release("publish")
-        self.assert_ok(r)
-        self.assertIn(f"at {elsewhere[:7]}", r.stdout)
-        self.assertEqual(self.tag_commit("v0.14.1"), elsewhere)
-        self.assertEqual(self.release_notes("v0.14.1"), "- first entry\n")
+        with self.subTest("tag on a main commit with another version"):
+            self.tag("v0.14.1", rev="HEAD~1", push=True)
+            self.assert_refused(self.release("publish"), "fix or delete the tag")
+            self.assertIsNone(self.release_notes("v0.14.1"))
+            self.git("push", "-q", "origin", ":refs/tags/v0.14.1")
+            self.git("tag", "-d", "v0.14.1")
+        with self.subTest("tag on a commit that never reached main"):
+            main_head = self.head()
+            self.git("checkout", "-q", "-b", "side")
+            self.write_main("0.14.1", [], [("0.14.1", ["side entry"]), ("0.14.0", ["old entry"])], "side commit")
+            self.tag("v0.14.1", push=True)
+            self.git("checkout", "-q", "main")
+            self.assertEqual(self.head(), main_head)
+            self.assert_refused(self.release("publish"), "fix or delete the tag")
+            self.assertIsNone(self.release_notes("v0.14.1"))
 
     def test_publish_creates_the_first_release_when_the_repo_has_no_tags(self):
         first = self.git("rev-list", "--max-parents=0", "HEAD")
@@ -490,28 +508,6 @@ class ReleaseTest(unittest.TestCase):
         self.assertIn("- first entry", r.stdout)
         self.assertNotIn("v0.14.1", self.origin_refs("tags"))
         self.assertIsNone(self.release_notes("v0.14.1"))
-
-
-class GithubRepoTest(unittest.TestCase):
-    """Which repo gh is pointed at, for each form origin's URL can take. Pure parsing, so it runs everywhere."""
-
-    def test_github_repo_maps_each_remote_url_form(self):
-        sys.path.insert(0, str(SCRIPTS))
-        self.addCleanup(sys.path.remove, str(SCRIPTS))
-        import release
-        cases = {
-            "https://github.com/mqmalagris/agent-skills.git": "mqmalagris/agent-skills",
-            "https://github.com/mqmalagris/agent-skills": "mqmalagris/agent-skills",
-            "git@github.com:mqmalagris/agent-skills.git": "mqmalagris/agent-skills",
-            "ssh://git@github.com:22/mqmalagris/agent-skills.git": "mqmalagris/agent-skills",
-            "git@github-personal:mqmalagris/agent-skills.git": "mqmalagris/agent-skills",
-            "https://ghe.example.com/team/skills.git": "ghe.example.com/team/skills",
-            "/tmp/release-test/origin.git": None,
-            "C:\\Users\\me\\origin.git": None,
-        }
-        for url, want in cases.items():
-            with self.subTest(url=url):
-                self.assertEqual(release.github_repo(url), want)
 
 
 if __name__ == "__main__":

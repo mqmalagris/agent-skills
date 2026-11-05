@@ -41,7 +41,7 @@ Nothing pushes `main` directly; a release always lands through its PR and the `v
 
 **One-time setup.** The prepare step opens the PR with the Actions token, which needs **Settings, Actions, General, "Allow GitHub Actions to create and approve pull requests"** turned on. A PR opened with that token triggers no other workflows, so prepare dispatches `validate.yml` on the release branch itself to put the required check on the PR.
 
-**Local fallback.** The same two steps, for when the workflow is broken or Actions is down:
+**Local fallback.** The same two steps, for when the workflow is broken or Actions is down. Run them from a clone whose only remote is `origin`, or set `GH_REPO=mqmalagris/agent-skills`, so `gh` opens the PR and the Release on this repo. `publish --ref <commit>` also finishes an older release whose tag went out without its Release, and doesn't mark it Latest.
 
 ```bash
 python3 scripts/release.py prepare --bump minor --dry-run   # preview the version and notes

@@ -36,11 +36,12 @@ jobs:
         with:
           python-version: "3.13"  # PyYAML 6.0.2 ships wheels for it; no source build in a job with a write token
       - name: Install PyYAML (strict frontmatter parsing; pinned, prebuilt wheel only)
-        run: pip install --only-binary :all: pyyaml==6.0.2
+        run: "pip install --only-binary :all: pyyaml==6.0.2"
       - name: Open or rebuild the release PR
         env:
           BUMP: ${{ inputs.bump }}
           GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -64,6 +65,7 @@ jobs:
       - name: Publish the collection version if it has no release yet
         env:
           GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
