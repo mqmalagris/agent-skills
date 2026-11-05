@@ -3,6 +3,9 @@
 All notable changes to this collection are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); the collection follows [SemVer](https://semver.org). See [VERSIONING.md](VERSIONING.md) for the per-skill vs collection model.
 
 ## [Unreleased]
+
+## [0.14.1] - 2026-11-05
+
 - `semver` 0.1.1: points collection releases at "Cutting a release" in VERSIONING.md instead of the removed `release.py --bump` call
 - `publish-skill` 0.2.1: the release step points to "Cutting a release" in VERSIONING.md, since collection releases now run in GitHub Actions
 - Collection releases run in GitHub Actions. Dispatching the `release` workflow opens a "release vX.Y.Z" PR that bumps the collection version and rolls this changelog, and running it again rebuilds that PR. Merging it tags the version and creates the GitHub Release. `release.py` becomes `prepare` and `publish`, the same steps CI runs, and never pushes `main`; it also prints the notes on a cp1252 console instead of crashing. `validate.yml` now runs the release script's tests.
