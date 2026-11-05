@@ -8,7 +8,7 @@ version -> log a CHANGELOG [Unreleased] entry -> validate JSON -> commit + push.
 Idempotent. On UPDATE it preserves the existing category/keywords/description
 and bumps the PATCH version by default (--bump minor|major or --version to
 override, --no-bump to hold). On a NEW skill it uses --version (default 0.1.0).
-Collection releases are cut separately with scripts/release.py in the repo.
+Collection releases are cut separately; see "Cutting a release" in the repo's VERSIONING.md.
 """
 import argparse, json, re, shutil, subprocess, sys
 from pathlib import Path
