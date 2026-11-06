@@ -26,6 +26,18 @@ Non-negotiable. Fabricated metrics destroy credibility the moment a candidate ca
 
 **Facts are immutable:** job titles, employers, dates, technologies, accomplishments — rewrite form only. Never reword "Junior Developer" to "Software Engineer". Never alter date ranges.
 
+**Ownership, status and provenance.** Three ways a true bullet still fails an interview, all found in a real post-rejection audit (see [STORIES.md](STORIES.md)):
+
+| Failure | Example | Fix |
+|---|---|---|
+| Ownership broader than git | "Own the platform end to end" when a teammate has more commits | "One of two lead engineers", or name the domains owned; use the [ownership ladder](STORIES.md#step-3-ownership-audit) |
+| Status rounded up | "Shipped" for work on staging or behind a flag | One [status as of a date](STORIES.md#step-5-status-as-of-a-date) |
+| A ratio from a smoke test | "~5x cheaper" from one query; the ledger said 2.5x | Re-derive from the system of record on a matched sample; write the [provenance line](STORIES.md#step-4-metric-provenance) |
+| Tech claim from an old version | "Runs on two model providers" when the rewrite uses one | Check the current code's imports |
+| Infrastructure implied as yours | "Built a release-tier system" when you gated a feature behind an existing flag | Name what was already there; the story is what you did with it |
+
+When `<dir>/career-evidence/` exists, its `ownership-audit.md` and `cv-audit.md` override the master on any of these.
+
 ## Inferred target profile
 
 Used in standalone rewrite (sync (b)) and when polishing without a JD. Declare explicitly in [Post-CV section](#post-cv-section-pt-br) §A so the candidate can correct.
@@ -84,7 +96,9 @@ Order can be inverted for rhythm — `[Z], [X], [Y]` reads well too. The three s
 
 **Use `[ESTIMADO]` aggressively but conservatively.** If the source implies a scale ("multi-store retailer" → 5–15 stores, "60+ Lambda functions" → 60+ already given), commit to a defensible conservative number and tag `[ESTIMADO]`. A bullet with a tagged conservative estimate beats a bullet with no number. Only fall back to `[DADO AUSENTE: ...]` when no inference is defensible from the source text.
 
-**Every number needs a defense.** Interviewers probe metrics: what was the baseline, how was it measured, how much of it was yours. For every metric kept in a tailored CV (direct or `[ESTIMADO]`), record a one-line defense in the post-CV §C list: baseline, measurement source, the candidate's share of the outcome. `screen-prep` pulls these into its metric-defense section. A number the candidate cannot defend in one sentence gets softened or cut.
+**Every number needs a defense.** Interviewers probe metrics: what was the baseline, how was it measured, how much of it was yours. For every metric kept in a tailored CV (direct or `[ESTIMADO]`), record a one-line defense in the post-CV §C list: baseline, measurement source, sample, environment, date, and the candidate's share of the outcome. `screen-prep` pulls these into its metric-defense section. A number the candidate cannot defend in one sentence gets softened or cut.
+
+Put the sample in the bullet when it's small or from testing ("about 2.5x, 8.9 to 3.5 credits on a 48-request before/after test"). It reads as precise, and it pre-empts the "was that production?" follow-up.
 
 ## Achievements over tasks — lead with WHY, not HOW
 
@@ -131,6 +145,8 @@ AI tooling is now an expected skill, and bare tool names read as noise. When the
 
 - Name tool + task + outcome in the bullet ("cut review turnaround from 2 days to same-day by adding an LLM pre-review step to CI"), not "Experienced with Claude Code, Copilot, Cursor".
 - Show judgment: what the candidate verifies, where they do not trust generated output, what guardrails they built.
+- **One concrete catch beats a percentage.** "Agents write 95% of my code" invites "so how do you know it's right?". A clause like "caught an agent-written plan claiming tests proved a change when those tests mocked the code being changed" answers it before it's asked. Interviewers for AI-native roles ask for this case by name; the story bank should hold one ([STORIES.md](STORIES.md#step-6-story-bank)).
+- Say who caught what. If an AI reviewer found a bug, the bullet says the candidate triaged or fixed it, not found it.
 - One line in Skills (`AI tooling: ...`) is enough; the evidence belongs in bullets.
 
 The topic is too new for rigorous study; this is emerging practice.
@@ -494,7 +510,8 @@ Resolva estes itens para obter um CV ainda mais forte. Agrupados por empresa/se�
 - [ ] `[ESTIMADO]` na linha "{trecho}" — confirme o número exato.
 - [ ] `[DADO AUSENTE: qual era X?]` na linha "{trecho}" — informe a métrica.
 - [ ] `[DADO AUSENTE: métricas sobre {Empresa}]` — número de usuários, ARR, funding, clientes conhecidos.
-- [ ] Defesa da métrica "{número}": base de comparação {antes}, medido por {fonte}, sua parte {o que foi seu}.
+- [ ] Defesa da métrica "{número}": base de comparação {antes}, medido por {fonte}, amostra {N}, ambiente {produção / staging / teste}, data {mês/ano}, sua parte {o que foi seu}.
+- [ ] Linha de correção, se esta empresa já viu uma versão antiga do número: "{frase exata}".
 
 ### {Próxima empresa / seção}
 ...

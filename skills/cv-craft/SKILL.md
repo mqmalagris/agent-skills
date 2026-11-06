@@ -1,6 +1,7 @@
 ---
 name: cv-craft
-description: Maintain a canonical master CV in Markdown and produce tailored, ATS-friendly resumes and recruiter-screen prep packs from job descriptions. Supports six modes. bootstrap (build master from scratch via interview), sync (import existing resume in any format into master, with optional standalone rewrite output), check (assess fit and eligibility against a JD before committing to an application, writing no CV), tailor (generate CV matched to a JD), screen-prep (draft answers for first recruiter-call questions), and linkedin-align (cross-check a LinkedIn profile against the master and target roles). Use when the user asks to update their CV/resume, rewrite an existing CV, tailor a resume to a job posting, check a job description or ask whether a role is worth applying to, prepare for a recruiter screen, align or review their LinkedIn profile, import a resume PDF/docx into Markdown, or runs /cv-craft.
+description: >-
+  Maintain a canonical master CV in Markdown and produce tailored, ATS-friendly resumes, recruiter-screen prep packs and interview story banks. Seven modes. bootstrap (build master via interview), sync (import an existing resume, optional standalone rewrite), check (fit and eligibility against a JD, no CV written), tailor (CV matched to a JD), screen-prep (first recruiter-call answers), linkedin-align (profile vs master), and evidence (audit git, PRs, tickets and production data into an evidence catalog, ownership audit, story bank and question map). Use when the user asks to update, rewrite or tailor a CV, check a job description or whether a role is worth applying to, prep a recruiter screen or interview, build interview stories, verify CV claims against real evidence, prepare after a rejection, align LinkedIn, import a resume PDF/docx, or runs /cv-craft.
 ---
 
 # cv-craft
@@ -15,13 +16,15 @@ Read before every mode. Violating these destroys candidate credibility in interv
 2. **Never delete information silently.** Anything removed from the source goes into the post-CV change log with a one-line justification. The candidate can restore it on the next pass.
 3. **Never alter facts.** Job titles, employers, dates, technologies, and accomplishments must match the source exactly. Rewrite form, not content.
 4. **Surface inferred target profile.** When no JD is supplied (sync standalone rewrite, bootstrap polish), infer role / seniority / specialization / company type from the source. Declare it in the post-CV section so the candidate can correct.
+5. **Never claim more ownership, status or certainty than the evidence shows.** "Own X end to end" when a teammate has more commits, "shipped" for something on staging, or a ratio from one smoke test all fall apart on the first follow-up question. Use the [ownership ladder](STORIES.md#step-3-ownership-audit), a [status as of a date](STORIES.md#step-5-status-as-of-a-date), and a [provenance line](STORIES.md#step-4-metric-provenance) for every number.
 
 See [REFERENCE.md — Data integrity](REFERENCE.md#data-integrity) and [Post-CV section template](REFERENCE.md#post-cv-section-pt-br).
 
 ## Quick start
 
-1. Detect mode from the user's request: `bootstrap` | `sync` | `check` | `tailor` | `screen-prep` | `linkedin-align`. Ask if ambiguous.
+1. Detect mode from the user's request: `bootstrap` | `sync` | `check` | `tailor` | `screen-prep` | `linkedin-align` | `evidence`. Ask if ambiguous.
    - A pasted JD with "check this", "what do you think", "should I apply", "am I a fit", or no instruction at all is `check`, not `tailor`. Do not write a CV until asked.
+   - "Build my interview stories", "audit my CV claims", "what did I actually own", or interview feedback after a rejection is `evidence`.
 2. Resolve the **CV directory** (see [Path resolution](#path-resolution) below). All artifacts live there.
 3. Read or create `cv-master.md` per [MASTER_TEMPLATE.md](MASTER_TEMPLATE.md).
 4. Run the per-mode flow below. Always preview, wait for confirmation, then write.
@@ -37,6 +40,7 @@ The skill is path-agnostic. Resolve in this order before any read or write:
    - Screen-prep: `<dir>/screen-prep-{company}-{role-slug}.md`
    - Stylesheet: `<dir>/cv-style.css`
    - Gap ledger: `<dir>/gap-ledger.md` (see [Gap ledger](#gap-ledger))
+   - Career evidence: `<dir>/career-evidence/` (see [evidence](#evidence--career-evidence-and-interview-stories))
 3. **If not in memory, ask the user**:
    - In `sync` / `tailor` / `screen-prep`: *"Where is your master CV? (paste an absolute path, or tell me the folder it lives in)"*
    - In `bootstrap`: *"Where should I create your master CV? (paste an absolute folder path; I'll put `cv-master.md` and outputs there)"*
@@ -145,6 +149,8 @@ If `check` already ran on this JD, reuse its analysis. Do not re-derive the gate
 Steps:
 1. Extract from JD: required skills, preferred skills, responsibilities, seniority, domain, company keywords. Build the requirement set `K` for scoring, must-haves marked.
 2. From `cv-master.md`, **select and rephrase** matching experiences and bullets — never invent. Rewrite each kept bullet with strong action verb + specific technical context + measurable impact (XYZ method — see [REFERENCE.md](REFERENCE.md#bullet-rules--xyz-method)). Apply the [three-tier metric system](REFERENCE.md#data-integrity) — flag `[ESTIMADO]` or `[DADO AUSENTE: ...]` when needed.
+   - **If `<dir>/career-evidence/` exists, it outranks the master.** Check every kept bullet against `ownership-audit.md` (the verb matches what was the user's), `cv-audit.md` (no Fix or Tighten item comes back), and the catalog's provenance and status lines. Prefer bullets backed by a story card: a bullet that leads into a rehearsed 90-second story is worth more than one that doesn't. Every number on the CV gets its provenance line in post-CV §C.
+   - **Check what this company already saw.** If an earlier application to the same company carried a number or wording that has since been corrected, use the corrected form and put the correction line in post-CV §C.
 3. **Consolidate Skills** into single section grouped by category (Languages · Frameworks · Databases · Cloud/DevOps · Tools). Lead each category with JD-relevant items the user actually has. **No ratings.** Match JD vocabulary verbatim where the user has the underlying skill, and make sure every must-have also appears **in a bullet that shows it in use**. AI-assisted review grades per requirement and reviewers tend to follow the grade, so a must-have that lives only in the Skills list is a weak spot (see [REFERENCE.md — Tailoring rules](REFERENCE.md#tailoring-rules)).
 4. Rewrite the summary per [three-layer structure](REFERENCE.md#summary-three-layer-structure) (Identity / Scale / Complexity), 3–5 lines, aligned to the role. Apply [voice rules](REFERENCE.md#voice-rules) — banned-buzzword list, no em-dashes, no AI-tell words.
 5. **Strict length** per [REFERENCE.md — Length](REFERENCE.md#length): 1 page under 5 years; 1 page by default at 5–7 years, 2 only when content fills them; max 2 at 8+; never a partial second page. Drop weakest bullets first when trimming.
@@ -159,6 +165,9 @@ Steps:
 14. **Update the [gap ledger](#gap-ledger)** with every requirement the master could not support, including the ones deliberately left off the CV. Same turn, not a follow-up offer.
 15. Offer export (DOCX + PDF, see [Export](#export)).
 16. **Offer a cover letter** when the portal accepts one and the fit is strong. In the one large field experiment found (n=7,287 applications), tailored cover letters raised callbacks about 53% over none. Three short paragraphs: why this company (specific), the one proof point that maps to their gate, the logistics line (location, timezone, contract model). Same voice rules, same no-invention rule.
+17. **Record what was sent.** When the user confirms the application went out, add a row to `career-evidence/README.md`'s "what each live process has seen" table (numbers, ownership wording, stories used), if that folder exists.
+
+Written application questions ("hardest problem you solved", "most ambitious thing you shipped") are short story cards: use the card's headline and 60-second version, cut to the field limit, with the check and the user's own mistake kept in. Short outreach to a recruiter keeps the outcome and drops the method ([STORIES.md](STORIES.md#short-outreach-is-not-a-cv)).
 
 ATS-safe formatting rules in [REFERENCE.md](REFERENCE.md).
 
@@ -170,8 +179,9 @@ Output sections, in this order:
 - **Logistics knockouts first.** Work authorization and contract model (contractor / EOR / W2), location and the timezone-overlap window the user can commit to, English level, notice period, start date. One tight, honest line each. For a remote international candidate these end calls faster than any technical question, so they lead the pack.
 - **30-second intro pitch**: first-person, aligned to the role.
 - **Why this company / role**: 3 sentences from JD signals; ask the user for any personal angle.
-- **Top 8 likely first-call questions** with draft answers in the user's voice, each ≤ 120 words. Calls are often transcribed and auto-summarized for people who were not on them; each answer carries one concrete fact that survives the summary.
-- **Metric defense**: for each number on the CV sent to this company, the one-sentence answer to "how did you measure that, and what was yours?" Pull from the tailored CV's post-CV §C.
+- **Top 8 likely first-call questions** with draft answers in the user's voice, each ≤ 120 words. Calls are often transcribed and auto-summarized for people who were not on them; each answer carries one concrete fact that survives the summary. When `career-evidence/` exists, build each answer from the mapped story card in `interview-question-map.md` (answer, me, context, decision, check, result) instead of from scratch, and name the card (S4) so the user can rehearse the long version.
+- **Ownership line**: the one sentence from `ownership-audit.md` for "what did you personally own?", if that file exists. It is the question most likely to follow any project answer.
+- **Metric defense**: for each number on the CV sent to this company, the one-sentence answer to "how did you measure that, and what was yours?" Pull from the tailored CV's post-CV §C. If this company saw an older, corrected form of a number, put the correction line first.
 - **Salary expectation**, two branches (see [REFERENCE.md — Voice rules](REFERENCE.md#voice-rules)): range posted → anchor in the upper half of it; no range → ask the user for their range, never guess, and prep a line asking them to share the band first.
 - **Gaps and risks**: JD requirements the master does not cover, with honest framings.
 - **Consistency and authenticity check**: CV and LinkedIn dates and titles match exactly (run `linkedin-align` if unsure), camera on for the first video call, a verifiable reference or public trail ready. Employers now screen remote candidates for identity fraud (DOJ and FBI have issued alerts on fake remote IT workers), and an ID check or a "move your camera" request is standard process, not an accusation. A genuine candidate clears these by being consistent.
@@ -199,6 +209,25 @@ Steps:
 7. **Report** as a findings list (consistency first, then discoverability), each with the proposed text. Write nothing to LinkedIn. The user edits the profile; this mode only drafts.
 
 Do not claim to know LinkedIn's live ranking weights. They are not public; coach consistency and search-term coverage, not "beating the algorithm".
+
+### evidence — career evidence and interview stories
+
+Answers "what can I prove I did, and how do I tell it in 90 seconds?" Builds `<dir>/career-evidence/` from the user's real work: git history, PRs and review threads, design docs, PM-tool threads, production data and coding-agent transcripts. Run it before a final round, after a rejection with feedback, or when the master has grown faster than anyone has checked it. Full method in [STORIES.md](STORIES.md); read it first.
+
+Read-only on every source. The only writes are inside `career-evidence/`. The CV is never edited by this mode; proposed changes go in `cv-audit.md`, and the user applies them or asks you to.
+
+Steps:
+
+1. **Scope and identity.** Ask which employers, repos and date range to cover, and any interview feedback to answer (quote it at the top of the readiness file). Collect the user's verified git identities; attribute nothing to an ambiguous name.
+2. **Gather and catalog** (STORIES.md Steps 1 and 2). One `E-NN` entry per piece of work, every claim labeled VF / RI / UR with a reference. Search beyond git: PM threads (including cached tool results in old agent transcripts), production ledgers and logs, agent transcripts for proposals the user rejected.
+3. **Ownership audit** (Step 3): four columns per project and one defensible ownership sentence.
+4. **Provenance and status** (Steps 4 and 5): for every number on the master, the source, sample, environment and date; re-derive any ratio that came from a smoke test. Every item gets a status as of a date.
+5. **Story bank** (Step 6): 12 to 20 A-to-H cards with a coverage table; make sure the eight named story types are covered or listed as missing. For AI-native targets, grade "agent was wrong" cases separately.
+6. **Question map** (Step 7): framework, question to story map, honest-boundary lines, follow-up drills.
+7. **CV audit** (Step 8): Fix / Tighten / OK per claim in the master and in every CV a live process has seen, plus overlooked accomplishments. For each corrected claim, a correction pack sorted by priority and the correction line.
+8. **Open questions** (Step 9): ask them one at a time with context and a suggested answer; record answers and update the other files in the same turn.
+9. **Readiness assessment**: per competency area, the strongest evidence, weakest point, and what to do, in hours. No numeric scores. Separate what a side project can close from what it can't.
+10. **Report** in the chat: the three findings most likely to have cost the user an offer, the top five fixes ranked by expected value, and the open questions. Offer to apply the CV diff; don't apply it unasked.
 
 ## Gap ledger
 
@@ -308,6 +337,7 @@ Show a diff or preview before every write. Wait for explicit user confirmation. 
 - [EXAMPLES.md](EXAMPLES.md) — sample tailored CV and sample screen-prep pack
 - [verify-pdf.py](verify-pdf.py) — post-render check that a PDF extracts as text (ligatures, leaked review markers, glued words, AI-screener injection, partial last page)
 - [EVIDENCE.md](EVIDENCE.md) — sources and confidence behind the rules, from the 2026-09 research pass; read before changing a rule
+- [STORIES.md](STORIES.md) — `evidence` mode method: identity, evidence catalog, ownership audit, metric provenance, status, story cards, question map, correction propagation
 
 ## Humanize the written prose (if available)
 
