@@ -88,6 +88,16 @@ Evidence deserts (practitioner opinion only): framing non-quantifiable engineeri
 
 No study supports a specific answer length; the 120-word cap is a practical proxy.
 
+## Interview stories (`evidence` mode)
+
+| Claim | Tier | Status | Source |
+|---|---|---|---|
+| Structured, behavioral interviews ask for specific past situations, so prepared, specific stories are what gets scored | T1 | follows from the .42 validity finding above | Sackett et al. (2022) |
+| An interviewer's feedback on a rejected senior AI-native candidate: personal ownership unclear, no concrete "agent was wrong and I caught it" case, long indirect answers | n=1 | first-hand, November 2026 | the case that produced STORIES.md |
+| In that audit, git and production data contradicted three CV claims (ownership scope, a cost ratio, a provider claim) that the candidate believed true | n=1 | verified against commits and a billing ledger | same audit |
+
+Everything in [STORIES.md](STORIES.md) beyond the first row is convention built on one well-documented case, not research. The answer-first framework and the ownership ladder are labeled as practice. The rule that carries the weight, "never claim more than the evidence shows", needs no study: the cost of being caught is a lost offer, the cost of precision is a slightly smaller-sounding bullet.
+
 ## LinkedIn
 
 | Claim | Tier | Status | Source |
