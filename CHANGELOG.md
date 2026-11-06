@@ -3,6 +3,7 @@
 All notable changes to this collection are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); the collection follows [SemVer](https://semver.org). See [VERSIONING.md](VERSIONING.md) for the per-skill vs collection model.
 
 ## [Unreleased]
+- brag-doc 0.4.0: shipped lines carry ownership, status-as-of-date and refs tags; numbers carry their measurement method; new Caught and Story seeds fields; new compile stories target that drafts story cards in cv-craft's format.
 - cv-craft 0.5.0: new evidence mode (STORIES.md) that audits git, PRs, tickets and production data into an evidence catalog, ownership audit, story bank and question map; rule 5 (never claim more ownership, status or certainty than the evidence shows); tailor and screen-prep read career-evidence/ when present.
 - `pr-craft` 0.4.0: the size gate blocks, and above 800 lines it stops with the reading and the layer cut until the user decides; size is measured against origin/<target branch>; a stack is always a GitHub stack, with `gh stack link` for layers that already exist
 

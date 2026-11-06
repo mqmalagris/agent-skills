@@ -1,7 +1,7 @@
 {
   "name": "brag-doc",
-  "version": "0.3.0",
-  "description": "Maintain a monthly brag document and roll it up into a promo packet, self-review, or CV material. Lucas Faria's 4-field template + Julia Evans' impact-first categories. Feeds cv-craft.",
+  "version": "0.4.0",
+  "description": "Maintain a monthly brag document and roll it up into a promo packet, self-review, CV material or interview story seeds. Lucas Faria's 4-field template + Julia Evans' impact-first categories, with ownership, status, evidence and story seeds recorded each month. Feeds cv-craft.",
   "author": {
     "name": "Matheus Malagris",
     "url": "https://github.com/mqmalagris"
@@ -15,6 +15,7 @@
     "self-review",
     "promotion",
     "cv-source",
+    "interview-stories",
     "career"
   ]
 }

@@ -131,23 +131,6 @@
       ]
     },
     {
-      "name": "brag-doc",
-      "source": "./skills/brag-doc",
-      "description": "Maintain a monthly brag document and roll it up into a promo packet, self-review, or CV material. Lucas Faria's 4-field template + Julia Evans' impact-first categories. Feeds cv-craft.",
-      "version": "0.3.0",
-      "author": {
-        "name": "Matheus Malagris"
-      },
-      "category": "career",
-      "keywords": [
-        "brag-document",
-        "career",
-        "self-review",
-        "promotion",
-        "cv-source"
-      ]
-    },
-    {
       "name": "portfolio-sync",
       "source": "./skills/portfolio-sync",
       "description": "Sync the current project into a central project-portfolio Markdown archive. Source data for cv-craft.",
@@ -541,6 +524,24 @@
         "ats",
         "job-search",
         "interview-prep"
+      ]
+    },
+    {
+      "name": "brag-doc",
+      "source": "./skills/brag-doc",
+      "description": "Maintain a monthly brag document and roll it up into a promo packet, self-review, CV material or interview story seeds. Lucas Faria's 4-field template + Julia Evans' impact-first categories, with ownership, status, evidence and story seeds recorded each month. Feeds cv-craft.",
+      "version": "0.4.0",
+      "author": {
+        "name": "Matheus Malagris"
+      },
+      "category": "career",
+      "keywords": [
+        "brag-document",
+        "career",
+        "self-review",
+        "promotion",
+        "cv-source",
+        "interview-stories"
       ]
     }
   ]
